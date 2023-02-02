@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>清水泥沙</title>
+    <link>https://869413421.github.io/</link>
+    <description>Recent content on 清水泥沙</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-zh</language>
+    <lastBuildDate>Thu, 02 Feb 2023 14:57:24 +0800</lastBuildDate><atom:link href="https://869413421.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>第一篇文章</title>
+      <link>https://869413421.github.io/post/fisrt-post/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/fisrt-post/</guid>
+      <description>测试一下吧</description>
+    </item>
+    
+  </channel>
+</rss>
