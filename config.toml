@@ -5,6 +5,11 @@ theme = "paper"
 
 # disqusShortname = 'YOUR_DISQUS_SHORTNAME'   # use disqus comments
 
+[taxonomies]
+  tag = "tags"
+  series = "series"
+  category = "categories"
+
 [params]
   # color style
   color = 'light'                           # linen, wheat, gray, light
@@ -27,3 +32,27 @@ theme = "paper"
   monoDarkIcon = true                       # show monochrome dark mode icon
   #gravatarCdn = 'GRAVATAR_CDN_LINK'         # e.g. 'https://cdn.v2ex.com/gravatar/'
   #graphCommentId = "YOUR_GRAPH_COMMENT_ID"  # use graph comment (disqus alternative)
+
+[[menu.main]]
+    identifier = "about"
+    pre = ""
+    name = "个人简历"
+    url = "/about"
+    title = ""
+    weight = 4	
+    
+[[menu.main]] 
+	identifier = "categories" 
+	pre = "" 
+	name = "分类" 
+	url = "/categories" 
+	title = "" 
+	weight = 3
+	
+[[menu.main]] 
+	identifier = "tags" 
+	pre = "" 
+	name = "标签" 
+	url = "/tags" 
+	title = "" 
+	weight = 2

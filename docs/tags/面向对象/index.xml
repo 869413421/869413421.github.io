@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on 清水泥沙</title>
-    <link>https://869413421.github.io/post/</link>
-    <description>Recent content in Posts on 清水泥沙</description>
+    <title>面向对象 on 清水泥沙</title>
+    <link>https://869413421.github.io/tags/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/</link>
+    <description>Recent content in 面向对象 on 清水泥沙</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-zh</language>
-    <lastBuildDate>Thu, 02 Feb 2023 14:57:24 +0800</lastBuildDate><atom:link href="https://869413421.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 02 Feb 2023 14:57:24 +0800</lastBuildDate><atom:link href="https://869413421.github.io/tags/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>面向对象的六大原则（单一职责原则）</title>
       <link>https://869413421.github.io/post/single/</link>
