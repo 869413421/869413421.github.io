@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>c# on 清水泥沙</title>
+    <link>https://869413421.github.io/categories/c#/</link>
+    <description>Recent content in c# on 清水泥沙</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-zh</language>
+    <lastBuildDate>Tue, 07 Feb 2023 15:52:40 +0800</lastBuildDate><atom:link href="https://869413421.github.io/categories/c#/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>c#操作redis</title>
+      <link>https://869413421.github.io/post/c_redis/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/c_redis/</guid>
+      <description>Redis是什么？ redis是一个开源的，面向键/值对的NOSQL的分布式数据库系统
+NOSQL指的是非关系型的数据，简单直白地讲就是在非关系型的数据库中不存在表的概念，而是以键值对的方式，
+即一个KEY关联一个值的方式进行存储。
+redis是一个纯粹为应用而生的高性能数据库系统，非常适合用于持久储存，适应高并发等业务情景。
+顺便提一下，redis是一个单线程的程序
+redis是单线程的程序，为什么会这么快 1.大量的线程导致的线程切换开销
+2.不存在非必要的内存浪费（因为redis是即使申请内存的，数据多大申请存储的内存就多大）
+3.数据结构多样但只做自己的事情。（这样说有点模糊。。）
+redis能存储的五种数据类型 1.string（字符串）
+public ActionResult Index() {
+//创建一个指向服务器Redis连接var Client = new RedisClient(&amp;quot;127.0.0.1&amp;quot;, 6370);//将一个集合存储在服务器上，存储的类型为string//因为在向服务器存储的过程中Redis会将存储的数据序列化为JSON数据，所以在Redis中存储的数据本质是一个字符串var UserList = UserInfoService.LoadEntities(u =&amp;gt; u.DelFlag == 1).ToList();Client.Set&amp;lt;List&amp;lt;UserInfo&amp;gt;&amp;gt;(&amp;quot;UserList&amp;quot;, UserList);//获取一个key中的值，和存储的时候一样，读取的时候会对Redis中的数据反序列化。List&amp;lt;UserInfo&amp;gt; List = Client.Get&amp;lt;List&amp;lt;UserInfo&amp;gt;&amp;gt;(&amp;quot;UserList&amp;quot;);var temp = from s in Listselect new{Id=s.ID,Name=s.UName,CreateTime=s.SubTime};return Json(temp);}从代码中可以推断当redis内部进行存取所做的序列化和反序列化步骤必定会造成一定的性能损耗，虽然对redis来说影响微乎其微，
+但对于某些特殊业务场景下可能造成更加量级的影响，所以我们可以使用hash来进行无需序列化的存储。（仅仅是一个菜鸡的认知，如果大神有幸读到本篇文章请批评我的无知。。）
+2.hash（哈希）
+3.list（包含队列，栈的双向链表） 数据结构
+Client.PushItemToList(&amp;ldquo;Item&amp;rdquo;, &amp;ldquo;111&amp;rdquo;); ///redis中的栈操作，和队列操作无异
+后面会做一个分布式缓存的列子。 4.set（无序列表）* 使用并集和交集能满足的一些业务场景，列如新浪微博中两个用户共同的粉丝。
+5.zset(有序列表) 两种持久化存储方式 1.</description>
+    </item>
+    
+  </channel>
+</rss>

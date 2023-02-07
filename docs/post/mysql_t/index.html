@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>MySql（事务，锁） - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="事务是什么 事务是数据库一个不可以分隔的操作序列。在事务中执行的操作，会使结果从一个一致性状态到达另一个一致性状态。要么是产生操作结果，要么就是不产生结果
+事务的四个特性（ACID） 原子性：一个事务是是一个执行单位，它要么就是全部执行，要么就是全部不执行。 一致性：事务执行的前后，多个事务对数据的读取是一致的。 隔离性：并发访问数据库是，一个事务中读取的数据是不受其他事务所影响的。 持久性：一个事务在提交之后，他作出的改变是持久的。 脏读 在一个事务中更新了一部分数据，这个时候另外一个事务读取了这一部分数据。而这个时候，第一个事务中回滚了数据，第二个事务中读取到的数据就是错误的了，这就是脏读。 幻读 在一个事务当中，两次查询的数据行数不一致。原因可能是在第一次读取后另外一个事务又插入了几行数据。 不可重复读 在一个事务当中，由于在两次查询中有另外一个事务更新了数据，所以导致两次查询的数据不一致。 事务隔离级别 READ-UNCOMMITTED(读取未提交)： 读取尚未提交的数据，可能造成脏读，幻读，不可重复读
+READ-COMMITTED(读取已提交)： 读取已经提交的事务数据，能防止数据脏读，但仍然有可能会幻读，不可重复度。
+REPEATABLE-READ(可重复读) 对数据同一个字段读取是保持一致的，当够避免脏读和不可重复读，但幻读依然可能存在。
+SERIALIZABLE(可串行化)： 事务最高隔离级别，允许事务串行化，完成一个事务再继续下一个事务。所有事务都是逐个执行，可以避免脏读，幻读，不可重复读。
+MySql事务的隔壁界别是REPEATABLE-READ（可重复读），MySql的事务机制是基于锁机制和并发调度实现的，隔离级别越低，使用的锁就越少。InnoDB 存储引擎在 分布式事务 的情况下一般会用到**SERIALIZABLE(可串行化)**隔离级别。
+隔离级别与锁的关系 在READ-UNCOMMITTED(读取未提交)隔离级别下，数据不会进行加锁。 在READ-COMMITTED(读取已提交)隔离级别下，会加共享锁，语句执行完之后就会释放锁。 在REPEATABLE-READ(可重复读)，在读操作下会加共享锁，并且在事务结束之后才会进行释放。 SERIALIZABLE(可串行化)，会锁定整个范围的键，并且一直到事务结束。 锁粒度 在关系型数据库中，锁粒度一共有三种。
+表级锁（table-level-locking） 表级锁是粒度最大的锁表方式，表示对当前操作的整张表进行加锁。锁资源消耗较少，MyIsAm和InnoDb都支持表级锁。
+特点 开销小，加锁快。不会出现死锁，但是锁冲突率高，同时并发能力低。 行级锁（row-level-locking） 行级锁是颗粒度最小的锁表方式，它只会对当前操作的的记录进行锁定。行级锁，分为共享锁和排他锁。
+特点 开销大，加锁慢。会出现死锁，锁冲突率低，并发能力高。 页级别锁 页级别锁，是表级别和行级别的一种折中方案。他会锁定当前操作的数据相邻的一组数据。
+特点 开销和加锁时间介于行级和表级之间，会出现死锁，并发能力一般 共享锁与排他锁 共享锁：共享锁能同时存在多个，对数据加上共享锁之后，其他事务只能加共享锁对数据进行读取而不能进行修改。 排它锁 锁定的数据只能有一个排它锁，排他锁与其他类型的锁互斥，锁定的数据不能被其他操作进行读取或修改。 乐观锁和悲观锁 悲观锁： 假设数据冲突一定会发生，屏蔽掉一切可能违反数据完整性的操作，事务开启直接将数据锁死，直到事务完成。
+乐观锁 ：假设数据冲突一定不会发生，只在最后持久化之前对数据完整性进行检查，如果不一致取消操作。" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="MySql（事务，锁）" />
+<meta property="og:description" content="MySql（事务，锁）" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/mysql_t/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="MySql（事务，锁）">
+<meta itemprop="description" content="MySql（事务，锁）"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="54">
+<meta itemprop="keywords" content="MySQL,数据库," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="MySql（事务，锁）"/>
+<meta name="twitter:description" content="MySql（事务，锁）"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">MySql（事务，锁）</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h3 id="事务是什么">事务是什么</h3>
+<p>事务是数据库一个不可以分隔的操作序列。在事务中执行的操作，会使结果从一个一致性状态到达另一个一致性状态。要么是产生操作结果，要么就是不产生结果</p>
+<h3 id="事务的四个特性acid">事务的四个特性（ACID）</h3>
+<ul>
+<li>原子性：一个事务是是一个执行单位，它要么就是全部执行，要么就是全部不执行。</li>
+<li>一致性：事务执行的前后，多个事务对数据的读取是一致的。</li>
+<li>隔离性：并发访问数据库是，一个事务中读取的数据是不受其他事务所影响的。</li>
+<li>持久性：一个事务在提交之后，他作出的改变是持久的。</li>
+</ul>
+<h3 id="脏读">脏读</h3>
+<ul>
+<li>在一个事务中更新了一部分数据，这个时候另外一个事务读取了这一部分数据。而这个时候，第一个事务中回滚了数据，第二个事务中读取到的数据就是错误的了，这就是脏读。</li>
+</ul>
+<h3 id="幻读">幻读</h3>
+<ul>
+<li>在一个事务当中，两次查询的数据行数不一致。原因可能是在第一次读取后另外一个事务又插入了几行数据。</li>
+</ul>
+<h3 id="不可重复读">不可重复读</h3>
+<ul>
+<li>在一个事务当中，由于在两次查询中有另外一个事务更新了数据，所以导致两次查询的数据不一致。</li>
+</ul>
+<h3 id="事务隔离级别">事务隔离级别</h3>
+<ul>
+<li>
+<p><strong>READ-UNCOMMITTED(读取未提交)：</strong> 读取尚未提交的数据，可能造成脏读，幻读，不可重复读</p>
+</li>
+<li>
+<p><strong>READ-COMMITTED(读取已提交)：</strong> 读取已经提交的事务数据，能防止数据脏读，但仍然有可能会幻读，不可重复度。</p>
+</li>
+<li>
+<p><strong>REPEATABLE-READ(可重复读)</strong> 对数据同一个字段读取是保持一致的，当够避免脏读和不可重复读，但幻读依然可能存在。</p>
+</li>
+<li>
+<p><strong>SERIALIZABLE(可串行化)：</strong> 事务最高隔离级别，允许事务串行化，完成一个事务再继续下一个事务。所有事务都是逐个执行，可以避免脏读，幻读，不可重复读。</p>
+<p>MySql事务的隔壁界别是REPEATABLE-READ（可重复读），MySql的事务机制是基于锁机制和并发调度实现的，隔离级别越低，使用的锁就越少。InnoDB 存储引擎在 <strong>分布式事务</strong> 的情况下一般会用到**SERIALIZABLE(可串行化)**隔离级别。</p>
+</li>
+</ul>
+<h3 id="隔离级别与锁的关系">隔离级别与锁的关系</h3>
+<ul>
+<li>在READ-UNCOMMITTED(读取未提交)隔离级别下，数据不会进行加锁。</li>
+<li>在READ-COMMITTED(读取已提交)隔离级别下，会加共享锁，语句执行完之后就会释放锁。</li>
+<li>在REPEATABLE-READ(可重复读)，在读操作下会加共享锁，并且在事务结束之后才会进行释放。</li>
+<li>SERIALIZABLE(可串行化)，会锁定整个范围的键，并且一直到事务结束。</li>
+</ul>
+<h3 id="锁粒度">锁粒度</h3>
+<p>在关系型数据库中，锁粒度一共有三种。</p>
+<ul>
+<li>
+<p><strong>表级锁（table-level-locking）</strong>
+表级锁是粒度最大的锁表方式，表示对当前操作的整张表进行加锁。锁资源消耗较少，MyIsAm和InnoDb都支持表级锁。</p>
+<ul>
+<li>特点
+开销小，加锁快。不会出现死锁，但是锁冲突率高，同时并发能力低。</li>
+</ul>
+</li>
+<li>
+<p><strong>行级锁（row-level-locking）</strong>
+行级锁是颗粒度最小的锁表方式，它只会对当前操作的的记录进行锁定。行级锁，分为共享锁和排他锁。</p>
+<ul>
+<li>特点
+开销大，加锁慢。会出现死锁，锁冲突率低，并发能力高。</li>
+</ul>
+</li>
+<li>
+<p><strong>页级别锁</strong>
+页级别锁，是表级别和行级别的一种折中方案。他会锁定当前操作的数据相邻的一组数据。</p>
+<ul>
+<li>特点
+开销和加锁时间介于行级和表级之间，会出现死锁，并发能力一般</li>
+</ul>
+</li>
+</ul>
+<h3 id="共享锁与排他锁">共享锁与排他锁</h3>
+<ul>
+<li><strong>共享锁</strong>：共享锁能同时存在多个，对数据加上共享锁之后，其他事务只能加共享锁对数据进行读取而不能进行修改。</li>
+<li><strong>排它锁</strong> 锁定的数据只能有一个排它锁，排他锁与其他类型的锁互斥，锁定的数据不能被其他操作进行读取或修改。</li>
+</ul>
+<h3 id="乐观锁和悲观锁">乐观锁和悲观锁</h3>
+<ul>
+<li>
+<p><strong>悲观锁</strong>： 假设数据冲突一定会发生，屏蔽掉一切可能违反数据完整性的操作，事务开启直接将数据锁死，直到事务完成。</p>
+</li>
+<li>
+<p><strong>乐观锁</strong> ：假设数据冲突一定不会发生，只在最后持久化之前对数据完整性进行检查，如果不一致取消操作。</p>
+</li>
+</ul>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/mysql"
+      >MySQL</a
+    >
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93"
+      >数据库</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/laravel/"
+      ><span class="mr-1.5">←</span><span>laravel中使用自定义的Common类</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/mysql_search/"
+      ><span>MySql（查询优化）</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -8,6 +8,34 @@
     <language>en-zh</language>
     <lastBuildDate>Thu, 02 Feb 2023 14:57:24 +0800</lastBuildDate><atom:link href="https://869413421.github.io/categories/%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>PHP中的traits快速入门</title>
+      <link>https://869413421.github.io/post/php_traits/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/php_traits/</guid>
+      <description>traits 在学习PHP的过程中，我们经常会翻阅PHP的官方手册。一般理解能力强悍的人多阅读几遍便可轻松理解其中要领，但往往更多的初学者对官方文档中寥寥数语的描述难以理解。作为一个曾有同样困扰的人，我的经验是遇到这种情况的时候，首先使用搜索引擎翻阅他人分享的学习成果，当知其一二有了概念以后随手写下一些文档，方便巩固知识，日后在工作中有需要时再去深入细节。
+traits是什么？ 首先我们先对这个知识有一个基本的概念，你可以先将traits理解成类似include用于代码复用的技术，include针对的是一个类或者其他文件，而traits则是一个针对方法结构的技术，我们使用use关键字就可以将结构体引用到当前的class当中。
+需求 图中一共存在五个类，分别是基类A以及其子类BCD和一个完全独立的E类，我们有两个方法getSum,getSub。我们需要在B，C，E中同时包含这两个方法，但D类中不包含。
+这时候，我们第一个想法大都会是
+1.在B，C，E中复制同样的代码实现这两个方法。
+2.定义一个接口让B,C,E去实现。
+在没有traits之前可能我们大部分人正是如此去实现需求，不管哪种方法最终的方式都是复制代码重用。
+然而这些方式的弊端是
+1.繁复的复制工作造成的代码冗余。
+2.不具备灵活性当需要添加新的方法时每个地方都要修改，难以维护。
+traits的出现正是为了解决上述问题
+如何使用traits 使用traits的方式很简单，和我们定义类的方式相像，除了关键字以为其余一致。
+当定义好一个结构体后我们只需要在类里面使用use关键字进行调用，根据我们上面的需求我们在B,C,E中分别use myCode这个tratis
+在代码中我们分在每个类中调用了我们定义的方法结构，从而我们不需要在每个类中对方法进行描述，因为程序已经将tratis中的方法自动添加到了每一个类中，这样我们就见面了各种手动繁复的操作，而如果程序后期需要对这几个类拓展的时候只需要对定义的tratis进行修改就可以达到预设的目的，极大地提交了可维护性。
+运行这段代码的返回结果为：
+最终我们的程序结构如下
+这样我们就算是对tratis进行了一个简单入门，但应该已经满足我们日常开发的需求；
+如果你需要深入了解更多细节可以参阅一下文章
+1.https://blog.csdn.net/qq_16142851/article/details/80437560
+2.https://segmentfault.com/a/1190000008009455</description>
+    </item>
+    
+    <item>
       <title>面向对象的六大原则（单一职责原则）</title>
       <link>https://869413421.github.io/post/single/</link>
       <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>

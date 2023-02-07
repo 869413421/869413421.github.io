@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>MySql（查询优化） - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="mysql数据类型 (1) 整数类型
+① tinyint
+② smallint
+③ mediumint
+④ int
+⑤ bigint
+(2) 实数类型
+① float
+② double
+③ decimal 可以存储比bigint还大的整数，可以用于存储精确的小数点
+(3) 字符串类型
+① varchar 可变长度的字符串类型，对于经常变更的数据char比varchar更好，char不容易产生碎片
+② char 定长字符串类型，对于较短的数据varchar存储空间更有效率
+③ blob
+④ text 查询回使用临时表导致严重的性能开销
+(4) 枚举
+① 有时可以把常用的字符串替换成枚举类型
+② 把不重复的集合存储成一个预定义的集合
+③ 尽量避免使用数字作为enum作为常量，容易混乱
+(5) 日期类型
+① timestamp 存储的是整形，相对空间效率更高
+② Datetime
+(6) 列属性
+① auto_increment自增
+② default 默认值
+③ not null 非空
+④ zerofill 无符号填充
+索引 (1) 索引对性能的影响
+① 减少数据检索数量" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="MySql（查询优化）" />
+<meta property="og:description" content="MySql（查询优化）" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/mysql_search/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="MySql（查询优化）">
+<meta itemprop="description" content="MySql（查询优化）"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="171">
+<meta itemprop="keywords" content="MySQL,数据库," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="MySql（查询优化）"/>
+<meta name="twitter:description" content="MySql（查询优化）"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">MySql（查询优化）</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><ol>
+<li>mysql数据类型</li>
+</ol>
+<p>(1) 整数类型</p>
+<p>① tinyint</p>
+<p>② smallint</p>
+<p>③ mediumint</p>
+<p>④ int</p>
+<p>⑤ bigint</p>
+<p>(2) 实数类型</p>
+<p>① float</p>
+<p>② double</p>
+<p>③ decimal 可以存储比bigint还大的整数，可以用于存储精确的小数点</p>
+<p>(3) 字符串类型</p>
+<p>① varchar 可变长度的字符串类型，对于经常变更的数据char比varchar更好，char不容易产生碎片</p>
+<p>② char 定长字符串类型，对于较短的数据varchar存储空间更有效率</p>
+<p>③ blob</p>
+<p>④ text 查询回使用临时表导致严重的性能开销</p>
+<p>(4) 枚举</p>
+<p>① 有时可以把常用的字符串替换成枚举类型</p>
+<p>② 把不重复的集合存储成一个预定义的集合</p>
+<p>③ 尽量避免使用数字作为enum作为常量，容易混乱</p>
+<p>(5) 日期类型</p>
+<p>① timestamp 存储的是整形，相对空间效率更高</p>
+<p>② Datetime</p>
+<p>(6) 列属性</p>
+<p>① auto_increment自增</p>
+<p>② default 默认值</p>
+<p>③ not null 非空</p>
+<p>④ zerofill 无符号填充</p>
+<ol start="2">
+<li>索引</li>
+</ol>
+<p>(1) 索引对性能的影响</p>
+<p>① 减少数据检索数量</p>
+<p>② 帮助服务器减少排序和临时表</p>
+<p>③ 将随机IO变成顺序IO</p>
+<p>(2) 查询优化</p>
+<p>① 开启慢SQL日志</p>
+<p>② 使用show profile查看SQL耗时</p>
+<p>③ 使用 show state 计数器</p>
+<p>④ 使用 show processlist查看线程正常状态</p>
+<p>⑤ 使用 explian分析单个SQL</p>
+<p>(3) 优化查询过程中的数据访问</p>
+<p>① 确定是否在查询大量数据导致性能下降</p>
+<p>② 确认是否检索过多的列和行</p>
+<p>③ 确认是否在分析大量不必要的数据行</p>
+<p>④ 避免使用如下SQL</p>
+<ol>
+<li>查询不必要的行数，使用limit</li>
+<li>多表关联返回所有的列，指定需要的列</li>
+<li>总是取出全部的列，select *会无法完成索引覆盖，需要进行回表查询</li>
+</ol>
+<p>⑤ 重复查询相同的数据使用缓存</p>
+<p>⑥ 是否扫描额外的记录</p>
+<ol>
+<li>使用explain进行分析，如果发现扫码大量数据但是只返回少数的行</li>
+</ol>
+<p>a. 使用索引覆盖，创建适合索引的索引</p>
+<p>b. 修改表结构，可以使用冗余的字段避免连接查询。</p>
+<p>c. 重写SQL语句，让优化器可以更优的方式执行查询</p>
+<p>(4) 优化长难的查询语句</p>
+<p>① 一个复杂查询还是多个简单查询</p>
+<ol>
+<li>MYSQL内部能每秒扫码大量的数据，但响应数据要慢得多，使用尽量少的查询是好的，但有时候可以根据业务需要将一个大的查询分为多个小查询也是必要的</li>
+</ol>
+<p>② 切分查询</p>
+<ol>
+<li>将一个大的查询分为多个小的查询</li>
+</ol>
+<p>a. 一次性删除1000万条数据比一次删除一万条数据，开销更大</p>
+<p>③ 分解关联查询</p>
+<ol>
+<li>将一条关联语句分解成多条的SQL来执行，缓存效率更高，也可以减少所的竞争</li>
+</ol>
+<p>(5) 优化特定类型的查询语句</p>
+<p>① 优化count（）查询</p>
+<ol>
+<li>count(*)会忽略所有的列，直接统计所有列数。尽量不使用count(列名)</li>
+<li>增加数据统计汇总表</li>
+<li>为汇总表做缓存</li>
+</ol>
+<p>② 优化关联查询</p>
+<ol>
+<li>确定on或者using子句中的列有索引</li>
+<li>确保group by order by 只有一个列，否则可能不使用索引</li>
+</ol>
+<p>③ 优化子查询</p>
+<ol>
+<li>使用关联查询替代</li>
+</ol>
+<p>④ 优化group by 和distinct</p>
+<ol>
+<li>使用索引来进行优化</li>
+<li>group by 不需要排序的时候加一个order by null ，MySQL不会再进行文件排序</li>
+<li>可以使用程序处理代替group by</li>
+</ol>
+<p>⑤ Limit 分页</p>
+<ol>
+<li>limit偏移量大，查询效率低</li>
+</ol>
+<p>a. 记录上一次查询的最大ID，使用where大于ID来进行查询</p>
+<p>⑥ 优化union查询</p>
+<ol>
+<li>使用union all优化</li>
+</ol>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/mysql"
+      >MySQL</a
+    >
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93"
+      >数据库</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/mysql_t/"
+      ><span class="mr-1.5">←</span><span>MySql（事务，锁）</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/mysql/"
+      ><span>MySql（系统基础篇）</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>redis on 清水泥沙</title>
+    <link>https://869413421.github.io/tags/redis/</link>
+    <description>Recent content in redis on 清水泥沙</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-zh</language>
+    <lastBuildDate>Tue, 07 Feb 2023 17:06:10 +0800</lastBuildDate><atom:link href="https://869413421.github.io/tags/redis/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Redis（底层和应用）</title>
+      <link>https://869413421.github.io/post/redis/</link>
+      <pubDate>Tue, 07 Feb 2023 17:06:10 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/redis/</guid>
+      <description>参考 https://mp.weixin.qq.com/s/_W9ny6l3-JqQ_SWm9ACtqg
+Redis的数据类型 String 用途 简单的key-value储存 setnx key value 配合set ex 实现分布式锁 计数器（原子性） 分布式全局唯一ID 底层 C语言中的String用char[]数组表示，源码中的用SDS封装char数组，这是Redis最少的存储单元，一个SDS可以最大存储512兆信息 Redis对SDS再次封装生成了RedisObject，主要有两个核心作用 声明存储的是那种类型的数据 存储指向SDS的指针 当你执行set key value 时，其实redis会创建两个RedisObject 对象，一个是key的redisObject,一个是value的RedisObject，并且指定type为REDIS_STRING，而SDS分别存储key的值，和value的值。 Redis底层对SDS进行了优化 SDS修改后大小&amp;gt;1M时，系统会进行一个空间预分配 SDS是惰性释放空间的，不会马上释放内存，下次进行写操作时，会利用已开辟空间，不会重新申请 List list的底层是一个双向链表，最大长度为2^32-1。常用的组合有
+lpush+lpop=stack 先进后出的栈 lpush+rpop=queue 先进先出的队列 lpush+ltrim =capped collection 有限集合 lpush+brpop = message queue 消息队列 一般可以用来做一些简单的消息队列，数据量小的的时候可以用独有的压缩队列来提升性能
+Hash hash适合将一些关联的聚合数据放在一起，比如用户信息，用户的购物车等一些数据。
+hash的底层是一个字典集合，整体是层层封装的。从下到上的层级顺序为
+dictEntry 这是真正存储数据的节点，包含key-value和next节点,是一个链表节点 dictht 一个dictEntry类型的数组 数组的长度size sizemask等于size-1 当前数组中含多少个节点 dict dictType 类型，包括一些自定义函数，这些函数使得 key 和 value 能够存储 rehashidx 其实是一个标志量，如果为-1说明当前没有扩容，如果不为 -1 则记录扩容位置； dictht数组，两个Hash表； iterators 记录了当前字典正在进行中的迭代器。 整体结构 渐进式扩容 dictht为何存在两个？</description>
+    </item>
+    
+    <item>
+      <title>c#操作redis</title>
+      <link>https://869413421.github.io/post/c_redis/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/c_redis/</guid>
+      <description>Redis是什么？ redis是一个开源的，面向键/值对的NOSQL的分布式数据库系统
+NOSQL指的是非关系型的数据，简单直白地讲就是在非关系型的数据库中不存在表的概念，而是以键值对的方式，
+即一个KEY关联一个值的方式进行存储。
+redis是一个纯粹为应用而生的高性能数据库系统，非常适合用于持久储存，适应高并发等业务情景。
+顺便提一下，redis是一个单线程的程序
+redis是单线程的程序，为什么会这么快 1.大量的线程导致的线程切换开销
+2.不存在非必要的内存浪费（因为redis是即使申请内存的，数据多大申请存储的内存就多大）
+3.数据结构多样但只做自己的事情。（这样说有点模糊。。）
+redis能存储的五种数据类型 1.string（字符串）
+public ActionResult Index() {
+//创建一个指向服务器Redis连接var Client = new RedisClient(&amp;quot;127.0.0.1&amp;quot;, 6370);//将一个集合存储在服务器上，存储的类型为string//因为在向服务器存储的过程中Redis会将存储的数据序列化为JSON数据，所以在Redis中存储的数据本质是一个字符串var UserList = UserInfoService.LoadEntities(u =&amp;gt; u.DelFlag == 1).ToList();Client.Set&amp;lt;List&amp;lt;UserInfo&amp;gt;&amp;gt;(&amp;quot;UserList&amp;quot;, UserList);//获取一个key中的值，和存储的时候一样，读取的时候会对Redis中的数据反序列化。List&amp;lt;UserInfo&amp;gt; List = Client.Get&amp;lt;List&amp;lt;UserInfo&amp;gt;&amp;gt;(&amp;quot;UserList&amp;quot;);var temp = from s in Listselect new{Id=s.ID,Name=s.UName,CreateTime=s.SubTime};return Json(temp);}从代码中可以推断当redis内部进行存取所做的序列化和反序列化步骤必定会造成一定的性能损耗，虽然对redis来说影响微乎其微，
+但对于某些特殊业务场景下可能造成更加量级的影响，所以我们可以使用hash来进行无需序列化的存储。（仅仅是一个菜鸡的认知，如果大神有幸读到本篇文章请批评我的无知。。）
+2.hash（哈希）
+3.list（包含队列，栈的双向链表） 数据结构
+Client.PushItemToList(&amp;ldquo;Item&amp;rdquo;, &amp;ldquo;111&amp;rdquo;); ///redis中的栈操作，和队列操作无异
+后面会做一个分布式缓存的列子。 4.set（无序列表）* 使用并集和交集能满足的一些业务场景，列如新浪微博中两个用户共同的粉丝。
+5.zset(有序列表) 两种持久化存储方式 1.</description>
+    </item>
+    
+    <item>
+      <title>laravel&#43;Redis简单实现队列通过压力测试的高并发处理</title>
+      <link>https://869413421.github.io/post/laravel_redis/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/laravel_redis/</guid>
+      <description>秒杀活动 在一般的网络商城中我们会经常接触到一些高并发的业务状况，例如我们常见的秒杀抢购等活动，
+在这些业务中我们经常需要处理一些关于请求信息过滤以及商品库存的问题。
+在请求中比较常见的状况是同一用户发出多次请求或者包含恶意的攻击，以及一些订单的复购等情况。
+而在库存方面则需要考虑超卖这种状况。
+下面我们来模拟一个简单可用的并发处理。
+直接上代码
+代码的流程 1.模拟用户请求，将用户写入redis队列中
+2.从用户中取出一个请求信息进行处理（可以在这个步骤做更多的处理，请求过滤，订单复购等）
+3.用户下单（支付等），减少库存。下面使用了两种方式进行了处理，一种使用了Redis中单线程原子操作的特性使程序一直线性操作从而保持了数据的一致。
+另外一种是用了事务进行操作，可以根据业务进行调整，这里就不一一描述了。
+实际的业务状况更为复杂，但更多的是出于对基础思路的拓展。
+AB测试 这里我使用了apache bench对代码进行测试
+不了解的可以参阅这篇文章，有非常详细的讲解
+https://www.jianshu.com/p/43d04d8baaf7
+调用 代码中的
+AddUserToRedis() 方法将一堆请求用户放进redis队列中 先看库存
+这里我们完成了1200个请求，其中标记失败的有1199个。这个是因为apache bench会以第一个请求响应的内容作为基准，
+如果后续请求响应内容不一致会标记为失败，如果看到length中标记的数量不要方，基本可以忽略，我们的请求实际是完成了的。</description>
+    </item>
+    
+  </channel>
+</rss>

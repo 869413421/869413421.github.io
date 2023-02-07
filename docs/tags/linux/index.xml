@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>linux on 清水泥沙</title>
+    <link>https://869413421.github.io/tags/linux/</link>
+    <description>Recent content in linux on 清水泥沙</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-zh</language>
+    <lastBuildDate>Tue, 07 Feb 2023 16:52:58 +0800</lastBuildDate><atom:link href="https://869413421.github.io/tags/linux/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>linux常用命令</title>
+      <link>https://869413421.github.io/post/linux_cmd/</link>
+      <pubDate>Tue, 07 Feb 2023 16:52:58 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/linux_cmd/</guid>
+      <description>常用命令 (1) 安全类型
+① sudo 使用root 用户来执行命令
+② su 使用指定用户来执行命令
+③ chmod 修改文件权限
+④ setfacl 修改文件权限，设置文件访问列表
+(2) 进程管理
+① w 显示已经登陆用户列表
+② top 电脑性能分析工具
+③ ps 显示系统进程
+④ kill 发送信号杀死进程
+⑤ pkill	根据进程名称杀死进程
+⑥ pstree 显示进程树木
+⑦ killall 指定名称杀死所有进程
+(3) 用户管理
+① id 显示当前用户ID以及分组的ID
+② usermod 修改账号信息包括分组权限
+③ useradd	增加用户
+④ groupadd	增加分组
+⑤ userdel 删除用户
+(4) 文件系统
+① mount 挂载文件系统
+② umount 取消挂载
+③ fsck 文件修复
+④ df 查看磁盘信息</description>
+    </item>
+    
+  </channel>
+</rss>

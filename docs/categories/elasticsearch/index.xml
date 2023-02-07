@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ElasticSearch on 清水泥沙</title>
+    <link>https://869413421.github.io/categories/elasticsearch/</link>
+    <description>Recent content in ElasticSearch on 清水泥沙</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-zh</language>
+    <lastBuildDate>Tue, 07 Feb 2023 15:52:40 +0800</lastBuildDate><atom:link href="https://869413421.github.io/categories/elasticsearch/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>ElasticSearch（基础操作）</title>
+      <link>https://869413421.github.io/post/elastice2/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/elastice2/</guid>
+      <description>设置索引分片 PUT /blogs{&amp;#34;settings&amp;#34; : {//设置3个主分片&amp;#34;number_of_shards&amp;#34; : 3,//设置1个副分片&amp;#34;number_of_replicas&amp;#34; : 1}} 一个分片保存所有数据的一部分 副分片是主分片的一个拷贝备份，同时用于搜索和返回文档 主分片在索引创建时指定，不能被修改，副分片可以被修改
+使用自定义ID索引文档 PUT /{index}/{type}/{id}{&amp;#34;field&amp;#34;: &amp;#34;value&amp;#34;,...} 使用ElasticSearch生成ID索引文档 POST /{index}/{_type}/{&amp;#34;title&amp;#34;: &amp;#34;My second blog entry&amp;#34;,&amp;#34;text&amp;#34;: &amp;#34;Still trying this out...&amp;#34;,&amp;#34;date&amp;#34;: &amp;#34;2014/01/01&amp;#34;} 将请求修改为POST,URL不指定ID，Es会为文档自动生成ID
+获取一个文档 GET /{index}/{_type}/{id} 获取文档的部分字段 GET /{index}/{_type}/{id}?_source={filed}，{filed} 获取文档source GET /{index}/{_type}/{id}/_source 检测文档是否存在 XHEAD /{index}/{_type}/{id} 文档如果存在，Es会返回200 ok的响应码 如果不存在，会返回404
+更新整个文档 PUT /{index}/{_type}/{id}{&amp;#34;title&amp;#34;: &amp;#34;My first blog entry&amp;#34;,&amp;#34;text&amp;#34;: &amp;#34;I am starting to get the hang of this.</description>
+    </item>
+    
+    <item>
+      <title>ElasticSearch系列（集群内部原理）</title>
+      <link>https://869413421.github.io/post/elastice1/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/elastice1/</guid>
+      <description>空集群 ElasticSearch集群是什么？ 一个运行中的Es实例我们称之一个节点，一个集群是指由一个或多个有相同cluster.name的节点组合而成，集群中所有节点会共同负载和分担所有压力。当集群内新增或者删除节点时，集群会重新平均分配所有的数据到每个节点。
+集群的主节点 当一个运行中的节点被选举为主节点的时候，他会负责整个集群内的所有变更。例如索引的增加和删除，或者增加或删除节点。任何节点都可以成为主节点，但是主节点不会负责文档级别的管理。所以即使系统的压力怎么增加，主节点都不会成为性能的瓶颈。
+操作时需要将请求发送到集群的哪一个节点？ 因为每个节点都知道需要操作的文档所在的节点，并且节点会帮我们将请求发送到文档所在的节点当中。所以我们需要对Es进行操作时，我们可以对集群中任意一个节点进行请求。
+集群健康 有时候我们需要对集群做一些监控,命令如下 GET /_cluster/health {&amp;#34;cluster_name&amp;#34;: &amp;#34;elasticsearch&amp;#34;,&amp;#34;status&amp;#34;: &amp;#34;green&amp;#34;, &amp;#34;timed_out&amp;#34;: false,&amp;#34;number_of_nodes&amp;#34;: 1,&amp;#34;number_of_data_nodes&amp;#34;: 1,&amp;#34;active_primary_shards&amp;#34;: 0,&amp;#34;active_shards&amp;#34;: 0,&amp;#34;relocating_shards&amp;#34;: 0,&amp;#34;initializing_shards&amp;#34;: 0,&amp;#34;unassigned_shards&amp;#34;: 0} status 字段指示着当前集群在总体上是否工作正常。它的三种颜色含义如下：
+green 所有的主分片和副本分片都正常运行 yellow 所有的主分片都正常运行，但不是所有的副本分片都正常运行。 red 有主分片没能正常运行 </description>
+    </item>
+    
+  </channel>
+</rss>

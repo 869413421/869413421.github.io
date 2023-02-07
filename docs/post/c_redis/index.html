@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>c#操作redis - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="Redis是什么？ redis是一个开源的，面向键/值对的NOSQL的分布式数据库系统
+NOSQL指的是非关系型的数据，简单直白地讲就是在非关系型的数据库中不存在表的概念，而是以键值对的方式，
+即一个KEY关联一个值的方式进行存储。
+redis是一个纯粹为应用而生的高性能数据库系统，非常适合用于持久储存，适应高并发等业务情景。
+顺便提一下，redis是一个单线程的程序
+redis是单线程的程序，为什么会这么快 1.大量的线程导致的线程切换开销
+2.不存在非必要的内存浪费（因为redis是即使申请内存的，数据多大申请存储的内存就多大）
+3.数据结构多样但只做自己的事情。（这样说有点模糊。。）
+redis能存储的五种数据类型 1.string（字符串）
+public ActionResult Index() {
+//创建一个指向服务器Redis连接var Client = new RedisClient(&quot;127.0.0.1&quot;, 6370);//将一个集合存储在服务器上，存储的类型为string//因为在向服务器存储的过程中Redis会将存储的数据序列化为JSON数据，所以在Redis中存储的数据本质是一个字符串var UserList = UserInfoService.LoadEntities(u =&gt; u.DelFlag == 1).ToList();Client.Set&lt;List&lt;UserInfo&gt;&gt;(&quot;UserList&quot;, UserList);//获取一个key中的值，和存储的时候一样，读取的时候会对Redis中的数据反序列化。List&lt;UserInfo&gt; List = Client.Get&lt;List&lt;UserInfo&gt;&gt;(&quot;UserList&quot;);var temp = from s in Listselect new{Id=s.ID,Name=s.UName,CreateTime=s.SubTime};return Json(temp);}从代码中可以推断当redis内部进行存取所做的序列化和反序列化步骤必定会造成一定的性能损耗，虽然对redis来说影响微乎其微，
+但对于某些特殊业务场景下可能造成更加量级的影响，所以我们可以使用hash来进行无需序列化的存储。（仅仅是一个菜鸡的认知，如果大神有幸读到本篇文章请批评我的无知。。）
+2.hash（哈希）
+3.list（包含队列，栈的双向链表） 数据结构
+Client.PushItemToList(&ldquo;Item&rdquo;, &ldquo;111&rdquo;); ///redis中的栈操作，和队列操作无异
+后面会做一个分布式缓存的列子。 4.set（无序列表）* 使用并集和交集能满足的一些业务场景，列如新浪微博中两个用户共同的粉丝。
+5.zset(有序列表) 两种持久化存储方式 1." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="c#操作redis" />
+<meta property="og:description" content="c#操作redis" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/c_redis/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="c#操作redis">
+<meta itemprop="description" content="c#操作redis"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="248">
+<meta itemprop="keywords" content="c#,redis," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="c#操作redis"/>
+<meta name="twitter:description" content="c#操作redis"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">c#操作redis</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="redis是什么">Redis是什么？</h2>
+<p>redis是一个开源的，面向键/值对的NOSQL的分布式数据库系统</p>
+<p>NOSQL指的是非关系型的数据，简单直白地讲就是在非关系型的数据库中不存在表的概念，而是以键值对的方式，</p>
+<p>即一个KEY关联一个值的方式进行存储。</p>
+<p>redis是一个纯粹为应用而生的高性能数据库系统，非常适合用于持久储存，适应高并发等业务情景。</p>
+<p>顺便提一下，redis是一个单线程的程序</p>
+<h2 id="redis是单线程的程序为什么会这么快">redis是单线程的程序，为什么会这么快</h2>
+<p>1.大量的线程导致的线程切换开销</p>
+<p>2.不存在非必要的内存浪费（因为redis是即使申请内存的，数据多大申请存储的内存就多大）</p>
+<p>3.数据结构多样但只做自己的事情。（这样说有点模糊。。）</p>
+<h2 id="redis能存储的五种数据类型">redis能存储的五种数据类型</h2>
+<p>1.string（字符串）</p>
+<p>public ActionResult Index()
+{</p>
+<pre><code>        //创建一个指向服务器Redis连接
+        var Client = new RedisClient(&quot;127.0.0.1&quot;, 6370);
+
+        //将一个集合存储在服务器上，存储的类型为string
+        //因为在向服务器存储的过程中Redis会将存储的数据序列化为JSON数据，所以在Redis中存储的数据本质是一个字符串
+        var UserList = UserInfoService.LoadEntities(u =&gt; u.DelFlag == 1).ToList();
+        Client.Set&lt;List&lt;UserInfo&gt;&gt;(&quot;UserList&quot;, UserList);
+
+        //获取一个key中的值，和存储的时候一样，读取的时候会对Redis中的数据反序列化。
+        List&lt;UserInfo&gt; List = Client.Get&lt;List&lt;UserInfo&gt;&gt;(&quot;UserList&quot;);
+
+        var temp = from s in List
+                   select new
+                   {
+                       Id=s.ID,
+                       Name=s.UName,
+                       CreateTime=s.SubTime
+                   };
+        return Json(temp);
+    }
+</code></pre>
+<p>从代码中可以推断当redis内部进行存取所做的序列化和反序列化步骤必定会造成一定的性能损耗，虽然对redis来说影响微乎其微，</p>
+<p>但对于某些特殊业务场景下可能造成更加量级的影响，所以我们可以使用hash来进行无需序列化的存储。（仅仅是一个菜鸡的认知，如果大神有幸读到本篇文章请批评我的无知。。）</p>
+<p>2.hash（哈希）</p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<p><em>3.list（包含队列，栈的双向链表） 数据结构</em></p>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<p>Client.PushItemToList(&ldquo;Item&rdquo;, &ldquo;111&rdquo;);
+///redis中的栈操作，和队列操作无异</p>
+<ul>
+<li>后面会做一个分布式缓存的列子。
+4.set（无序列表）*</li>
+</ul>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<p>使用并集和交集能满足的一些业务场景，列如新浪微博中两个用户共同的粉丝。</p>
+<ul>
+<li>5.zset(有序列表)</li>
+</ul>
+<!-- raw HTML omitted -->
+<!-- raw HTML omitted -->
+<h2 id="两种持久化存储方式">两种持久化存储方式</h2>
+<p>1.快照方式
+当对redis中的key操作数量到达一定数值时，将数据写磁盘文件上。（默认方式）
+当操作达不到一定值时不会在磁盘存储数据，有可能造成数据丢失。
+2.AOF
+每个一个时间缎就从内存中取出数据写在磁盘上。
+性能损耗
+两种方式使用配置文件进行配置</p>
+<h2 id="使用redis完成分布式队列文件并发">使用Redis完成分布式队列（文件并发）</h2>
+<p>1.定义一个异常类来对全局异常进行捕获，将异常信息存储到redis中</p>
+<pre tabindex="0"><code>using ServiceStack.Redis;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace Ym.OA.WebApp.Models
+{
+    public class MyExceptionAttribute:HandleErrorAttribute
+    {   
+        ///public static Queue&lt;Exception&gt; ExceptionQueue = new Queue&lt;Exception&gt;();
+        ///
+        public static IRedisClientsManager ClientManager = 
+        new PooledRedisClientManager(new string[] { &#34;127.0.0.1:6379&#34; });
+        public static IRedisClient Client = ClientManager.GetClient();
+        /// &lt;summary&gt;
+        /// 捕获异常，将异常放进队列中。
+        /// &lt;/summary&gt;
+        /// &lt;param name=&#34;filterContext&#34;&gt;&lt;/param&gt;
+        public override void OnException(ExceptionContext filterContext)
+        {
+            base.OnException(filterContext);
+            Exception ex = filterContext.Exception;
+            Client.EnqueueItemOnList(&#34;ErrorQueue&#34;, ex.ToString());
+           /// ExceptionQueue.Enqueue(ex);
+            filterContext.HttpContext.Response.Redirect(&#34;/Error.html&#34;);
+        }
+    }
+}
+</code></pre><p>2.在Global文件中重写Application_Start方法，让程序启动时执行拓展的代码，在当中获取redis中存储的错误信息写入日志。</p>
+<pre tabindex="0"><code>using log4net;
+using Spring.Web.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Web;
+using System.Web.Http;
+using System.Web.Mvc;
+using System.Web.Optimization;
+using System.Web.Routing;
+using Ym.OA.WebApp.Models;
+
+namespace Ym.OA.WebApp
+{
+    // 注意: 有关启用 IIS6 或 IIS7 经典模式的说明，
+    // 请访问 http://go.microsoft.com/?LinkId=9394801
+
+    public class MvcApplication :SpringMvcApplication
+    {
+        protected void Application_Start()
+        {
+            log4net.Config.XmlConfigurator.Configure();//读取log4配置文件
+            AreaRegistration.RegisterAllAreas();
+            WebApiConfig.Register(GlobalConfiguration.Configuration);
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
+            //开启线程扫描异常，写入日志。
+            string path = Server.MapPath(&#34;/Log/&#34;);
+            ThreadPool.QueueUserWorkItem((a) =&gt; {
+                while (true)
+                {
+                    ///判读Redis中存储的队列是否有数据
+                    if (MyExceptionAttribute.Client.GetListCount(&#34;ErrorQueue&#34;)&gt;0)
+                    {
+                        ///获取错误队列中的信息
+                        string ex = MyExceptionAttribute.Client.DequeueItemFromList(&#34;ErrorQueue&#34;).ToString();
+                        if (!string.IsNullOrEmpty(ex))
+                        {
+                            ILog logger = LogManager.GetLogger(&#34;ErrorMessage&#34;);
+                            logger.Error(ex.ToString());
+                        }
+                        else
+                        {
+                            Thread.Sleep(3000);
+                        }
+                    }
+                    else
+                    {
+                        Thread.Sleep(3000);
+                    }
+                }
+            },path);
+        }
+    }
+}
+</code></pre><p>这里只是简单地使用Redis进行简单操作，希望对大家有所帮助。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/c"
+      >c#</a
+    >
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/redis"
+      >redis</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/linux_cmd/"
+      ><span class="mr-1.5">←</span><span>linux常用命令</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/elastice2/"
+      ><span>ElasticSearch（基础操作）</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>PHP on 清水泥沙</title>
+    <link>https://869413421.github.io/categories/php/</link>
+    <description>Recent content in PHP on 清水泥沙</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-zh</language>
+    <lastBuildDate>Tue, 07 Feb 2023 15:52:40 +0800</lastBuildDate><atom:link href="https://869413421.github.io/categories/php/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>laravel中使用自定义的Common类</title>
+      <link>https://869413421.github.io/post/laravel/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/laravel/</guid>
+      <description>​	众所周知，laravel是一款高度集成的开发框架，框架内置非常多的操作方法，从而保证了我们的开发效率。但是在日常中为了满足我们的个性化业务，也需要自己去编写工具类，在laravel中我们完成编写后还需要重新去对compoer的自动加载类进行重新加载。
+​	首先在主要代码目录app下创建一个test.php1
+然后还需要在根目录的composer.json中的autoload的file数组中注册我们刚才的helper类
+最后在项目根目录下执行compoer dump-autoload命令，这样我们的类会被compoer自动加载了，在项目中直接描述我们的方法名就可以正常使用了。</description>
+    </item>
+    
+    <item>
+      <title>PHP（基础面试题）</title>
+      <link>https://869413421.github.io/post/php_mst/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/php_mst/</guid>
+      <description>引用变量 (1) 引用变量的概念
+引用变量指引用变量是指定义不同名称的对象，他们的指向同一个内存空间，不会开辟新的内存。是基于CopyAndWrite实现的。
+(2) PHP变量的机制
+PHP的变量是基于CopyAndWrite的机制进行实现的，比如定义了变量a,变量b=a,这个时候变量的的内存空间是一致的，b只是指向a的内存空间。只有修改了a的变量内容时，才会开辟一块新的空间重新存储变量a，而变量b的内存空间不变。
+unset只会取消变量的引用，而不会去销毁变量空间。只有等GC进行清理的时候才会销毁占用的空间
+Object类型本来就是基于引用实现的，两个对象修改值会彼此影响。需要复制对象时候使用clone
+真题：
+常量以及数据类型 (1) .PHP字符串的定义方式和各自区别
+单引号:单引号不能解析变量，单引号不能解析转义字符，只能解析单引号和反斜杠本身，单引号效率更高
+双引号：双引号可以解析变量可以解析转义字符，可以使用{}解析变量
+Heredoc：类似双引号，用于处理大文本
+Newdoc：类似单引号，用于处理大文本
+(2) .PHP的数据类型
+三大数据类型
+标量：
+浮点数Float(不能用于比较运算中)
+整形
+字符串
+布尔类型
+false的七种情况
+0，0.0，’ ’，””，’0’，false，array()，null
+复合
+数组，对象
+特殊
+资源
+NULL
+(3)超全局变量
+$GLOBALS
+$_SERVER
+$_REQUEST
+$_POST
+$_GET
+$_FILES
+$_ENV
+$_COOKIE
+$_SESSION
+(3) Null
+null的三种情况
+直接赋值为NULL,未定义的变量，unset变量
+(4) 常量
+定义常量difine是函数，const是语言结构。
+const可以定义类的常量，而difine不能定义，常量定义后不能修改不能删除
+一定义常量
+FILE
+LINE
+DIR
+FUNCTION
+CLASS
+TRAIT
+METHOD
+NAMESPACE
+真题
+用PHP写出当前客户端的IP和服务端的ID？
+__FILE__是什么？
+当前的文件路径和文件名称
+运算符 (1) foo()和@foo()之间的区别？
+@是错误控制符，放置在一个PHP表达式之前，表达式产生的错误信息都会被忽略掉
+(2) 运算符优先级</description>
+    </item>
+    
+    <item>
+      <title>PHP（高并发面试题）</title>
+      <link>https://869413421.github.io/post/php_mst2/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/php_mst2/</guid>
+      <description>web防盗链 判断referer 使用nginx模块的ngx_http_referer_module来阻挡非法域名的请求 判断签名 使用nginx第三方模块httpAccessKeyModule配置 减少页面HTTP请求 性能黄金法则
+10%-20%花在响应用户接收请求的HTML文档上
+80%是花在请求HTML所需要的所有组件
+如何改善 减少请求组件数量 图片地图 将多个图片合并，根据点击图片位置解析超链接 Css精灵 合并脚本和样式 图片使用base64编码减少引用 浏览器缓存以及压缩技术 200 form cache 直接从本地读取
+304 not modified 协商缓存，如果本地缓存失效，请求头发送一定校验数据到服务端，如果服务端数据没有改变，直接从本地缓存响应
+200 ok 以上两种失败，没有使用缓存，服务器直接返回完整响应。
+脚本压缩
+js压缩 css压缩 图片压缩 可以修改nginx配置
+CDN加速 建立独立图片服务器 动态语言静态化 原因
+动态脚本需要计算和数据查询，访问量大，服务器压力就大
+服务端 集群部署，负载均衡，减少单机的访问压力 缓存，浏览器缓存，CDN缓存，分布式缓存。设定缓存雪崩，缓存击穿，缓存穿透，双写一致等容灾方案 异步处理任务，次要操作通过多线程，异步队列，延时或者定时任务进行处理 优化数据库，分区，分库，分表，优化索引，可以使用全文搜索引擎来代替复杂查询 缓存预热 较少IO次数 减少IO传输大小 限流，通过前端页面限流，nginx设置阈值限流，服务端进行限流 各种池技术，连接池，进程池 优化代码的流程逻辑 锁选择，尽量避免使用悲观锁 并发处理，可以开启多线程，多携程等方式对业务进行处理 </description>
+    </item>
+    
+    <item>
+      <title>PHP中的traits快速入门</title>
+      <link>https://869413421.github.io/post/php_traits/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/php_traits/</guid>
+      <description>traits 在学习PHP的过程中，我们经常会翻阅PHP的官方手册。一般理解能力强悍的人多阅读几遍便可轻松理解其中要领，但往往更多的初学者对官方文档中寥寥数语的描述难以理解。作为一个曾有同样困扰的人，我的经验是遇到这种情况的时候，首先使用搜索引擎翻阅他人分享的学习成果，当知其一二有了概念以后随手写下一些文档，方便巩固知识，日后在工作中有需要时再去深入细节。
+traits是什么？ 首先我们先对这个知识有一个基本的概念，你可以先将traits理解成类似include用于代码复用的技术，include针对的是一个类或者其他文件，而traits则是一个针对方法结构的技术，我们使用use关键字就可以将结构体引用到当前的class当中。
+需求 图中一共存在五个类，分别是基类A以及其子类BCD和一个完全独立的E类，我们有两个方法getSum,getSub。我们需要在B，C，E中同时包含这两个方法，但D类中不包含。
+这时候，我们第一个想法大都会是
+1.在B，C，E中复制同样的代码实现这两个方法。
+2.定义一个接口让B,C,E去实现。
+在没有traits之前可能我们大部分人正是如此去实现需求，不管哪种方法最终的方式都是复制代码重用。
+然而这些方式的弊端是
+1.繁复的复制工作造成的代码冗余。
+2.不具备灵活性当需要添加新的方法时每个地方都要修改，难以维护。
+traits的出现正是为了解决上述问题
+如何使用traits 使用traits的方式很简单，和我们定义类的方式相像，除了关键字以为其余一致。
+当定义好一个结构体后我们只需要在类里面使用use关键字进行调用，根据我们上面的需求我们在B,C,E中分别use myCode这个tratis
+在代码中我们分在每个类中调用了我们定义的方法结构，从而我们不需要在每个类中对方法进行描述，因为程序已经将tratis中的方法自动添加到了每一个类中，这样我们就见面了各种手动繁复的操作，而如果程序后期需要对这几个类拓展的时候只需要对定义的tratis进行修改就可以达到预设的目的，极大地提交了可维护性。
+运行这段代码的返回结果为：
+最终我们的程序结构如下
+这样我们就算是对tratis进行了一个简单入门，但应该已经满足我们日常开发的需求；
+如果你需要深入了解更多细节可以参阅一下文章
+1.https://blog.csdn.net/qq_16142851/article/details/80437560
+2.https://segmentfault.com/a/1190000008009455</description>
+    </item>
+    
+  </channel>
+</rss>

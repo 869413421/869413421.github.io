@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>laravel on 清水泥沙</title>
+    <link>https://869413421.github.io/categories/laravel/</link>
+    <description>Recent content in laravel on 清水泥沙</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-zh</language>
+    <lastBuildDate>Tue, 07 Feb 2023 15:52:40 +0800</lastBuildDate><atom:link href="https://869413421.github.io/categories/laravel/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>laravel中使用自定义的Common类</title>
+      <link>https://869413421.github.io/post/laravel/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/laravel/</guid>
+      <description>​	众所周知，laravel是一款高度集成的开发框架，框架内置非常多的操作方法，从而保证了我们的开发效率。但是在日常中为了满足我们的个性化业务，也需要自己去编写工具类，在laravel中我们完成编写后还需要重新去对compoer的自动加载类进行重新加载。
+​	首先在主要代码目录app下创建一个test.php1
+然后还需要在根目录的composer.json中的autoload的file数组中注册我们刚才的helper类
+最后在项目根目录下执行compoer dump-autoload命令，这样我们的类会被compoer自动加载了，在项目中直接描述我们的方法名就可以正常使用了。</description>
+    </item>
+    
+    <item>
+      <title>laravel&#43;Redis简单实现队列通过压力测试的高并发处理</title>
+      <link>https://869413421.github.io/post/laravel_redis/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/laravel_redis/</guid>
+      <description>秒杀活动 在一般的网络商城中我们会经常接触到一些高并发的业务状况，例如我们常见的秒杀抢购等活动，
+在这些业务中我们经常需要处理一些关于请求信息过滤以及商品库存的问题。
+在请求中比较常见的状况是同一用户发出多次请求或者包含恶意的攻击，以及一些订单的复购等情况。
+而在库存方面则需要考虑超卖这种状况。
+下面我们来模拟一个简单可用的并发处理。
+直接上代码
+代码的流程 1.模拟用户请求，将用户写入redis队列中
+2.从用户中取出一个请求信息进行处理（可以在这个步骤做更多的处理，请求过滤，订单复购等）
+3.用户下单（支付等），减少库存。下面使用了两种方式进行了处理，一种使用了Redis中单线程原子操作的特性使程序一直线性操作从而保持了数据的一致。
+另外一种是用了事务进行操作，可以根据业务进行调整，这里就不一一描述了。
+实际的业务状况更为复杂，但更多的是出于对基础思路的拓展。
+AB测试 这里我使用了apache bench对代码进行测试
+不了解的可以参阅这篇文章，有非常详细的讲解
+https://www.jianshu.com/p/43d04d8baaf7
+调用 代码中的
+AddUserToRedis() 方法将一堆请求用户放进redis队列中 先看库存
+这里我们完成了1200个请求，其中标记失败的有1199个。这个是因为apache bench会以第一个请求响应的内容作为基准，
+如果后续请求响应内容不一致会标记为失败，如果看到length中标记的数量不要方，基本可以忽略，我们的请求实际是完成了的。</description>
+    </item>
+    
+  </channel>
+</rss>

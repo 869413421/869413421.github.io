@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>MQ on 清水泥沙</title>
+    <link>https://869413421.github.io/tags/mq/</link>
+    <description>Recent content in MQ on 清水泥沙</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-zh</language>
+    <lastBuildDate>Thu, 02 Feb 2023 14:57:24 +0800</lastBuildDate><atom:link href="https://869413421.github.io/tags/mq/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>RabbitMQ(基础)</title>
+      <link>https://869413421.github.io/post/rabbitmq/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/rabbitmq/</guid>
+      <description>1.1RabbitMQ的作用 异步任务 系统解耦 削峰 1.2为什么选择RabbitMQ 基于AMPQ协议(高级消息队列协议) 文档齐全，社区活跃 并发性能较高 相比其他中间件更容易维护 2.1RabbitMQ的七种运行模式
+普通模式：简单的队列 竞争模式 消息确认，生产者要收到消费者返回的信息才确认推出的消息被消费，否则重新进入队列重新分配 公平派遣，生产者不指派1个以上的消息给同一个消费者 发布订阅（广播系统）：生产者将消息发送到交换机，消费者生成队列绑定到交换机。使用fanout交换机 交换机推送：direct，根据路由key全匹配 如何保证rabbitMQ高可用性？ 使用主备模式，使用haproxy对消息进行分发，如果主节点挂掉了它会自动将请求转发到备用节点上。 如何保证消息不被重复消费？ 保证消息的唯一性，在生产的时候做唯一表示。判断这个表示是否已经消费过。 如何保证消息不被重复消费？ 生产者丢失，开始rabbitMQ的事务模式和confirm模式。一旦信道进入confirm模式，他会生成一个唯一ID，一旦消息被投递到队列，队列会返回一个包含唯一ID的ACK确认消息已经到达队列,如果失败会返回一个Nack给生产者并且重试。 消息队列丢数据,开启队列持久化，当数据到达队列持久化成功以后返回一个ack给到生产者。生产者如果没有收到会重新发送到队列。 消费数据丢失，关闭自动确认消息。根据业务判断，是否已经消费过，手动进行确认。 如何保证RabbitMQ消息的顺序性？
+答：单线程消费保证消息的顺序性；对消息进行编号，消费者处理消息是根据编号处理消息；
+如何保证RabbitMQ消息的顺序性？ 答：单线程消费保证消息的顺序性；对消息进行编号，消费者处理消息是根据编号处理消息；</description>
+    </item>
+    
+  </channel>
+</rss>

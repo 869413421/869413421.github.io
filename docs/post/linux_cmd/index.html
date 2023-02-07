@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>linux常用命令 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="常用命令 (1) 安全类型
+① sudo 使用root 用户来执行命令
+② su 使用指定用户来执行命令
+③ chmod 修改文件权限
+④ setfacl 修改文件权限，设置文件访问列表
+(2) 进程管理
+① w 显示已经登陆用户列表
+② top 电脑性能分析工具
+③ ps 显示系统进程
+④ kill 发送信号杀死进程
+⑤ pkill	根据进程名称杀死进程
+⑥ pstree 显示进程树木
+⑦ killall 指定名称杀死所有进程
+(3) 用户管理
+① id 显示当前用户ID以及分组的ID
+② usermod 修改账号信息包括分组权限
+③ useradd	增加用户
+④ groupadd	增加分组
+⑤ userdel 删除用户
+(4) 文件系统
+① mount 挂载文件系统
+② umount 取消挂载
+③ fsck 文件修复
+④ df 查看磁盘信息" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="linux常用命令" />
+<meta property="og:description" content="linux常用命令" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/linux_cmd/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T16:52:58+08:00" />
+<meta property="article:modified_time" content="2023-02-07T16:52:58+08:00" />
+
+  
+  <meta itemprop="name" content="linux常用命令">
+<meta itemprop="description" content="linux常用命令"><meta itemprop="datePublished" content="2023-02-07T16:52:58+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T16:52:58+08:00" />
+<meta itemprop="wordCount" content="212">
+<meta itemprop="keywords" content="linux," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="linux常用命令"/>
+<meta name="twitter:description" content="linux常用命令"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">linux常用命令</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><ol>
+<li>常用命令</li>
+</ol>
+<p>(1) 安全类型</p>
+<p>① sudo 使用root 用户来执行命令</p>
+<p>② su 使用指定用户来执行命令</p>
+<p>③ chmod 修改文件权限</p>
+<p>④ setfacl 修改文件权限，设置文件访问列表</p>
+<p>(2) 进程管理</p>
+<p>① w 显示已经登陆用户列表</p>
+<p>② top 	电脑性能分析工具</p>
+<p>③ ps 显示系统进程</p>
+<p>④ kill  发送信号杀死进程</p>
+<p>⑤ pkill	 根据进程名称杀死进程</p>
+<p>⑥ pstree 	显示进程树木</p>
+<p>⑦ killall 指定名称杀死所有进程</p>
+<p>(3) 用户管理</p>
+<p>① id 显示当前用户ID以及分组的ID</p>
+<p>② usermod 	修改账号信息包括分组权限</p>
+<p>③ useradd	增加用户</p>
+<p>④ groupadd	 增加分组</p>
+<p>⑤ userdel 删除用户</p>
+<p>(4) 文件系统</p>
+<p>① mount 挂载文件系统</p>
+<p>② umount 取消挂载</p>
+<p>③ fsck 	文件修复</p>
+<p>④ df 查看磁盘信息</p>
+<p>⑤ du	显示目录占用空间</p>
+<p>(5) 网络应用</p>
+<p>① curl	 网络请求命令，用于和服务器进行交互</p>
+<p>② telnet	远程登陆命令</p>
+<p>③ mail 		邮件命令</p>
+<p>④ elinks 以文本方式访问网站</p>
+<p>(6) 关机和重启</p>
+<p>① shutdown 关机</p>
+<p>② reboot 重启</p>
+<p>(7) 网络测试</p>
+<p>① ping 检测主机网络传输</p>
+<p>② netstat 查看端口信息</p>
+<p>③ host DNS查询</p>
+<p>(8) 网络配置</p>
+<p>① hostname 显示或者修改主机名称</p>
+<p>② ifconfig 修改网络配置（开放端口）</p>
+<p>(9) 常用工具</p>
+<p>① ssh 远程登陆命令</p>
+<p>② screen 令用于多重视窗管理程序</p>
+<p>③ clear 清空终端显示信息</p>
+<p>④ who 当前用户信息</p>
+<p>⑤ date  时间操作命令</p>
+<p>(10) 软件包管理</p>
+<p>① yum</p>
+<p>② rpm</p>
+<p>③ ap t-get</p>
+<p>(11) 文件查找和比较</p>
+<p>① locate</p>
+<p>② find</p>
+<p>(12) 文件内容查看</p>
+<p>① head 查看头部</p>
+<p>② tail 查看正在改变的内容</p>
+<p>③ less 分页</p>
+<p>④ more 分页查看向后</p>
+<p>(13) 文件处理</p>
+<p>① touch 创建文件</p>
+<p>② unlink 删除文件</p>
+<p>③ rename 重命名</p>
+<p>④ ln 设置软连接</p>
+<p>⑤ cat 文件截切连接</p>
+<p>(14) 目录</p>
+<p>① cd 跳转目录</p>
+<p>② mv 移动文件</p>
+<p>③ rm  重命名</p>
+<p>④ pwd 当前目录</p>
+<p>⑤ tree 文件树</p>
+<p>⑥ cp 复制</p>
+<p>⑦ ls 显示目录文件</p>
+<p>(15) 定时任务</p>
+<p>① crontab -e ****** 命令（分时日月周）</p>
+<p>② #at 2:00 tomorrow 明天两点执行</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/linux"
+      >linux</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/redis/"
+      ><span class="mr-1.5">←</span><span>Redis（底层和应用）</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/c_redis/"
+      ><span>c#操作redis</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

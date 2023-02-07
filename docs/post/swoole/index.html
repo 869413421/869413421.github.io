@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>swoole（基础） - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="swoole是什么？ swoole是一款为PHP使用C和C&#43;&#43;编写的高性能，异步事件携程通信引擎。
+为什么是通信引擎？ 因为原生的PHP是寄宿在服务器上经由PHP-FPM进行通讯处理的，PHP不负责请求响应部分生命周期的处理，只负责程序的运算。所有原生的PHP是不支持通讯处理的，而swoole能够不依赖服务器，PHP安装swoole后能够自己启动服务直接对用户的请求响应等通讯数据进行处理，所以swoole是一款通信引擎。
+异步 可以参照前端的ajax进行理解，异步是基于事件的，当我们在执行异步代码时。他不会阻塞当前的进程，而是将 即将执行的事件放置到事件循环当中 EventLoop当中，不理解 EventLoop的可以参考这篇文章 EventLoop详解
+携程 携程可以理解为是一个超轻量级线程，但与线程是由CPU以抢占的方式进行调度的，而携程是由程序员自行进行调度的。
+线程与携程的消耗对比 线程是不进行内存隔离的，但是每个线程都会进行加锁，而加锁的开销相对携程来说更大。 携程是运行在单进程单线成当中的，是以 串行的方式执行，每个携程都拥有自己的堆栈，所以不存在抢占和内存加锁。 如果需要深入理解请阅读 进程，线程，携程的区别
+当在携程中遇到耗时的IO或者网络请求时，当前的携程会自动让出控制权给主进程。关于携程更详细的理解请阅读 携程详解
+Channel 通道，用于协程间通讯，支持多生产者协程和多消费者协程。底层自动实现了协程的切换和调度。" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="swoole（基础）" />
+<meta property="og:description" content="swoole基础" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/swoole/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="swoole（基础）">
+<meta itemprop="description" content="swoole基础"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="22">
+<meta itemprop="keywords" content="swoole," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="swoole（基础）"/>
+<meta name="twitter:description" content="swoole基础"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">swoole（基础）</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="swoole是什么">swoole是什么？</h2>
+<p>swoole是一款为PHP使用C和C++编写的高性能，异步事件携程通信引擎。</p>
+<h5 id="为什么是通信引擎">为什么是通信引擎？</h5>
+<p>因为原生的PHP是寄宿在服务器上经由PHP-FPM进行通讯处理的，PHP不负责请求响应部分生命周期的处理，只负责程序的运算。所有原生的PHP是不支持通讯处理的，而swoole能够不依赖服务器，PHP安装swoole后能够自己启动服务直接对用户的请求响应等通讯数据进行处理，所以swoole是一款通信引擎。</p>
+<h5 id="异步">异步</h5>
+<p>可以参照前端的ajax进行理解，异步是基于事件的，当我们在执行异步代码时。他不会阻塞当前的进程，而是将 <code>即将执行的事件</code>放置到事件循环当中 <code>EventLoop</code>当中，不理解 <code>EventLoop</code>的可以参考这篇文章
+<a href="http://www.ruanyifeng.com/blog/2013/10/event_loop.html">EventLoop详解</a></p>
+<h5 id="携程">携程</h5>
+<p>携程可以理解为是一个超轻量级线程，但与线程是由CPU以抢占的方式进行调度的，而携程是由程序员自行进行调度的。</p>
+<h6 id="线程与携程的消耗对比">线程与携程的消耗对比</h6>
+<p>线程是不进行内存隔离的，但是每个线程都会进行加锁，而加锁的开销相对携程来说更大。
+携程是运行在单进程单线成当中的，是以 <code>串行</code>的方式执行，每个携程都拥有自己的堆栈，所以不存在抢占和内存加锁。
+如果需要深入理解请阅读
+<a href="https://blog.csdn.net/laoxi_liu/article/details/104005275">进程，线程，携程的区别</a></p>
+<p>当在携程中遇到耗时的IO或者网络请求时，当前的携程会自动让出控制权给主进程。关于携程更详细的理解请阅读
+<a href="https://www.jianshu.com/p/745b0b3ffae7">携程详解</a></p>
+<h5 id="channel">Channel</h5>
+<p>通道，用于协程间通讯，支持多生产者协程和多消费者协程。底层自动实现了协程的切换和调度。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/swoole"
+      >swoole</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/mysql_build/"
+      ><span class="mr-1.5">←</span><span>MySql（高可用，高拓展）</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/data/"
+      ><span>数据结构（基础）</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

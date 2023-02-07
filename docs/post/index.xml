@@ -6,7 +6,429 @@
     <description>Recent content in Posts on 清水泥沙</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-zh</language>
-    <lastBuildDate>Thu, 02 Feb 2023 14:57:24 +0800</lastBuildDate><atom:link href="https://869413421.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 07 Feb 2023 17:06:10 +0800</lastBuildDate><atom:link href="https://869413421.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Redis（底层和应用）</title>
+      <link>https://869413421.github.io/post/redis/</link>
+      <pubDate>Tue, 07 Feb 2023 17:06:10 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/redis/</guid>
+      <description>参考 https://mp.weixin.qq.com/s/_W9ny6l3-JqQ_SWm9ACtqg
+Redis的数据类型 String 用途 简单的key-value储存 setnx key value 配合set ex 实现分布式锁 计数器（原子性） 分布式全局唯一ID 底层 C语言中的String用char[]数组表示，源码中的用SDS封装char数组，这是Redis最少的存储单元，一个SDS可以最大存储512兆信息 Redis对SDS再次封装生成了RedisObject，主要有两个核心作用 声明存储的是那种类型的数据 存储指向SDS的指针 当你执行set key value 时，其实redis会创建两个RedisObject 对象，一个是key的redisObject,一个是value的RedisObject，并且指定type为REDIS_STRING，而SDS分别存储key的值，和value的值。 Redis底层对SDS进行了优化 SDS修改后大小&amp;gt;1M时，系统会进行一个空间预分配 SDS是惰性释放空间的，不会马上释放内存，下次进行写操作时，会利用已开辟空间，不会重新申请 List list的底层是一个双向链表，最大长度为2^32-1。常用的组合有
+lpush+lpop=stack 先进后出的栈 lpush+rpop=queue 先进先出的队列 lpush+ltrim =capped collection 有限集合 lpush+brpop = message queue 消息队列 一般可以用来做一些简单的消息队列，数据量小的的时候可以用独有的压缩队列来提升性能
+Hash hash适合将一些关联的聚合数据放在一起，比如用户信息，用户的购物车等一些数据。
+hash的底层是一个字典集合，整体是层层封装的。从下到上的层级顺序为
+dictEntry 这是真正存储数据的节点，包含key-value和next节点,是一个链表节点 dictht 一个dictEntry类型的数组 数组的长度size sizemask等于size-1 当前数组中含多少个节点 dict dictType 类型，包括一些自定义函数，这些函数使得 key 和 value 能够存储 rehashidx 其实是一个标志量，如果为-1说明当前没有扩容，如果不为 -1 则记录扩容位置； dictht数组，两个Hash表； iterators 记录了当前字典正在进行中的迭代器。 整体结构 渐进式扩容 dictht为何存在两个？</description>
+    </item>
+    
+    <item>
+      <title>linux常用命令</title>
+      <link>https://869413421.github.io/post/linux_cmd/</link>
+      <pubDate>Tue, 07 Feb 2023 16:52:58 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/linux_cmd/</guid>
+      <description>常用命令 (1) 安全类型
+① sudo 使用root 用户来执行命令
+② su 使用指定用户来执行命令
+③ chmod 修改文件权限
+④ setfacl 修改文件权限，设置文件访问列表
+(2) 进程管理
+① w 显示已经登陆用户列表
+② top 电脑性能分析工具
+③ ps 显示系统进程
+④ kill 发送信号杀死进程
+⑤ pkill	根据进程名称杀死进程
+⑥ pstree 显示进程树木
+⑦ killall 指定名称杀死所有进程
+(3) 用户管理
+① id 显示当前用户ID以及分组的ID
+② usermod 修改账号信息包括分组权限
+③ useradd	增加用户
+④ groupadd	增加分组
+⑤ userdel 删除用户
+(4) 文件系统
+① mount 挂载文件系统
+② umount 取消挂载
+③ fsck 文件修复
+④ df 查看磁盘信息</description>
+    </item>
+    
+    <item>
+      <title>c#操作redis</title>
+      <link>https://869413421.github.io/post/c_redis/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/c_redis/</guid>
+      <description>Redis是什么？ redis是一个开源的，面向键/值对的NOSQL的分布式数据库系统
+NOSQL指的是非关系型的数据，简单直白地讲就是在非关系型的数据库中不存在表的概念，而是以键值对的方式，
+即一个KEY关联一个值的方式进行存储。
+redis是一个纯粹为应用而生的高性能数据库系统，非常适合用于持久储存，适应高并发等业务情景。
+顺便提一下，redis是一个单线程的程序
+redis是单线程的程序，为什么会这么快 1.大量的线程导致的线程切换开销
+2.不存在非必要的内存浪费（因为redis是即使申请内存的，数据多大申请存储的内存就多大）
+3.数据结构多样但只做自己的事情。（这样说有点模糊。。）
+redis能存储的五种数据类型 1.string（字符串）
+public ActionResult Index() {
+//创建一个指向服务器Redis连接var Client = new RedisClient(&amp;quot;127.0.0.1&amp;quot;, 6370);//将一个集合存储在服务器上，存储的类型为string//因为在向服务器存储的过程中Redis会将存储的数据序列化为JSON数据，所以在Redis中存储的数据本质是一个字符串var UserList = UserInfoService.LoadEntities(u =&amp;gt; u.DelFlag == 1).ToList();Client.Set&amp;lt;List&amp;lt;UserInfo&amp;gt;&amp;gt;(&amp;quot;UserList&amp;quot;, UserList);//获取一个key中的值，和存储的时候一样，读取的时候会对Redis中的数据反序列化。List&amp;lt;UserInfo&amp;gt; List = Client.Get&amp;lt;List&amp;lt;UserInfo&amp;gt;&amp;gt;(&amp;quot;UserList&amp;quot;);var temp = from s in Listselect new{Id=s.ID,Name=s.UName,CreateTime=s.SubTime};return Json(temp);}从代码中可以推断当redis内部进行存取所做的序列化和反序列化步骤必定会造成一定的性能损耗，虽然对redis来说影响微乎其微，
+但对于某些特殊业务场景下可能造成更加量级的影响，所以我们可以使用hash来进行无需序列化的存储。（仅仅是一个菜鸡的认知，如果大神有幸读到本篇文章请批评我的无知。。）
+2.hash（哈希）
+3.list（包含队列，栈的双向链表） 数据结构
+Client.PushItemToList(&amp;ldquo;Item&amp;rdquo;, &amp;ldquo;111&amp;rdquo;); ///redis中的栈操作，和队列操作无异
+后面会做一个分布式缓存的列子。 4.set（无序列表）* 使用并集和交集能满足的一些业务场景，列如新浪微博中两个用户共同的粉丝。
+5.zset(有序列表) 两种持久化存储方式 1.</description>
+    </item>
+    
+    <item>
+      <title>ElasticSearch（基础操作）</title>
+      <link>https://869413421.github.io/post/elastice2/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/elastice2/</guid>
+      <description>设置索引分片 PUT /blogs{&amp;#34;settings&amp;#34; : {//设置3个主分片&amp;#34;number_of_shards&amp;#34; : 3,//设置1个副分片&amp;#34;number_of_replicas&amp;#34; : 1}} 一个分片保存所有数据的一部分 副分片是主分片的一个拷贝备份，同时用于搜索和返回文档 主分片在索引创建时指定，不能被修改，副分片可以被修改
+使用自定义ID索引文档 PUT /{index}/{type}/{id}{&amp;#34;field&amp;#34;: &amp;#34;value&amp;#34;,...} 使用ElasticSearch生成ID索引文档 POST /{index}/{_type}/{&amp;#34;title&amp;#34;: &amp;#34;My second blog entry&amp;#34;,&amp;#34;text&amp;#34;: &amp;#34;Still trying this out...&amp;#34;,&amp;#34;date&amp;#34;: &amp;#34;2014/01/01&amp;#34;} 将请求修改为POST,URL不指定ID，Es会为文档自动生成ID
+获取一个文档 GET /{index}/{_type}/{id} 获取文档的部分字段 GET /{index}/{_type}/{id}?_source={filed}，{filed} 获取文档source GET /{index}/{_type}/{id}/_source 检测文档是否存在 XHEAD /{index}/{_type}/{id} 文档如果存在，Es会返回200 ok的响应码 如果不存在，会返回404
+更新整个文档 PUT /{index}/{_type}/{id}{&amp;#34;title&amp;#34;: &amp;#34;My first blog entry&amp;#34;,&amp;#34;text&amp;#34;: &amp;#34;I am starting to get the hang of this.</description>
+    </item>
+    
+    <item>
+      <title>ElasticSearch系列（集群内部原理）</title>
+      <link>https://869413421.github.io/post/elastice1/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/elastice1/</guid>
+      <description>空集群 ElasticSearch集群是什么？ 一个运行中的Es实例我们称之一个节点，一个集群是指由一个或多个有相同cluster.name的节点组合而成，集群中所有节点会共同负载和分担所有压力。当集群内新增或者删除节点时，集群会重新平均分配所有的数据到每个节点。
+集群的主节点 当一个运行中的节点被选举为主节点的时候，他会负责整个集群内的所有变更。例如索引的增加和删除，或者增加或删除节点。任何节点都可以成为主节点，但是主节点不会负责文档级别的管理。所以即使系统的压力怎么增加，主节点都不会成为性能的瓶颈。
+操作时需要将请求发送到集群的哪一个节点？ 因为每个节点都知道需要操作的文档所在的节点，并且节点会帮我们将请求发送到文档所在的节点当中。所以我们需要对Es进行操作时，我们可以对集群中任意一个节点进行请求。
+集群健康 有时候我们需要对集群做一些监控,命令如下 GET /_cluster/health {&amp;#34;cluster_name&amp;#34;: &amp;#34;elasticsearch&amp;#34;,&amp;#34;status&amp;#34;: &amp;#34;green&amp;#34;, &amp;#34;timed_out&amp;#34;: false,&amp;#34;number_of_nodes&amp;#34;: 1,&amp;#34;number_of_data_nodes&amp;#34;: 1,&amp;#34;active_primary_shards&amp;#34;: 0,&amp;#34;active_shards&amp;#34;: 0,&amp;#34;relocating_shards&amp;#34;: 0,&amp;#34;initializing_shards&amp;#34;: 0,&amp;#34;unassigned_shards&amp;#34;: 0} status 字段指示着当前集群在总体上是否工作正常。它的三种颜色含义如下：
+green 所有的主分片和副本分片都正常运行 yellow 所有的主分片都正常运行，但不是所有的副本分片都正常运行。 red 有主分片没能正常运行 </description>
+    </item>
+    
+    <item>
+      <title>laravel中使用自定义的Common类</title>
+      <link>https://869413421.github.io/post/laravel/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/laravel/</guid>
+      <description>​	众所周知，laravel是一款高度集成的开发框架，框架内置非常多的操作方法，从而保证了我们的开发效率。但是在日常中为了满足我们的个性化业务，也需要自己去编写工具类，在laravel中我们完成编写后还需要重新去对compoer的自动加载类进行重新加载。
+​	首先在主要代码目录app下创建一个test.php1
+然后还需要在根目录的composer.json中的autoload的file数组中注册我们刚才的helper类
+最后在项目根目录下执行compoer dump-autoload命令，这样我们的类会被compoer自动加载了，在项目中直接描述我们的方法名就可以正常使用了。</description>
+    </item>
+    
+    <item>
+      <title>MySql（事务，锁）</title>
+      <link>https://869413421.github.io/post/mysql_t/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/mysql_t/</guid>
+      <description>事务是什么 事务是数据库一个不可以分隔的操作序列。在事务中执行的操作，会使结果从一个一致性状态到达另一个一致性状态。要么是产生操作结果，要么就是不产生结果
+事务的四个特性（ACID） 原子性：一个事务是是一个执行单位，它要么就是全部执行，要么就是全部不执行。 一致性：事务执行的前后，多个事务对数据的读取是一致的。 隔离性：并发访问数据库是，一个事务中读取的数据是不受其他事务所影响的。 持久性：一个事务在提交之后，他作出的改变是持久的。 脏读 在一个事务中更新了一部分数据，这个时候另外一个事务读取了这一部分数据。而这个时候，第一个事务中回滚了数据，第二个事务中读取到的数据就是错误的了，这就是脏读。 幻读 在一个事务当中，两次查询的数据行数不一致。原因可能是在第一次读取后另外一个事务又插入了几行数据。 不可重复读 在一个事务当中，由于在两次查询中有另外一个事务更新了数据，所以导致两次查询的数据不一致。 事务隔离级别 READ-UNCOMMITTED(读取未提交)： 读取尚未提交的数据，可能造成脏读，幻读，不可重复读
+READ-COMMITTED(读取已提交)： 读取已经提交的事务数据，能防止数据脏读，但仍然有可能会幻读，不可重复度。
+REPEATABLE-READ(可重复读) 对数据同一个字段读取是保持一致的，当够避免脏读和不可重复读，但幻读依然可能存在。
+SERIALIZABLE(可串行化)： 事务最高隔离级别，允许事务串行化，完成一个事务再继续下一个事务。所有事务都是逐个执行，可以避免脏读，幻读，不可重复读。
+MySql事务的隔壁界别是REPEATABLE-READ（可重复读），MySql的事务机制是基于锁机制和并发调度实现的，隔离级别越低，使用的锁就越少。InnoDB 存储引擎在 分布式事务 的情况下一般会用到**SERIALIZABLE(可串行化)**隔离级别。
+隔离级别与锁的关系 在READ-UNCOMMITTED(读取未提交)隔离级别下，数据不会进行加锁。 在READ-COMMITTED(读取已提交)隔离级别下，会加共享锁，语句执行完之后就会释放锁。 在REPEATABLE-READ(可重复读)，在读操作下会加共享锁，并且在事务结束之后才会进行释放。 SERIALIZABLE(可串行化)，会锁定整个范围的键，并且一直到事务结束。 锁粒度 在关系型数据库中，锁粒度一共有三种。
+表级锁（table-level-locking） 表级锁是粒度最大的锁表方式，表示对当前操作的整张表进行加锁。锁资源消耗较少，MyIsAm和InnoDb都支持表级锁。
+特点 开销小，加锁快。不会出现死锁，但是锁冲突率高，同时并发能力低。 行级锁（row-level-locking） 行级锁是颗粒度最小的锁表方式，它只会对当前操作的的记录进行锁定。行级锁，分为共享锁和排他锁。
+特点 开销大，加锁慢。会出现死锁，锁冲突率低，并发能力高。 页级别锁 页级别锁，是表级别和行级别的一种折中方案。他会锁定当前操作的数据相邻的一组数据。
+特点 开销和加锁时间介于行级和表级之间，会出现死锁，并发能力一般 共享锁与排他锁 共享锁：共享锁能同时存在多个，对数据加上共享锁之后，其他事务只能加共享锁对数据进行读取而不能进行修改。 排它锁 锁定的数据只能有一个排它锁，排他锁与其他类型的锁互斥，锁定的数据不能被其他操作进行读取或修改。 乐观锁和悲观锁 悲观锁： 假设数据冲突一定会发生，屏蔽掉一切可能违反数据完整性的操作，事务开启直接将数据锁死，直到事务完成。
+乐观锁 ：假设数据冲突一定不会发生，只在最后持久化之前对数据完整性进行检查，如果不一致取消操作。</description>
+    </item>
+    
+    <item>
+      <title>MySql（查询优化）</title>
+      <link>https://869413421.github.io/post/mysql_search/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/mysql_search/</guid>
+      <description>mysql数据类型 (1) 整数类型
+① tinyint
+② smallint
+③ mediumint
+④ int
+⑤ bigint
+(2) 实数类型
+① float
+② double
+③ decimal 可以存储比bigint还大的整数，可以用于存储精确的小数点
+(3) 字符串类型
+① varchar 可变长度的字符串类型，对于经常变更的数据char比varchar更好，char不容易产生碎片
+② char 定长字符串类型，对于较短的数据varchar存储空间更有效率
+③ blob
+④ text 查询回使用临时表导致严重的性能开销
+(4) 枚举
+① 有时可以把常用的字符串替换成枚举类型
+② 把不重复的集合存储成一个预定义的集合
+③ 尽量避免使用数字作为enum作为常量，容易混乱
+(5) 日期类型
+① timestamp 存储的是整形，相对空间效率更高
+② Datetime
+(6) 列属性
+① auto_increment自增
+② default 默认值
+③ not null 非空
+④ zerofill 无符号填充
+索引 (1) 索引对性能的影响
+① 减少数据检索数量</description>
+    </item>
+    
+    <item>
+      <title>MySql（系统基础篇）</title>
+      <link>https://869413421.github.io/post/mysql/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/mysql/</guid>
+      <description>数据库三大范式是什么 第一范式：每个列不可拆分 第二范式：在第一范式基础上，所有非主键列完全依赖主键列，而不是主键的一部分 第三范式：在第二范式基础上，所有非主键列只依赖主键列，不依赖其他的非主键。 MySql自带的权限表 user权限表：记录允许连接到服务器的用户帐号信息，里面的权限是全局级的。 db权限表：记录各个帐号在各个数据库上的操作权限。 table_priv权限表：记录数据表级的操作权限。 columns_priv权限表：记录数据列级的操作权限。 host权限表：配合db权限表对给定主机上数据库级操作权限作更细致的控制。这个权限表不受GRANT和REVOKE语句的影响。 MySql的binlog binlog是MySql存储的二进制日志，用于记录用户操作Sql语句的信息
+binlog具备三种模式
+STATMENT模式 在STATMENT模式中用户每一条 修改数据的SQL都会记录到日志当中 优点： 不需要记录每一条SQL语句和每行的数据变化，减少磁盘的读写IO,减少数据库开销。
+缺点： 在某些情况下会导致master-slave中的数据不一致(如sleep()函数， last_insert_id()，以及user-defined functions(udf)等会出现问题)
+ROW模式 不记录每一条SQL的上下文的信息，只记录那一行被修改了，修改成什么样。 优点：不会出现某些特定情况下的存储过程、或function、或trigger的调用和触发 无法被正确复制的问题。
+缺点：会产生大量的日志，尤其是alter table的时候会让日志暴涨。
+混合模式 一般情况下使用STATMENT模式记录日志，在无法使用STATMENT模式时，切换为ROW模式。MySql会根据执行的SQL来选择日志保存的方式。 binlog的设置 在MySQL配置文件my.cnf文件中的mysqld节中添加下面的配置文件：
+[mysqld]
+#设置日志格式
+binlog_format = mixed 设置日志路径，注意路经需要mysql用户有权限写 log-bin = /data/mysql/logs/mysql-bin.log 设置binlog清理时间 expire_logs_days = 7 binlog每个日志文件大小 max_binlog_size = 100m binlog缓存大小 binlog_cache_size = 4m 最大binlog缓存大小 max_binlog_cache_size = 512m 重启MySQL生效，如果不方便重启服务，也可以直接修改对应的变量即可。
+引擎 常用的引擎
+InnoDB InnoDB提供了ACID的事务支持，并且支持行级别锁，外键约束。 MyIASM MyIASM不支持事务，行级别锁。但是支持表级别锁 MEMORY MyIASM所有数据存储在内存中，读取速度快，但是安全性低 MyIAM索引和InnoDB索引的区别 InnoDB索引是聚簇索引，MyISAM索引是非聚簇索引。 InnoDB索引的叶子节点上存储着索引和行数据，所以InnoDB的主键索引数据非常高效 MyIASM索引的叶子节点上存储着行数据距的指向地址，需要再根据地址去进行查找 InnoDB的非主键索引的叶子节点存储着主键和其他非主键索引的列数据 InnoDB的四大特性 插入缓冲 插入缓冲在非唯一索引非聚合索引才生效，当第一次插入时，MySQL会先检查buffer中是否包含索引页，如果有直接插入，如果没有先放置到buffer中，等到一定频率再合并操作。</description>
+    </item>
+    
+    <item>
+      <title>MySql（索引）</title>
+      <link>https://869413421.github.io/post/mysql_index/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/mysql_index/</guid>
+      <description>索引是什么 索引是一个特殊的文件，他是实际存在在文件系统中的，记录着数据表里所有数据的引用指针
+索引是一个数据结构，是数据库操作系统的一种排序数据结构，能帮助我们快速查询，更新我们数据表的数据
+优点 创建索引的原因是为了帮助用户快速地检索数据 缺点 创建索引能加快检索速度，但是也意味着数据库增删改时需要对索引进行维护，会增加增删改的性能消耗，降低执行效率。 索引是实际存在系统中的，会占用系统的存储空间。 索引使用场景 where 因为主键索引中存储或者包含了行数据的引用地址，一般情况下，主键索引是最快的。如果一个where 语句中包含多个索引，MySql会选择最优的命中。
+orderBy 在我们对某个字段进行orderBy时，如果这个字段没有建立索引，MySql会使用外部排序，即是将查询到的结果集分批从硬盘当中读取内存中进行排序,这个操作不仅要进行IO操作还要占用内存进行排序所以它是非常影响性能的。
+如果存在索引的情况下，MySql会直接根据索引的排序和映射逐条取出数据。如果是分页的话直接取索引某个范围进行读取。不再需要读入内存中排序后再进行截取某一部分数据。
+join 在我们设计表结构的时候，我们要join的字段应该是一个外键并且应该加上索引，这样能提高join时的查询效率，如果外键不存在索引的情况下，join的表可能会出现全表扫描。严重损耗检索效率
+索引覆盖 如果我们一个select语句中，需要查询的字段都建立过索引，那么MySql会直接从索引页中获取数据，而不再去查询原始数据，这个就是索引覆盖。索引我们在写查询语句的时候尽量select需要的字段，提高索引覆盖的几率。
+索引的几种类型 主键索引：数据表中的唯一标识，不允许为null
+唯一索引：数据表的的列不允许重复，多个列可以聚合，允许为null
+普通索引：基础的索引，多个列可以聚合，允许为null
+全文索引： 一种全文搜索索引
+索引的两种算法 b+tree BTree是最常用的mysql数据库索引算法，也是mysql默认的算法。因为它不仅可以被用在=,&amp;gt;,&amp;gt;=,&amp;lt;,&amp;lt;=和between这些比较操作符上，而且还可以用于like操作符，只要它的查询条件是一个不以通配符开头的常量， 例如：
+hash算法 Hash索引只能用于对等比较，例如=,&amp;lt;=&amp;gt;（相当于=）操作符。由于是一次定位数据，不像BTree索引需要从根节点到枝节点，最后才能访问到页节点这样多次IO访问，所以检索效率远高于BTree索引。
+索引的设计原则 适合索引的字段应该是出现在where语句中，或者join连接的列中。
+数据过少的表不适合创建索引
+尽量是用短索引，有时需要索引很长的字符列，它会使索引变大并且变慢。索引字符串的前半部分能有效地节约索引空间。
+不要过度索引，索引会占用磁盘空间，并且会降低写性能。索引的创建只要保证查询性能即可。
+索引的创建原则 最左前匹配原则，是聚合索引中非常重要的原则，MySql会一直向右匹配直到遇到范围查询(&amp;gt;、&amp;lt;、between、like)就停止匹配。例如组合索引abc,查询语句为a=1,b&amp;gt;2,c=3。这样c是使用不了索引的。
+字段较为频繁查询的应该使用索引。
+频繁更新的字段不适合创建索引。
+不能有效区分的列不适合创建索引。(如性别，男女未知，最多也就三种，区分度实在太低)
+尽量扩展索引，而不是去新建索引。如系统上有a索引，要增加一个ab索引，应该直接拓展索引，将a索引修改为ab索引。
+有外键的列一定要建立索引。
+对text,image,bit或者数据过长的字段不要建立索引
+创建索引需要注意什么 不要设置可空字段，因为可空字段很难被查询优化，同事会使索引排序运算更加复杂，可以使用一个特殊的值或者0或者空字符串代替。
+取离散值最大的字段（数据表值唯一值越多的离散值越大）
+索引字段越小越好，字段过长影响索引效率，占用更多内存空间。
+最左前缀原则，最左前匹配原则 顾名思义，就是最左优先，在创建多列索引时，要根据业务需求，where子句中使用最频繁的一列放在最左边。
+最左前缀匹配原则，非常重要的原则，mysql会一直向右匹配直到遇到范围查询(&amp;gt;、&amp;lt;、between、like)就停止匹配，比如a = 1 and b = 2 and c &amp;gt; 3 and d = 4 如果建立(a,b,c,d)顺序的索引，d是用不到索引的，如果建立(a,b,d,c)的索引则都可以用到，a,b,d的顺序可以任意调整。
+=和in可以乱序，比如a = 1 and b = 2 and c = 3 建立(a,b,c)索引可以任意顺序，mysql的查询优化器会帮你优化成索引可以识别的形式</description>
+    </item>
+    
+    <item>
+      <title>MySql（高可用，高拓展）</title>
+      <link>https://869413421.github.io/post/mysql_build/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/mysql_build/</guid>
+      <description>* 分区表原理 工作原理
+对用户而言，分区表是一个独立的逻辑表，mysql底层将其分成了多个物理子表，每一个分区表都是一个独立的文件
+适用场景
+表非常大，无法全部存放在内存中，或者表的最后有热点数据，其他的都是历史数据 分区表更容易维护，可以对独立的分区进行操作 分区表可以分布在不同的服务器上 可以使用分区表避免某些特殊的瓶颈 可以恢复和备份独立的分区 限制
+一个表只能有1024个分区 5.1版本中，分区表达式必须是整数 分区表字段中如果包含主键和唯一所以，那么主键和唯一列必须包含进去 分区表中不能使用外键约束 如果需要对现有表进行修改 所有分区表虚使用相同的存储引擎 某些引擎不支持分区 分库分表 工作原理 通过一些hash算法和工具实现将一张表的数据，垂直拆分和水平拆分 使用场景 单表记录数到达百万或者千万级别时候 解决表锁的问题 分表方式 水平分割 表很大，分割后降低在查询时候所需要读取的数据和索引的页数 使用场景 表中的数据具有独立性，比如说表中记录各个地区的数据或者不同时期的数据 需要把不同的数据存放在不同的介质 缺点 给应用增加复杂度，查询某些数据的时候需要定位到数据在某张表 垂直分割 将数据表的列进行分割，常用的列和不常用的列拆分成两个表 使用场景 一个表中一些列不常用，列外一些列常用 可以使数据行变小，一个数据也能存储更多的数据，查询时候减少IO次数 缺点 查询冗余，查询需要进行join操作 mysql主从复制 工作原理 在主库上把数据更改记录到二进制文件，从库将 主库的日志复制到自己的中继日志当中。从库读取日志，将数据重写到从库数据当中。 主从复制解决的问题 数据分布：随意停止或开始复制 负载均衡：降低单个服务器压力 高可用和故障切换：某个节点失败后其他节点顶替其工作，避免程序崩溃 异步复制：也是默认的主从同步方式。这种方式的优点是效率高。缺点是不能保证数据一定会到达slave。可能会受到网络等原因出现延迟，导致主从数据不一致。当前对master中的表进行数据操作，master将事务Binlog事件写入到Binlog文件中，此时主库只会通知一下Dump线程发送这些新的Binlog到slave（slave的 I/O 线程读取并将事件写入relay-log中）然后主库就会继续处理提交操作，而此时不会保证这些Binlog传到任何一个从库节点上。 全同步复制：优点是能够保证数据的强一致性，缺点是效率太低。当master上有提交事务之后，Dump线程发送这些新的Binlog到slave上，并且必须等待所有的slave回复成功（所有从库将事件写入中继日志，并将数据写入数据库）才能继续下一步操作。 半同步复制：优点是在耗费少量性能的基础上能在一定程度上保证数据的一致性。当master上有提交事务之后，Dump线程发送这些新的Binlog到slave上，并且必须等待其中一个slave回复成功（slave将事件写入relay-log）才能继续下一步操作。 </description>
+    </item>
+    
+    <item>
+      <title>swoole（基础）</title>
+      <link>https://869413421.github.io/post/swoole/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/swoole/</guid>
+      <description>swoole是什么？ swoole是一款为PHP使用C和C++编写的高性能，异步事件携程通信引擎。
+为什么是通信引擎？ 因为原生的PHP是寄宿在服务器上经由PHP-FPM进行通讯处理的，PHP不负责请求响应部分生命周期的处理，只负责程序的运算。所有原生的PHP是不支持通讯处理的，而swoole能够不依赖服务器，PHP安装swoole后能够自己启动服务直接对用户的请求响应等通讯数据进行处理，所以swoole是一款通信引擎。
+异步 可以参照前端的ajax进行理解，异步是基于事件的，当我们在执行异步代码时。他不会阻塞当前的进程，而是将 即将执行的事件放置到事件循环当中 EventLoop当中，不理解 EventLoop的可以参考这篇文章 EventLoop详解
+携程 携程可以理解为是一个超轻量级线程，但与线程是由CPU以抢占的方式进行调度的，而携程是由程序员自行进行调度的。
+线程与携程的消耗对比 线程是不进行内存隔离的，但是每个线程都会进行加锁，而加锁的开销相对携程来说更大。 携程是运行在单进程单线成当中的，是以 串行的方式执行，每个携程都拥有自己的堆栈，所以不存在抢占和内存加锁。 如果需要深入理解请阅读 进程，线程，携程的区别
+当在携程中遇到耗时的IO或者网络请求时，当前的携程会自动让出控制权给主进程。关于携程更详细的理解请阅读 携程详解
+Channel 通道，用于协程间通讯，支持多生产者协程和多消费者协程。底层自动实现了协程的切换和调度。</description>
+    </item>
+    
+    <item>
+      <title>数据结构（基础）</title>
+      <link>https://869413421.github.io/post/data/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/data/</guid>
+      <description>什么是数据结构 数据结构就是按照一定的逻辑把元素按照一定关系进行存储的数据
+数据结构分类 可以分为逻辑机构和物理结构两大类
+逻辑结构
+1.集合机构，指的是一堆没有任何关系的数据存储在一个集合中，它们是平级的
+2.线性结构，所有的的数据都存在1对1的关系、
+3.树形结构，树状机构中存在着1对多的关系
+4.图形结构，图形结构中存储着多对多的复杂关系
+物理结构
+1.顺序结构，所有的数据都是存储在一个连续内存当中的，它的逻辑关系和物理关系是一致的。
+2.链式存储结构，在链式存储结构中，存储单元可以是连续的也可以是不连续的，元素之间不能反映元素的逻辑关系，只存储元素的引用地址。根据指针来确定彼此的逻辑关系
+线性表 线性表是最基本，最简单的数据结构，一个线性表是一组拥有相同特征的元素的有限序列 线性表特征 表中第一个元素没有前驱，它是线性表的头结点。 表中最后一个元素没有后继，它是线性表的尾结点。 除了第一个和最后一个元素外，其他元素都拥有前驱和后续结点。 线性表的分类 根据不同的存储方式分类，线性表可以分为顺序表和链表
+顺序表 顺序表是一种以数组方式进行表示的线性表，顺序表中元素间的逻辑与物理存储的逻辑一致，表中的元素是存储在一个连续内存当中的。 链表 之前我们已经使用顺序存储结构实现了线性表，我们会发现虽然顺序表的查询很快，时间复杂度为O(1),但是增删的效率是比较低的，因为每一次增删操作都伴随着大量的数据元素移动。这个问题有没有解决方案呢？有，我们可以使用另外一种存储结构实现线性表，链式存储结构。 链表是一种物理存储单元上非连续、非顺序的存储结构，其物理结构不能只管的表示数据元素的逻辑顺序，数据元素的逻辑顺序是通过链表中的指针链接次序实现的。链表由一系列的结点（链表中的每一个元素称为结点）组成，结点可以在运行时动态生成。 单向链表 单向链表是链表的一种，它由多个结点组成，每个结点都由一个数据域和一个指针域组成，数据域用来存储数据，指针域用来指向其后继结点。链表的头结点的数据域不存储数据，指针域指向第一个真正存储数据的结点。单向链表查找或者插入数据都要从头部开始查找。 </description>
+    </item>
+    
+    <item>
+      <title>laravel&#43;Redis简单实现队列通过压力测试的高并发处理</title>
+      <link>https://869413421.github.io/post/laravel_redis/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/laravel_redis/</guid>
+      <description>秒杀活动 在一般的网络商城中我们会经常接触到一些高并发的业务状况，例如我们常见的秒杀抢购等活动，
+在这些业务中我们经常需要处理一些关于请求信息过滤以及商品库存的问题。
+在请求中比较常见的状况是同一用户发出多次请求或者包含恶意的攻击，以及一些订单的复购等情况。
+而在库存方面则需要考虑超卖这种状况。
+下面我们来模拟一个简单可用的并发处理。
+直接上代码
+代码的流程 1.模拟用户请求，将用户写入redis队列中
+2.从用户中取出一个请求信息进行处理（可以在这个步骤做更多的处理，请求过滤，订单复购等）
+3.用户下单（支付等），减少库存。下面使用了两种方式进行了处理，一种使用了Redis中单线程原子操作的特性使程序一直线性操作从而保持了数据的一致。
+另外一种是用了事务进行操作，可以根据业务进行调整，这里就不一一描述了。
+实际的业务状况更为复杂，但更多的是出于对基础思路的拓展。
+AB测试 这里我使用了apache bench对代码进行测试
+不了解的可以参阅这篇文章，有非常详细的讲解
+https://www.jianshu.com/p/43d04d8baaf7
+调用 代码中的
+AddUserToRedis() 方法将一堆请求用户放进redis队列中 先看库存
+这里我们完成了1200个请求，其中标记失败的有1199个。这个是因为apache bench会以第一个请求响应的内容作为基准，
+如果后续请求响应内容不一致会标记为失败，如果看到length中标记的数量不要方，基本可以忽略，我们的请求实际是完成了的。</description>
+    </item>
+    
+    <item>
+      <title>PHP（基础面试题）</title>
+      <link>https://869413421.github.io/post/php_mst/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/php_mst/</guid>
+      <description>引用变量 (1) 引用变量的概念
+引用变量指引用变量是指定义不同名称的对象，他们的指向同一个内存空间，不会开辟新的内存。是基于CopyAndWrite实现的。
+(2) PHP变量的机制
+PHP的变量是基于CopyAndWrite的机制进行实现的，比如定义了变量a,变量b=a,这个时候变量的的内存空间是一致的，b只是指向a的内存空间。只有修改了a的变量内容时，才会开辟一块新的空间重新存储变量a，而变量b的内存空间不变。
+unset只会取消变量的引用，而不会去销毁变量空间。只有等GC进行清理的时候才会销毁占用的空间
+Object类型本来就是基于引用实现的，两个对象修改值会彼此影响。需要复制对象时候使用clone
+真题：
+常量以及数据类型 (1) .PHP字符串的定义方式和各自区别
+单引号:单引号不能解析变量，单引号不能解析转义字符，只能解析单引号和反斜杠本身，单引号效率更高
+双引号：双引号可以解析变量可以解析转义字符，可以使用{}解析变量
+Heredoc：类似双引号，用于处理大文本
+Newdoc：类似单引号，用于处理大文本
+(2) .PHP的数据类型
+三大数据类型
+标量：
+浮点数Float(不能用于比较运算中)
+整形
+字符串
+布尔类型
+false的七种情况
+0，0.0，’ ’，””，’0’，false，array()，null
+复合
+数组，对象
+特殊
+资源
+NULL
+(3)超全局变量
+$GLOBALS
+$_SERVER
+$_REQUEST
+$_POST
+$_GET
+$_FILES
+$_ENV
+$_COOKIE
+$_SESSION
+(3) Null
+null的三种情况
+直接赋值为NULL,未定义的变量，unset变量
+(4) 常量
+定义常量difine是函数，const是语言结构。
+const可以定义类的常量，而difine不能定义，常量定义后不能修改不能删除
+一定义常量
+FILE
+LINE
+DIR
+FUNCTION
+CLASS
+TRAIT
+METHOD
+NAMESPACE
+真题
+用PHP写出当前客户端的IP和服务端的ID？
+__FILE__是什么？
+当前的文件路径和文件名称
+运算符 (1) foo()和@foo()之间的区别？
+@是错误控制符，放置在一个PHP表达式之前，表达式产生的错误信息都会被忽略掉
+(2) 运算符优先级</description>
+    </item>
+    
+    <item>
+      <title>PHP（高并发面试题）</title>
+      <link>https://869413421.github.io/post/php_mst2/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/php_mst2/</guid>
+      <description>web防盗链 判断referer 使用nginx模块的ngx_http_referer_module来阻挡非法域名的请求 判断签名 使用nginx第三方模块httpAccessKeyModule配置 减少页面HTTP请求 性能黄金法则
+10%-20%花在响应用户接收请求的HTML文档上
+80%是花在请求HTML所需要的所有组件
+如何改善 减少请求组件数量 图片地图 将多个图片合并，根据点击图片位置解析超链接 Css精灵 合并脚本和样式 图片使用base64编码减少引用 浏览器缓存以及压缩技术 200 form cache 直接从本地读取
+304 not modified 协商缓存，如果本地缓存失效，请求头发送一定校验数据到服务端，如果服务端数据没有改变，直接从本地缓存响应
+200 ok 以上两种失败，没有使用缓存，服务器直接返回完整响应。
+脚本压缩
+js压缩 css压缩 图片压缩 可以修改nginx配置
+CDN加速 建立独立图片服务器 动态语言静态化 原因
+动态脚本需要计算和数据查询，访问量大，服务器压力就大
+服务端 集群部署，负载均衡，减少单机的访问压力 缓存，浏览器缓存，CDN缓存，分布式缓存。设定缓存雪崩，缓存击穿，缓存穿透，双写一致等容灾方案 异步处理任务，次要操作通过多线程，异步队列，延时或者定时任务进行处理 优化数据库，分区，分库，分表，优化索引，可以使用全文搜索引擎来代替复杂查询 缓存预热 较少IO次数 减少IO传输大小 限流，通过前端页面限流，nginx设置阈值限流，服务端进行限流 各种池技术，连接池，进程池 优化代码的流程逻辑 锁选择，尽量避免使用悲观锁 并发处理，可以开启多线程，多携程等方式对业务进行处理 </description>
+    </item>
+    
+    <item>
+      <title>PHP中的traits快速入门</title>
+      <link>https://869413421.github.io/post/php_traits/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/php_traits/</guid>
+      <description>traits 在学习PHP的过程中，我们经常会翻阅PHP的官方手册。一般理解能力强悍的人多阅读几遍便可轻松理解其中要领，但往往更多的初学者对官方文档中寥寥数语的描述难以理解。作为一个曾有同样困扰的人，我的经验是遇到这种情况的时候，首先使用搜索引擎翻阅他人分享的学习成果，当知其一二有了概念以后随手写下一些文档，方便巩固知识，日后在工作中有需要时再去深入细节。
+traits是什么？ 首先我们先对这个知识有一个基本的概念，你可以先将traits理解成类似include用于代码复用的技术，include针对的是一个类或者其他文件，而traits则是一个针对方法结构的技术，我们使用use关键字就可以将结构体引用到当前的class当中。
+需求 图中一共存在五个类，分别是基类A以及其子类BCD和一个完全独立的E类，我们有两个方法getSum,getSub。我们需要在B，C，E中同时包含这两个方法，但D类中不包含。
+这时候，我们第一个想法大都会是
+1.在B，C，E中复制同样的代码实现这两个方法。
+2.定义一个接口让B,C,E去实现。
+在没有traits之前可能我们大部分人正是如此去实现需求，不管哪种方法最终的方式都是复制代码重用。
+然而这些方式的弊端是
+1.繁复的复制工作造成的代码冗余。
+2.不具备灵活性当需要添加新的方法时每个地方都要修改，难以维护。
+traits的出现正是为了解决上述问题
+如何使用traits 使用traits的方式很简单，和我们定义类的方式相像，除了关键字以为其余一致。
+当定义好一个结构体后我们只需要在类里面使用use关键字进行调用，根据我们上面的需求我们在B,C,E中分别use myCode这个tratis
+在代码中我们分在每个类中调用了我们定义的方法结构，从而我们不需要在每个类中对方法进行描述，因为程序已经将tratis中的方法自动添加到了每一个类中，这样我们就见面了各种手动繁复的操作，而如果程序后期需要对这几个类拓展的时候只需要对定义的tratis进行修改就可以达到预设的目的，极大地提交了可维护性。
+运行这段代码的返回结果为：
+最终我们的程序结构如下
+这样我们就算是对tratis进行了一个简单入门，但应该已经满足我们日常开发的需求；
+如果你需要深入了解更多细节可以参阅一下文章
+1.https://blog.csdn.net/qq_16142851/article/details/80437560
+2.https://segmentfault.com/a/1190000008009455</description>
+    </item>
+    
+    <item>
+      <title>RabbitMQ(基础)</title>
+      <link>https://869413421.github.io/post/rabbitmq/</link>
+      <pubDate>Thu, 02 Feb 2023 14:57:24 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/rabbitmq/</guid>
+      <description>1.1RabbitMQ的作用 异步任务 系统解耦 削峰 1.2为什么选择RabbitMQ 基于AMPQ协议(高级消息队列协议) 文档齐全，社区活跃 并发性能较高 相比其他中间件更容易维护 2.1RabbitMQ的七种运行模式
+普通模式：简单的队列 竞争模式 消息确认，生产者要收到消费者返回的信息才确认推出的消息被消费，否则重新进入队列重新分配 公平派遣，生产者不指派1个以上的消息给同一个消费者 发布订阅（广播系统）：生产者将消息发送到交换机，消费者生成队列绑定到交换机。使用fanout交换机 交换机推送：direct，根据路由key全匹配 如何保证rabbitMQ高可用性？ 使用主备模式，使用haproxy对消息进行分发，如果主节点挂掉了它会自动将请求转发到备用节点上。 如何保证消息不被重复消费？ 保证消息的唯一性，在生产的时候做唯一表示。判断这个表示是否已经消费过。 如何保证消息不被重复消费？ 生产者丢失，开始rabbitMQ的事务模式和confirm模式。一旦信道进入confirm模式，他会生成一个唯一ID，一旦消息被投递到队列，队列会返回一个包含唯一ID的ACK确认消息已经到达队列,如果失败会返回一个Nack给生产者并且重试。 消息队列丢数据,开启队列持久化，当数据到达队列持久化成功以后返回一个ack给到生产者。生产者如果没有收到会重新发送到队列。 消费数据丢失，关闭自动确认消息。根据业务判断，是否已经消费过，手动进行确认。 如何保证RabbitMQ消息的顺序性？
+答：单线程消费保证消息的顺序性；对消息进行编号，消费者处理消息是根据编号处理消息；
+如何保证RabbitMQ消息的顺序性？ 答：单线程消费保证消息的顺序性；对消息进行编号，消费者处理消息是根据编号处理消息；</description>
+    </item>
+    
     <item>
       <title>面向对象的六大原则（单一职责原则）</title>
       <link>https://869413421.github.io/post/single/</link>

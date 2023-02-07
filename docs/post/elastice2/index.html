@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>ElasticSearch（基础操作） - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="设置索引分片 PUT /blogs{&#34;settings&#34; : {//设置3个主分片&#34;number_of_shards&#34; : 3,//设置1个副分片&#34;number_of_replicas&#34; : 1}} 一个分片保存所有数据的一部分 副分片是主分片的一个拷贝备份，同时用于搜索和返回文档 主分片在索引创建时指定，不能被修改，副分片可以被修改
+使用自定义ID索引文档 PUT /{index}/{type}/{id}{&#34;field&#34;: &#34;value&#34;,...} 使用ElasticSearch生成ID索引文档 POST /{index}/{_type}/{&#34;title&#34;: &#34;My second blog entry&#34;,&#34;text&#34;: &#34;Still trying this out...&#34;,&#34;date&#34;: &#34;2014/01/01&#34;} 将请求修改为POST,URL不指定ID，Es会为文档自动生成ID
+获取一个文档 GET /{index}/{_type}/{id} 获取文档的部分字段 GET /{index}/{_type}/{id}?_source={filed}，{filed} 获取文档source GET /{index}/{_type}/{id}/_source 检测文档是否存在 XHEAD /{index}/{_type}/{id} 文档如果存在，Es会返回200 ok的响应码 如果不存在，会返回404
+更新整个文档 PUT /{index}/{_type}/{id}{&#34;title&#34;: &#34;My first blog entry&#34;,&#34;text&#34;: &#34;I am starting to get the hang of this." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="ElasticSearch（基础操作）" />
+<meta property="og:description" content="基础操作" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/elastice2/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="ElasticSearch（基础操作）">
+<meta itemprop="description" content="基础操作"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="147">
+<meta itemprop="keywords" content="ElasticSearch," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="ElasticSearch（基础操作）"/>
+<meta name="twitter:description" content="基础操作"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">ElasticSearch（基础操作）</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><ul>
+<li>设置索引分片</li>
+</ul>
+<pre tabindex="0"><code>PUT /blogs
+{
+   &#34;settings&#34; : {
+	//设置3个主分片
+      &#34;number_of_shards&#34; : 3,
+	//设置1个副分片
+      &#34;number_of_replicas&#34; : 1
+   }
+}
+</code></pre><p>一个分片保存所有数据的一部分
+副分片是主分片的一个拷贝备份，同时用于搜索和返回文档
+主分片在索引创建时指定，不能被修改，副分片可以被修改</p>
+<ul>
+<li>使用自定义ID索引文档</li>
+</ul>
+<pre tabindex="0"><code>PUT /{index}/{type}/{id}
+{
+  &#34;field&#34;: &#34;value&#34;,
+  ...
+}
+</code></pre><ul>
+<li>使用ElasticSearch生成ID索引文档</li>
+</ul>
+<pre tabindex="0"><code>POST /{index}/{_type}/
+{
+  &#34;title&#34;: &#34;My second blog entry&#34;,
+  &#34;text&#34;:  &#34;Still trying this out...&#34;,
+  &#34;date&#34;:  &#34;2014/01/01&#34;
+}
+</code></pre><p>将请求修改为POST,URL不指定ID，Es会为文档自动生成ID</p>
+<ul>
+<li>获取一个文档</li>
+</ul>
+<pre tabindex="0"><code>GET /{index}/{_type}/{id}
+</code></pre><ul>
+<li>获取文档的部分字段</li>
+</ul>
+<pre tabindex="0"><code>GET /{index}/{_type}/{id}?_source={filed}，{filed}
+</code></pre><ul>
+<li>获取文档source</li>
+</ul>
+<pre tabindex="0"><code>GET /{index}/{_type}/{id}/_source
+</code></pre><ul>
+<li>检测文档是否存在</li>
+</ul>
+<pre tabindex="0"><code>XHEAD /{index}/{_type}/{id}
+</code></pre><p>文档如果存在，Es会返回<code>200 ok</code>的响应码
+如果不存在，会返回<code>404</code></p>
+<ul>
+<li>更新整个文档</li>
+</ul>
+<pre tabindex="0"><code>PUT  /{index}/{_type}/{id}
+{
+  &#34;title&#34;: &#34;My first blog entry&#34;,
+  &#34;text&#34;:  &#34;I am starting to get the hang of this...&#34;,
+  &#34;date&#34;:  &#34;2014/01/02&#34;
+}
+</code></pre><p>Es中所有文档都是不可修改的，当我们进行更新的时候，Es内部会将文档进行删除，将新的文档覆盖到旧文档的位置，并且更新<code>_version</code>版本号
+流程为
+1.从旧文档构建 JSON
+2.更改该 JSON
+3.删除旧文档
+4.索引一个新文档</p>
+<ul>
+<li>使用指定ID创建一个新的文档两种方式</li>
+</ul>
+<pre tabindex="0"><code>PUT /{index}/{_type}/{id}?op_type=create
+{ ... }
+</code></pre><pre tabindex="0"><code>PUT /{index}/{_type}/{id}/_create
+{ ... }
+</code></pre><p>两个方式效果一样，如果文档不存在，Es成功索引了文档，会返回元数据和一个 <code>201 Created</code> 的 HTTP 响应码。
+如果具有相同的 <code>_index</code> 、 <code>_type</code> 和 <code>_id</code> 的文档已经存在，Elasticsearch 将会返回 <code>409 Conflict</code> 响应码</p>
+<ul>
+<li>删除文档</li>
+</ul>
+<pre tabindex="0"><code>DELETE /{index}/{_type}/{id}
+</code></pre><p>如果文档存在，Es会返回一个 <code>200 </code> 的 HTTP 响应码。
+不存在，Es会返回一个 <code>404 </code> 的 HTTP 响应码。</p>
+<p>删除文档不会立即将文档从磁盘中删除，只是将文档标记为已删除状态。随着你不断的索引更多的数据，Elasticsearch 将会在后台清理标记为已删除的文档。</p>
+<ul>
+<li>轻量搜索</li>
+</ul>
+<pre tabindex="0"><code>GET /{index}/{_type}/_search?q=filed:value
+</code></pre><p>如果文档存在，Es会返回一个 <code>200 </code> 的 HTTP 响应码。
+不存在，Es会返回一个 <code>404 </code> 的 HTTP 响应码。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/elasticsearch"
+      >ElasticSearch</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/c_redis/"
+      ><span class="mr-1.5">←</span><span>c#操作redis</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/elastice1/"
+      ><span>ElasticSearch系列（集群内部原理）</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

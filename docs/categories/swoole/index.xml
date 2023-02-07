@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>swoole on 清水泥沙</title>
+    <link>https://869413421.github.io/categories/swoole/</link>
+    <description>Recent content in swoole on 清水泥沙</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-zh</language>
+    <lastBuildDate>Tue, 07 Feb 2023 15:52:40 +0800</lastBuildDate><atom:link href="https://869413421.github.io/categories/swoole/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>swoole（基础）</title>
+      <link>https://869413421.github.io/post/swoole/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/swoole/</guid>
+      <description>swoole是什么？ swoole是一款为PHP使用C和C++编写的高性能，异步事件携程通信引擎。
+为什么是通信引擎？ 因为原生的PHP是寄宿在服务器上经由PHP-FPM进行通讯处理的，PHP不负责请求响应部分生命周期的处理，只负责程序的运算。所有原生的PHP是不支持通讯处理的，而swoole能够不依赖服务器，PHP安装swoole后能够自己启动服务直接对用户的请求响应等通讯数据进行处理，所以swoole是一款通信引擎。
+异步 可以参照前端的ajax进行理解，异步是基于事件的，当我们在执行异步代码时。他不会阻塞当前的进程，而是将 即将执行的事件放置到事件循环当中 EventLoop当中，不理解 EventLoop的可以参考这篇文章 EventLoop详解
+携程 携程可以理解为是一个超轻量级线程，但与线程是由CPU以抢占的方式进行调度的，而携程是由程序员自行进行调度的。
+线程与携程的消耗对比 线程是不进行内存隔离的，但是每个线程都会进行加锁，而加锁的开销相对携程来说更大。 携程是运行在单进程单线成当中的，是以 串行的方式执行，每个携程都拥有自己的堆栈，所以不存在抢占和内存加锁。 如果需要深入理解请阅读 进程，线程，携程的区别
+当在携程中遇到耗时的IO或者网络请求时，当前的携程会自动让出控制权给主进程。关于携程更详细的理解请阅读 携程详解
+Channel 通道，用于协程间通讯，支持多生产者协程和多消费者协程。底层自动实现了协程的切换和调度。</description>
+    </item>
+    
+  </channel>
+</rss>

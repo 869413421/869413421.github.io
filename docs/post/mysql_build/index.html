@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>MySql（高可用，高拓展） - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="* 分区表原理 工作原理
+对用户而言，分区表是一个独立的逻辑表，mysql底层将其分成了多个物理子表，每一个分区表都是一个独立的文件
+适用场景
+表非常大，无法全部存放在内存中，或者表的最后有热点数据，其他的都是历史数据 分区表更容易维护，可以对独立的分区进行操作 分区表可以分布在不同的服务器上 可以使用分区表避免某些特殊的瓶颈 可以恢复和备份独立的分区 限制
+一个表只能有1024个分区 5.1版本中，分区表达式必须是整数 分区表字段中如果包含主键和唯一所以，那么主键和唯一列必须包含进去 分区表中不能使用外键约束 如果需要对现有表进行修改 所有分区表虚使用相同的存储引擎 某些引擎不支持分区 分库分表 工作原理 通过一些hash算法和工具实现将一张表的数据，垂直拆分和水平拆分 使用场景 单表记录数到达百万或者千万级别时候 解决表锁的问题 分表方式 水平分割 表很大，分割后降低在查询时候所需要读取的数据和索引的页数 使用场景 表中的数据具有独立性，比如说表中记录各个地区的数据或者不同时期的数据 需要把不同的数据存放在不同的介质 缺点 给应用增加复杂度，查询某些数据的时候需要定位到数据在某张表 垂直分割 将数据表的列进行分割，常用的列和不常用的列拆分成两个表 使用场景 一个表中一些列不常用，列外一些列常用 可以使数据行变小，一个数据也能存储更多的数据，查询时候减少IO次数 缺点 查询冗余，查询需要进行join操作 mysql主从复制 工作原理 在主库上把数据更改记录到二进制文件，从库将 主库的日志复制到自己的中继日志当中。从库读取日志，将数据重写到从库数据当中。 主从复制解决的问题 数据分布：随意停止或开始复制 负载均衡：降低单个服务器压力 高可用和故障切换：某个节点失败后其他节点顶替其工作，避免程序崩溃 异步复制：也是默认的主从同步方式。这种方式的优点是效率高。缺点是不能保证数据一定会到达slave。可能会受到网络等原因出现延迟，导致主从数据不一致。当前对master中的表进行数据操作，master将事务Binlog事件写入到Binlog文件中，此时主库只会通知一下Dump线程发送这些新的Binlog到slave（slave的 I/O 线程读取并将事件写入relay-log中）然后主库就会继续处理提交操作，而此时不会保证这些Binlog传到任何一个从库节点上。 全同步复制：优点是能够保证数据的强一致性，缺点是效率太低。当master上有提交事务之后，Dump线程发送这些新的Binlog到slave上，并且必须等待所有的slave回复成功（所有从库将事件写入中继日志，并将数据写入数据库）才能继续下一步操作。 半同步复制：优点是在耗费少量性能的基础上能在一定程度上保证数据的一致性。当master上有提交事务之后，Dump线程发送这些新的Binlog到slave上，并且必须等待其中一个slave回复成功（slave将事件写入relay-log）才能继续下一步操作。 " />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="MySql（高可用，高拓展）" />
+<meta property="og:description" content="MySql（高可用，高拓展）" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/mysql_build/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="MySql（高可用，高拓展）">
+<meta itemprop="description" content="MySql（高可用，高拓展）"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="52">
+<meta itemprop="keywords" content="MySQL,数据库," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="MySql（高可用，高拓展）"/>
+<meta name="twitter:description" content="MySql（高可用，高拓展）"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">MySql（高可用，高拓展）</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h3 id="-分区表原理">* 分区表原理</h3>
+<ul>
+<li>
+<p>工作原理</p>
+<p>对用户而言，分区表是一个独立的逻辑表，mysql底层将其分成了多个物理子表，每一个分区表都是一个独立的文件</p>
+</li>
+<li>
+<p>适用场景</p>
+<ul>
+<li>表非常大，无法全部存放在内存中，或者表的最后有热点数据，其他的都是历史数据</li>
+<li>分区表更容易维护，可以对独立的分区进行操作</li>
+<li>分区表可以分布在不同的服务器上</li>
+<li>可以使用分区表避免某些特殊的瓶颈</li>
+<li>可以恢复和备份独立的分区</li>
+</ul>
+</li>
+<li>
+<p>限制</p>
+<ul>
+<li>一个表只能有1024个分区</li>
+<li>5.1版本中，分区表达式必须是整数</li>
+<li>分区表字段中如果包含主键和唯一所以，那么主键和唯一列必须包含进去</li>
+<li>分区表中不能使用外键约束</li>
+<li>如果需要对现有表进行修改</li>
+<li>所有分区表虚使用相同的存储引擎</li>
+<li>某些引擎不支持分区</li>
+</ul>
+</li>
+</ul>
+<h3 id="分库分表">分库分表</h3>
+<ul>
+<li>工作原理
+<ul>
+<li>通过一些hash算法和工具实现将一张表的数据，垂直拆分和水平拆分</li>
+</ul>
+</li>
+<li>使用场景
+<ul>
+<li>单表记录数到达百万或者千万级别时候</li>
+<li>解决表锁的问题</li>
+</ul>
+</li>
+<li>分表方式
+<ul>
+<li>水平分割
+<ul>
+<li>表很大，分割后降低在查询时候所需要读取的数据和索引的页数
+<ul>
+<li>使用场景
+<ul>
+<li>表中的数据具有独立性，比如说表中记录各个地区的数据或者不同时期的数据</li>
+<li>需要把不同的数据存放在不同的介质</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>缺点
+<ul>
+<li>给应用增加复杂度，查询某些数据的时候需要定位到数据在某张表</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>垂直分割
+<ul>
+<li>将数据表的列进行分割，常用的列和不常用的列拆分成两个表
+<ul>
+<li>使用场景
+<ul>
+<li>一个表中一些列不常用，列外一些列常用</li>
+<li>可以使数据行变小，一个数据也能存储更多的数据，查询时候减少IO次数</li>
+</ul>
+</li>
+<li>缺点
+<ul>
+<li>查询冗余，查询需要进行join操作</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="mysql主从复制">mysql主从复制</h3>
+<ul>
+<li>工作原理
+<ul>
+<li>在主库上把数据更改记录到二进制文件，从库将 主库的日志复制到自己的中继日志当中。从库读取日志，将数据重写到从库数据当中。</li>
+</ul>
+</li>
+<li>主从复制解决的问题
+<ul>
+<li>数据分布：随意停止或开始复制</li>
+<li>负载均衡：降低单个服务器压力</li>
+<li>高可用和故障切换：某个节点失败后其他节点顶替其工作，避免程序崩溃</li>
+</ul>
+</li>
+<li>异步复制：也是默认的主从同步方式。这种方式的优点是效率高。缺点是不能保证数据一定会到达slave。可能会受到网络等原因出现延迟，导致主从数据不一致。当前对master中的表进行数据操作，master将事务Binlog事件写入到Binlog文件中，此时主库只会通知一下Dump线程发送这些新的Binlog到slave（slave的 I/O 线程读取并将事件写入relay-log中）然后主库就会继续处理提交操作，而此时不会保证这些Binlog传到任何一个从库节点上。</li>
+<li>全同步复制：优点是能够保证数据的强一致性，缺点是效率太低。当master上有提交事务之后，Dump线程发送这些新的Binlog到slave上，并且必须等待所有的slave回复成功（所有从库将事件写入中继日志，并将数据写入数据库）才能继续下一步操作。</li>
+<li>半同步复制：优点是在耗费少量性能的基础上能在一定程度上保证数据的一致性。当master上有提交事务之后，Dump线程发送这些新的Binlog到slave上，并且必须等待其中一个slave回复成功（slave将事件写入relay-log）才能继续下一步操作。</li>
+</ul>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/mysql"
+      >MySQL</a
+    >
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93"
+      >数据库</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/mysql_index/"
+      ><span class="mr-1.5">←</span><span>MySql（索引）</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/swoole/"
+      ><span>swoole（基础）</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

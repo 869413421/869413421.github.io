@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>数据结构（基础） - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="什么是数据结构 数据结构就是按照一定的逻辑把元素按照一定关系进行存储的数据
+数据结构分类 可以分为逻辑机构和物理结构两大类
+逻辑结构
+1.集合机构，指的是一堆没有任何关系的数据存储在一个集合中，它们是平级的
+2.线性结构，所有的的数据都存在1对1的关系、
+3.树形结构，树状机构中存在着1对多的关系
+4.图形结构，图形结构中存储着多对多的复杂关系
+物理结构
+1.顺序结构，所有的数据都是存储在一个连续内存当中的，它的逻辑关系和物理关系是一致的。
+2.链式存储结构，在链式存储结构中，存储单元可以是连续的也可以是不连续的，元素之间不能反映元素的逻辑关系，只存储元素的引用地址。根据指针来确定彼此的逻辑关系
+线性表 线性表是最基本，最简单的数据结构，一个线性表是一组拥有相同特征的元素的有限序列 线性表特征 表中第一个元素没有前驱，它是线性表的头结点。 表中最后一个元素没有后继，它是线性表的尾结点。 除了第一个和最后一个元素外，其他元素都拥有前驱和后续结点。 线性表的分类 根据不同的存储方式分类，线性表可以分为顺序表和链表
+顺序表 顺序表是一种以数组方式进行表示的线性表，顺序表中元素间的逻辑与物理存储的逻辑一致，表中的元素是存储在一个连续内存当中的。 链表 之前我们已经使用顺序存储结构实现了线性表，我们会发现虽然顺序表的查询很快，时间复杂度为O(1),但是增删的效率是比较低的，因为每一次增删操作都伴随着大量的数据元素移动。这个问题有没有解决方案呢？有，我们可以使用另外一种存储结构实现线性表，链式存储结构。 链表是一种物理存储单元上非连续、非顺序的存储结构，其物理结构不能只管的表示数据元素的逻辑顺序，数据元素的逻辑顺序是通过链表中的指针链接次序实现的。链表由一系列的结点（链表中的每一个元素称为结点）组成，结点可以在运行时动态生成。 单向链表 单向链表是链表的一种，它由多个结点组成，每个结点都由一个数据域和一个指针域组成，数据域用来存储数据，指针域用来指向其后继结点。链表的头结点的数据域不存储数据，指针域指向第一个真正存储数据的结点。单向链表查找或者插入数据都要从头部开始查找。 " />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="数据结构（基础）" />
+<meta property="og:description" content="数据结构基础" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/data/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="数据结构（基础）">
+<meta itemprop="description" content="数据结构基础"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="27">
+<meta itemprop="keywords" content="数据结构," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="数据结构（基础）"/>
+<meta name="twitter:description" content="数据结构基础"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">数据结构（基础）</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="什么是数据结构">什么是数据结构</h2>
+<p>数据结构就是按照一定的逻辑把元素按照一定关系进行存储的数据</p>
+<h2 id="数据结构分类">数据结构分类</h2>
+<p>可以分为逻辑机构和物理结构两大类</p>
+<ul>
+<li>
+<p>逻辑结构</p>
+<p>1.集合机构，指的是一堆没有任何关系的数据存储在一个集合中，它们是平级的</p>
+<p>2.线性结构，所有的的数据都存在1对1的关系、</p>
+<p>3.树形结构，树状机构中存在着1对多的关系</p>
+<p>4.图形结构，图形结构中存储着多对多的复杂关系</p>
+</li>
+<li>
+<p>物理结构</p>
+<p>1.顺序结构，所有的数据都是存储在一个连续内存当中的，它的逻辑关系和物理关系是一致的。</p>
+<p>2.链式存储结构，在链式存储结构中，存储单元可以是连续的也可以是不连续的，元素之间不能反映元素的逻辑关系，只存储元素的引用地址。根据指针来确定彼此的逻辑关系</p>
+</li>
+</ul>
+<h2 id="线性表">线性表</h2>
+<ul>
+<li>线性表是最基本，最简单的数据结构，一个线性表是一组拥有相同特征的元素的有限序列</li>
+<li>线性表特征
+<ul>
+<li>表中第一个元素没有前驱，它是线性表的头结点。</li>
+<li>表中最后一个元素没有后继，它是线性表的尾结点。</li>
+<li>除了第一个和最后一个元素外，其他元素都拥有前驱和后续结点。</li>
+</ul>
+</li>
+</ul>
+<h3 id="线性表的分类">线性表的分类</h3>
+<p>根据不同的存储方式分类，线性表可以分为<strong>顺序表</strong>和<strong>链表</strong></p>
+<h4 id="顺序表">顺序表</h4>
+<ul>
+<li>顺序表是一种以数组方式进行表示的线性表，顺序表中元素间的逻辑与物理存储的逻辑一致，表中的元素是存储在一个连续内存当中的。</li>
+</ul>
+<h4 id="链表">链表</h4>
+<ul>
+<li>之前我们已经使用顺序存储结构实现了线性表，我们会发现虽然顺序表的查询很快，时间复杂度为O(1),但是增删的效率是比较低的，因为每一次增删操作都伴随着大量的数据元素移动。这个问题有没有解决方案呢？有，我们可以使用另外一种存储结构实现线性表，链式存储结构。</li>
+<li>链表是一种物理存储单元上非连续、非顺序的存储结构，其物理结构不能只管的表示数据元素的逻辑顺序，数据元素的逻辑顺序是通过链表中的指针链接次序实现的。链表由一系列的结点（链表中的每一个元素称为结点）组成，结点可以在运行时动态生成。</li>
+</ul>
+<h4 id="单向链表">单向链表</h4>
+<ul>
+<li>单向链表是链表的一种，它由多个结点组成，每个结点都由一个数据域和一个指针域组成，数据域用来存储数据，指针域用来指向其后继结点。链表的头结点的数据域不存储数据，指针域指向第一个真正存储数据的结点。单向链表查找或者插入数据都要从头部开始查找。</li>
+</ul>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"
+      >数据结构</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/swoole/"
+      ><span class="mr-1.5">←</span><span>swoole（基础）</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/laravel_redis/"
+      ><span>laravel&#43;Redis简单实现队列通过压力测试的高并发处理</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>
