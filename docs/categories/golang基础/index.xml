@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>golang基础 on 清水泥沙</title>
+    <link>https://869413421.github.io/categories/golang%E5%9F%BA%E7%A1%80/</link>
+    <description>Recent content in golang基础 on 清水泥沙</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-zh</language>
+    <lastBuildDate>Tue, 07 Feb 2023 15:52:40 +0800</lastBuildDate><atom:link href="https://869413421.github.io/categories/golang%E5%9F%BA%E7%A1%80/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>golang基础(1.GOPATH和工作区)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/1.gopath%E5%92%8C%E5%B7%A5%E4%BD%9C%E5%8C%BA/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/1.gopath%E5%92%8C%E5%B7%A5%E4%BD%9C%E5%8C%BA/</guid>
+      <description>官方命令文档 设置gopath的意义是什么？ gopath是系统的环境变量，它是由一个或者多个文件目录路径组成。每一个文件路径是一个GO语言的工作区（workspace）。这些工作区用于存放go项目的源代码文件（sourcefile），安装（go install）以后的归档文件，编译后的可执行文件(go build)。
+go语言的源码的组织方式 在go语言中，包作为go语言的基本单位，这些包的名称和文件系统中目录名称一一对应，一个目录下可以有多个子目录，相对应的一个包下可以有多个子包 一个包下可以包含多个.go文件，这些源代码必须被声明为在同一包下。代码包的名称一般与源码所在的目录同名，如果不同名，那么在安装过程中会一代码文件中的包声明为准 每个包拥有自己的导入路径，在工作区中一个包的导入路径实际上就是从src子目录到该包存储位置的相对路径 了解源码安装后的后果 源码文件会被放到某个工作区的src目录下 如果安装后产生了归档文件，则会被放进该工作区的pkg子目录下 如果安装后产生了可执行文件，则会被放进该工作区的bin子目录下 理解构建和安装go程序的过程 构建命令使用go build,安装命令使用go install,构建和安装都会进行打包编译等操作，并且将这些操作生成的文件放到某个临时目录当中 如果构建的是库源码文件，这些文件只会被保存在临时目录当中，这里构建的意义在于检查和验证。 如果构建的是命令源码文件，那么操作的结果文件会被搬运到那个源码文件所在的目录中。 安装操作会先构建，然后把文件转运到指定的目录下。如果安装的是库源码文件，那么结果文件会被搬运到它所在工作区的 pkg 目录下的某个子目录 。 如果安装的是命令源码文件，那么结果文件会被搬运到它所在工作区的 bin 目录中，或者环境变量GOBIN指向的目录中。 go build 命令的一些可选项的用途和用法 在运行go build的时候，默认是不会编译目标代码所依赖的那些代码包。如果依赖代码包的归档文件不存在，或者源码发生了变化，那么它还是会被编译。如果要强制编译她们，可以在执行命令时加上选项 -a,此时目标代码包以及所依赖的代码包都会被编译，哪怕是标准库中的代码包也是如此。另外，如果不但要编译依赖的代码包，还要安装它们的归档文件，那么可以加入标记-i（新版本已抛弃）。如何确认那些包被编译了？
+运行go build时候加上-x,加上-n参数可以只看具体操作不执行他们 运行go build的时候加上-v,这样可以看到编译代码包的名称。 go get命令常用选项 go get 命令会自动帮我们从主流的公用代码仓库下载代码，并且将他们安装到环境变量gopath包含的第一工作区对应的目录中。
+-u : 下载并安装代码，不论工作区中是否已经存在 -d: 只下载代码包，不安装代码包 -fix: 在下载代码包后先运行一个用于根据当前版本GO语言的修正工具，然后再安装代码包 -t: 同时下载测试所需的代码包 -insecure：允许通过非安全的网络协议下载和安装代码包。HTTP 就是这样的协议。 </description>
+    </item>
+    
+    <item>
+      <title>golang基础(10.浮点型与复数类型)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/10.%E6%B5%AE%E7%82%B9%E5%9E%8B%E4%B8%8E%E5%A4%8D%E6%95%B0%E7%B1%BB%E5%9E%8B/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/10.%E6%B5%AE%E7%82%B9%E5%9E%8B%E4%B8%8E%E5%A4%8D%E6%95%B0%E7%B1%BB%E5%9E%8B/</guid>
+      <description>浮点型也叫做浮点数，用于表示包含小数点的数据，比如3.14,1.00
+浮点数表示 在go中浮点数定义了两种类型，分别是float32和float64,其中float32是单精度，精确到小数点后面7位数。float64为双精度（double），精确到小数点后15位。在实际开发中，应该尽可能地使用 float64 类型，因为 math 包中所有有关数学运算的函数都会要求接收这个类型。
+var a float32 = 0.1var b float64 = 0.2c := 8.0 //需要加小数点，否则会自动推导为整 :::tips 浮点数的运算和整型一样，也要保证操作数的类型一致，float32 和 float64 类型数据不能混合运算，需要手动进行强制转化才可以 :::
+浮点数的精度问题 浮点数不是一个精确的表达，因为二进制无法表达所有十进制小数，在双精度的时候会存在精度丢失问题。
+package mainimport &amp;#34;fmt&amp;#34;func main() {var a float64= 0.7var b float64 = 0.1c := a + bfmt.Printf(&amp;#34;a+b=%v &amp;#34;, c) // 输出0.7999999999999999fmt.Printf(&amp;#34;0.8 == 0.1+0.7 ? %v&amp;#34;, (0.8 == a+b)) // 输出false} 浮点数运算 浮点数可以通过算术运算符四则运算加减乘除，也可以进行比较运算（两个值得类型相等）。但在进行相等比较时，看起来相等的两个十进制浮点数，在底层转化为二进制时会丢失精度，因此不能被表象蒙蔽。如果需要比较可以使用以下方案。
+package mainimport (&amp;#34;fmt&amp;#34;&amp;#34;math&amp;#34;)func main() {var a float64 = 0.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(11.字符串和字符类型)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/11.%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%92%8C%E5%AD%97%E7%AC%A6%E7%B1%BB%E5%9E%8B/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/11.%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%92%8C%E5%AD%97%E7%AC%A6%E7%B1%BB%E5%9E%8B/</guid>
+      <description>字符串 在go中字符串作为一个基本类型，默认使用utf8编码。当字符为ASCII码时占用一个字节，其他字符串需要2-4个自己，中文占用3个字节。
+声明和初始化 var str string str = &amp;#34;test&amp;#34;str2 := &amp;#34;test2&amp;#34; 获取单个字符 获取单个字符可以使用数组下标的方式
+str := &amp;#34;test&amp;#34;ch := str[0]print(ch) // 输出t 格式化输出 还可以通过 Go 语言内置的 len() 函数获取指定字符串的长度，以及通过 fmt 包提供的 Printf 进行字符串格式化输出（用法和 PHP 中的 printf 类似）
+fmt.Printf(&amp;#34;The length of \&amp;#34;%s\&amp;#34; is %d &amp;#34;, str, len(str)) fmt.Printf(&amp;#34;The first character of \&amp;#34;%s\&amp;#34; is %c.&amp;#34;, str, ch) 转义字符 与PHP不同，go只允许使用双引号来定义字符串字面值。如果要对特定字符进行转义，可以通过 \ 实现，就像我们上面在字符串中转义双引号和换行符那样，常见的需要转义的字符如下所示：
+：换行符
+\r ：回车符 \t ：tab 键 \u 或 \U ：Unicode 字符 \ ：反斜杠自身 所以，上述打印代码输出结果为：</description>
+    </item>
+    
+    <item>
+      <title>golang基础(12.基本数据类型之间的转换)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/12.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B9%8B%E9%97%B4%E7%9A%84%E8%BD%AC%E6%8D%A2/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/12.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B9%8B%E9%97%B4%E7%9A%84%E8%BD%AC%E6%8D%A2/</guid>
+      <description>我们已经陆续介绍完了 Go 语言中的基本数据类型，分别是布尔类型、整型、浮点型、复数类型、字符串和字符类型，和 PHP 一样，Go 语言也支持这些基本数据类型之间的转化，但是不是像 PHP 那种可以自动转化，比如下面这些语句在 PHP 中都是合法的：
+$a = 1;$b = 1.1;$c = &amp;#34;test&amp;#34;;$d = true;$sum = $a + $b; // 将 $a 和 $b 相加，会自动将 $a 转化为浮点型，结果是 2.1$sum = $a + $d; // 将 $a 和 $d 相加，会自动将 $d 转化为整型，结果是 2$str = $c . $b; // 将 $b 和 $c 相连接，$b 会被转化为字符串，结果是「test1.1」 数值类型之间的转换 关于数值类型之间的转化，我们前面在介绍运算符的时候已经提到过，在进行类型转化时只需要调用要转化的数据类型对应的函数即可：
+v1:= uint(16) // 初始化 v1 类型为 unitv2 := int8(v1) // 将 v1 转化为 int8 类型并赋值给 v2v3 := uint16(v2) // 将 v2 转化为 uint16 类型并赋值给 v3 不过需要注意，在有符号与无符号以及高位数字向低位数字转化时，需要注意数字的溢出和截断，比如我们看这个例子：</description>
+    </item>
+    
+    <item>
+      <title>golang基础(13.数组及其使用)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/13.%E6%95%B0%E7%BB%84%E5%8F%8A%E5%85%B6%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/13.%E6%95%B0%E7%BB%84%E5%8F%8A%E5%85%B6%E4%BD%BF%E7%94%A8/</guid>
+      <description>数组的声明和初始化 数组是所有语言编程中最常用的数据结构之一，Go 语言也不例外，与 PHP、JavaScript 等弱类型动态语言不同，在 Go 语言中，数组是固定长度的、同一类型的数据集合。数组中包含的每个数据项被称为数组元素，一个数组包含的元素个数被称为数组的长度。和 PHP 一样，Go 语言也通过 [] 来标识数组类型，以下是一些常见的数组声明方法：
+var a [8]byte // 长度为8的数组，每个元素为一个字节var b [3][3]int // 二维数组（9宫格）var c [3][3][3]float64 // 三维数组（立体的9宫格）var d = [3]int{1, 2, 3} // 声明时初始化var e = new([3]string) // 通过 new 初始化 数组可以是多维的，但是声明数组必须指定同一个数据类型，且要在声明时候指定长度。&amp;lt;br /&amp;gt;还可以通过 := 对数组进行声明和初始化：a := [5]int{1,2,3,4,5} 此外还可以通过&amp;hellip;省略号的方式忽略数组长度
+a := [...]int{1,2,3} 这种情况go会在编译期间自动计算出数组长度数组初始化的时候，如果没填充慢，空位即是对应元素的初始值
+a := [5]int{1, 2, 3}fmt.Println(a) 上述代码的打印结果是：
+[1 2 3 0 0] 还可以初始化指定下标位置的元素值
+a : = [5]int{1:3,2:4} 数组长度在定义后就不可更改，在声明时可以指定数组长度为一个常量或者一个常量表达式（常量表达式是指在编译期即可计算结果的表达式）。数组的长度是该数组类型的一个内置常量，可以用 Go 语言的内置函数 len() 来获取：</description>
+    </item>
+    
+    <item>
+      <title>golang基础(14.数组切片)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/14.%E6%95%B0%E7%BB%84%E5%88%87%E7%89%87/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/14.%E6%95%B0%E7%BB%84%E5%88%87%E7%89%87/</guid>
+      <description>数组定义长度后是无法修改的，数组的长度是数组类型本身的一部分，长度是数组内的一个内置常量，因此我们不能对数组进行一个增删操作。显然数组这种不灵活的特性是不能满足日常开发需求的，因此golang提供了另一种数据类型（slice）数组切片来你补数组的不足。数组切片是一个能对元素进行增删的数组，它的底层就是基于数组实现的。
+数组切片的定义 在go中，定义数组切片稍微与定义数组不同，数组是需要指定长度和类型的，数组切片只需要指定类型不需要指定长度。
+package mainimport &amp;#34;fmt&amp;#34;func main() {// 数组var arr = [5]int{1, 2, 3, 4, 5}// 切片var _slice = []int{1, 2, 3, 4, 5}fmt.Println(arr)fmt.Println(_slice)} 切片是一个可变长度同一类型元素的集合，切片的长度可以随着元素增长而增长（不会因为减少而减少），不过数组底层管理依然使用数组来管理元素。切片是数组的一层封装，基于数组为其提供一系列管理功能，可以动态拓展存储空间。创建数组切片 创建数组切片的方法主要有三种 —— 基于数组、基于数组切片和直接创建。
+基于数组 数组切片可以基于一个已经存在的数组创建。数组可以看做是切片的底层数组，切片则是其某个连续片段的引用。切片可以局域数组的一部分创建也可以基于一整个创建，甚至可以创建一个比原数组更大的切片。
+package mainimport &amp;#34;fmt&amp;#34;func main() {// 创建一个数组nums := [...]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}// 基于数组片段创建切片slice1 := nums[0:3]slice2 := nums[5:9]// 基于数组全部创建切片sliceAll := nums[:]fmt.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(15.数组切片增删)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/15.%E6%95%B0%E7%BB%84%E5%88%87%E7%89%87%E5%A2%9E%E5%88%A0/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/15.%E6%95%B0%E7%BB%84%E5%88%87%E7%89%87%E5%A2%9E%E5%88%A0/</guid>
+      <description>动态增加元素切片比数组强大之处在于能够动态增加元素，甚至可以在容量不足的情况下自动扩容。元素个数和元素可以分配的空间是两个不同的值，元素个数是长度，元素可分配空间是容量。一个切片容量的初始值可以根据创建方式改变
+对于基于数组和切片创建的切片而言，默认容量是从切片起始索引到对应底层数组的结尾索引； 对于通过内置 make 函数创建的切片而言，在没有指定容量参数的情况下，默认容量和切片长度一致。 函数append()可以为数组末尾增加参数。如果追加的元素个数超出 原切片的的默认容量，则底层会自动进行扩容：
+package mainimport &amp;#34;fmt&amp;#34;func main() {slice1 := make([]int, 4, 10)fmt.Println(len(slice1))fmt.Println(cap(slice1))slice2 := append(slice1, 1, 2, 3)fmt.Println(len(slice2)) // 长度7fmt.Println(cap(slice2)) // 容量10slice1 = append(slice1, slice2...)fmt.Println(slice1) fmt.Println(len(slice1)) // 长度11fmt.Println(cap(slice1)) // 容量20} 需要注意的是append方法并不会改变原来的切片，而是会生成一个新的容量 更大切片当中，将原有的元素和新增的元素一并拷贝到新的切片中一并放回。默认情况下，扩容后的`新切片是原切片容量的2倍`。如果还不足以容纳新元素则会再次进行扩容，直到新的容量足够容纳下所有的元素。但是，当原切片的长度大于或等于 `1024 `时，Go 语言将会以原容量的 `1.25 `倍作为新容量的基准。&amp;lt;br /&amp;gt;因此在开发阶段我们应该合理地分配容量值，减少内部因扩容重新分配内存和搬送内存的操作次数，提高程序性能。内容复制 go中拥有一个复制数组切片的函数copy，作用是讲一个数组切片的元素搬运到另一个数组切片。如果两个数组切片的元素个数不一致，会按其中较小的切片进行复制。
+package mainimport &amp;#34;fmt&amp;#34;func main() {slice1 := []int{1, 2, 3, 4, 5}slice2 := []int{6, 7, 8}// 复制slice1到slice2//copy(slice2, slice1)//fmt.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(16.字典类型声明，初始化，简单使用)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/16.%E5%AD%97%E5%85%B8%E7%B1%BB%E5%9E%8B%E5%A3%B0%E6%98%8E%E5%88%9D%E5%A7%8B%E5%8C%96%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/16.%E5%AD%97%E5%85%B8%E7%B1%BB%E5%9E%8B%E5%A3%B0%E6%98%8E%E5%88%9D%E5%A7%8B%E5%8C%96%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/</guid>
+      <description>字典定义 go中支持字典类型的数据，所谓字典类型，指的是一个键值对的关系集合。一个键对应一个值，go中的字典是一个无序集合，不会根据键或值进行排序。在go中声明字典：
+package mainimport (&amp;#34;fmt&amp;#34;&amp;#34;strconv&amp;#34;)func main() {var map1 map[string]intfmt.Println(map1)map2 := map[string]int{&amp;#34;one&amp;#34;: 1,&amp;#34;two&amp;#34;: 2,}fmt.Println(map2)key := &amp;#34;two&amp;#34;value, ok := map2[key]if ok {fmt.Printf(&amp;#34;map has key:&amp;#34; + key + &amp;#34; values is:&amp;#34; + strconv.Itoa(value))} else {fmt.Printf(&amp;#34;map no has key&amp;#34;)}} 字典声明 var map1 map[string]int 在go中声明字典需要指定键的数据类型以及值得数据类型
+字典初始化 我们可以通过先声明再初始化的方式进行初始化，就像上面示例代码做的那样，也可以通过 := 将声明和初始化合并为一条语句：
+map2 := map[string]int{&amp;#34;one&amp;#34;: 1,&amp;#34;two&amp;#34;: 2,} 还可以通过make函数来初始化一个字典，使用make函数创建的字典可以直接赋值。直接声明不允许这样操作，因为数据没被初始化为nil赋值会直接抛异常。</description>
+    </item>
+    
+    <item>
+      <title>golang基础(17.字典遍历排序)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/17.%E5%AD%97%E5%85%B8%E9%81%8D%E5%8E%86%E6%8E%92%E5%BA%8F/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/17.%E5%AD%97%E5%85%B8%E9%81%8D%E5%8E%86%E6%8E%92%E5%BA%8F/</guid>
+      <description>字典遍历 使用for range 可以对字典进行遍历。
+package mainimport &amp;#34;fmt&amp;#34;func main() {map1 := map[string]int{&amp;#34;one&amp;#34;: 1,&amp;#34;two&amp;#34;: 2,&amp;#34;three&amp;#34;: 3,}for k, v := range map1 {fmt.Println(k, v)}} 键值对调 键值对调指交换字典的键和值。
+package mainimport &amp;#34;fmt&amp;#34;func main() {map1 := map[string]int{&amp;#34;one&amp;#34;: 1,&amp;#34;two&amp;#34;: 2,&amp;#34;three&amp;#34;: 3,}for k, v := range map1 {fmt.Println(k, v)}invMap := make(map[int]string, 3)for k, v := range map1 {invMap[v] = k}for k, v := range invMap {fmt.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(18.指针的基本概念和使用)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/18.%E6%8C%87%E9%92%88%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/18.%E6%8C%87%E9%92%88%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E4%BD%BF%E7%94%A8/</guid>
+      <description>指针概述 在go中我们可以通过变量来定义操作我们的物理存储空间，其本质是一块内存空间的定义。而指针的定义是指指向存储这些变量值的内存地址。
+package mainimport &amp;#34;fmt&amp;#34;func main() {var a = 100var ptr *intptr = &amp;amp;afmt.Println(a) // 变量值fmt.Println(ptr) // 变量值存储地址} 上述代码定义了一个整形变量a值是一百，然后定义了一个整形指针。通过&amp;amp;符号，将变量a的变量值地址赋值给了指针ptr。我们可以通过 *ptr 获取指针指向内存地址存储的变量值（我们通常将这种引用称作「间接引用」），ptr 本身是一个内存地址值（通过 &amp;amp;a 可以获取变量 a 所在的内存地址）&amp;lt;br /&amp;gt;go语言引入指针类型，主要基于两点考虑。一个是为程序员提供操作变量对应内存数据结构的能力，一个是为了提供程序性能。（指针可以值直接传递某个变量的内存地址，可以在传递过程当中产生的值拷贝）&amp;lt;br /&amp;gt;指针在go中有两个使用场景类型指针 数组切片 作为类型指针时，允许对这个指针类型的数据直接进行修改指向其他内存地址，传递数据时如果使用指针则无须拷贝数据从而节省内存空间，此外和 C 语言中的指针不同，Go 语言中的类型指针不能进行偏移和运算，因此更为安全。数组切片，由指向起始元素的原始指针、元素数量和容量组成，所以切片与数组不同，是引用类型，而非值类型。
+指针的基本使用 指针类型的声明和初始化 指针变量传值时之所以可以节省空间，因为指针指向的内存地址大小是固定的，在32位机器上占4个字节，在64位上占8个字节，与指向内存存储的值无关。
+var ptr *intfmt.Println(ptr)a := 100ptr = &amp;amp;afmt.Println(ptr)fmt.Println(*ptr) 当指针被声明后，没有指向任何变量内存地址时，它的零值是 nil，然后我们可以通过在给定变量前加上取地址符 &amp;amp; 获取变量对应的内存地址将其赋值给声明的指针类型，这样，就是对指针的初始化了，然后我们可以通过在指针类型前加上间接引用符 * 获取指针指向内存空间存储的变量值。当然，我们也可以通过 := 对指针进行初始化：
+a := 100ptr := &amp;amp;afmt.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(19.条件语句)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/19.%E6%9D%A1%E4%BB%B6%E8%AF%AD%E5%8F%A5/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/19.%E6%9D%A1%E4%BB%B6%E8%AF%AD%E5%8F%A5/</guid>
+      <description>流程控制主要用于设定计算执行的次序，建立程序的逻辑结构。Go 语言的流程控制和 PHP 类似，支持如下的几种流程控制语句：
+条件语句，用于条件判断，对应关键词有if,else和else if 选择语句，用于分支选择，对应关键字有switch , case ,select(用于channel) 循环语句，用于迭代数据，对应关键词有for,range 跳转语句，用于跳转到指定逻辑，对应关键词goto // ifif condition { // do something }// if...else...if condition { // do something } else {// do something }// if...else if...else...if condition1 { // do something } else if condition2 {// do something else } else {// catch-all or default } 关于 Go 语言的条件语句，需要注意以下几点:
+条件语句中不需要圆括号 语句体中有几条语句，花括号都必须存在 左花括号 { 必须与 if 或者 else 处于同一行 在 if 之后，条件语句之前，可以添加变量初始化语句，使用 ; 间隔，比如上述代码可以这么写 if score := 100; score &amp;gt; 90 { </description>
+    </item>
+    
+    <item>
+      <title>golang基础(2.命令源码文件)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/2.%E5%91%BD%E4%BB%A4%E6%BA%90%E7%A0%81%E6%96%87%E4%BB%B6/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/2.%E5%91%BD%E4%BB%A4%E6%BA%90%E7%A0%81%E6%96%87%E4%BB%B6/</guid>
+      <description>命令源码文件怎样接收参数 flag.StringVar package mainimport (&amp;#34;flag&amp;#34;&amp;#34;fmt&amp;#34;)var name stringfunc init() {// 初始化参数flag.StringVar(&amp;amp;name, &amp;#34;name&amp;#34;, &amp;#34;everyone&amp;#34;, &amp;#34;user name&amp;#34;)}func main() {// 1.正式接收参数flag.Parse()fmt.Printf(&amp;#34;hello,%s! &amp;#34;, name)} 函数flag.StringVar接受 4 个参数。
+第 1 个参数是用于存储该命令参数的值的地址，具体 到这里就是在前面声明的变量name的地址了，由表达式&amp;amp;name表示。 第 2 个参数是为了指定该命令参数的名称，这里是name。 第 3 个参数是为了指定在未追加该命 令参数时的默认值，这里是everyone。 至于第 4 个函数参数，即是该命令参数的简短说明了，这在打印命令说明时会用到。 flag.String 还有一个与flag.StringVar函数类似的函数，叫flag.String。这两个函数 的区别是，后者会直接返回一个已经分配好的用于存储命令参数值的地址。
+package mainimport (&amp;#34;flag&amp;#34;&amp;#34;fmt&amp;#34;)func main() {// 1.正式接收参数name := flag.String(&amp;#34;name&amp;#34;, &amp;#34;everyone&amp;#34;, &amp;#34;username&amp;#34;)flag.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(20.分支语句)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/20.%E5%88%86%E6%94%AF%E8%AF%AD%E5%8F%A5/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/20.%E5%88%86%E6%94%AF%E8%AF%AD%E5%8F%A5/</guid>
+      <description>分支语句会根据条件的不同选择不同的分支代码进行执行，在go中不需要显式通过break语句跳出。
+switch var1 {case a:...case b:...default:...} switch可以进行等值判断，也可以条件判断。如果是条件判断，不允许将变量放到switch关键词后。
+package mainimport &amp;#34;fmt&amp;#34;func main() {// 等值判断num := 100switch num {case 90, 100:fmt.Println(1)case 80:fmt.Println(2)}// 条件判断switch {case num &amp;gt;= 90:fmt.Println(&amp;#34;a&amp;#34;)case num &amp;gt;= 90 &amp;amp;&amp;amp; num &amp;lt; 95:fmt.Println(&amp;#34;b&amp;#34;)}} 在go语言中使用逗号分隔不同的分支条件从而到达合并分支语句的目的，如 case 90,100。&amp;lt;br /&amp;gt;Go 分支语句中比较有意思的一点，那就是不需要显式通过 break 语句退出某个分支，上一个分支语句代码会在下一个 case 语句出现之前自动退出，如果你想要继续执行后续分支代码，可以通过一个 `fallthrough `语句来声明：package mainimport &amp;#34;fmt&amp;#34;func main() {num := 100switch {case num &amp;gt; 90:fmt.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(21.循环语句)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/21.%E5%BE%AA%E7%8E%AF%E8%AF%AD%E5%8F%A5/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/21.%E5%BE%AA%E7%8E%AF%E8%AF%AD%E5%8F%A5/</guid>
+      <description>基本使用 与其它编程语言不同的是，Go 语言中的循环语句只支持 for 关键字，而不支持 while 和 do-while 结构。关键字 for 的基本使用方法与 PHP 类似，只是循环条件不含括号，比如我们要计算 1 到 100 之间所有数字之后，可以这么做：
+package mainimport &amp;#34;fmt&amp;#34;func main() {sum := 0for i := 0; i &amp;lt;= 100; i++ {sum += i}fmt.Println(sum) // 输出5050} 无限循环 go不支持while和do-while语句，如果需要无限循环，可以通过不带条件的for语句实现：
+package mainimport &amp;#34;fmt&amp;#34;func main() {sum := 0i := 0for {i++if i &amp;gt; 100 {break}sum += i}fmt.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(22.跳转语句)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/22.%E8%B7%B3%E8%BD%AC%E8%AF%AD%E5%8F%A5/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/22.%E8%B7%B3%E8%BD%AC%E8%AF%AD%E5%8F%A5/</guid>
+      <description>break 与 continue 语句 Go 语言支持在循环语句中通过 break 语句跳出循环，通过 continue 语句进入下一个循环。break 的默认作用范围是该语句所在的最内部的循环体：
+package mainimport &amp;#34;fmt&amp;#34;func main() {arr := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}for i := 0; i &amp;lt; len(arr); i++ {for j := 0; j &amp;lt; len(arr[i]); j++ {num := arr[i][j]if j &amp;gt; 1 {break}fmt.Println(num)}}} continue 则用于忽略剩余的循环体而直接进入下一次循环的过程：
+package mainimport &amp;#34;fmt&amp;#34;func main() {arr := [][]int{{1, 2, 3}, {4, 5, 6}, {7, 8, 9}}for i := 0; i &amp;lt; len(arr); i++ {for j := 0; j &amp;lt; len(arr[i]); j++ {num := arr[i][j]if j &amp;gt; 1 {break} else {continue}fmt.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(23.函数的基本调用和定义)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/23.%E5%87%BD%E6%95%B0%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%B0%83%E7%94%A8%E5%92%8C%E5%AE%9A%E4%B9%89/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/23.%E5%87%BD%E6%95%B0%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%B0%83%E7%94%A8%E5%92%8C%E5%AE%9A%E4%B9%89/</guid>
+      <description>在 Go 语言中，函数的基本组成为：关键字 func、函数名、参数列表、返回值、函数体和返回语句，作为强类型语言，无论是参数还是返回值，在定义函数时，都要声明其类型。函数主要分为三种类型
+普通函数 匿名函数 类型系统方法 函数定义 func add(a, b int) int {return a + b} 如果函数的参数列表中包含若干个类型相同的参数，比如上面例子中的 a 和 b，则可以在参数列表中省略前面变量的类型声明，只保留最后一个。
+函数调用 函数调用非常方便，如果是在同一个包中（即定义在同一个目录下的 Go 文件中），只需直接调用即可：
+package mainimport &amp;#34;fmt&amp;#34;func add(a, b int) int {return a + b}func main() {fmt.Println(add(1, 2))} 需要先导入了该函数所在的包，然后才能调用该函数，比如，我们将 add 函数放到单独的 mymath 包中（函数名首字母改为大写）：package mymathfunc Add(a, b int) int {return a + b} 然后我们可以这样在 main 包中调用 Add 函数：</description>
+    </item>
+    
+    <item>
+      <title>golang基础(24.函数的传参和返回值)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/24.%E5%87%BD%E6%95%B0%E7%9A%84%E4%BC%A0%E5%8F%82%E5%92%8C%E8%BF%94%E5%9B%9E%E5%80%BC/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/24.%E5%87%BD%E6%95%B0%E7%9A%84%E4%BC%A0%E5%8F%82%E5%92%8C%E8%BF%94%E5%9B%9E%E5%80%BC/</guid>
+      <description>按值传参和引用传参 go中默认按值来进行参数传递，就是传递传入参数的一个副本。函数只对副本操作，不会对原值有任何影响。
+package mainimport &amp;#34;fmt&amp;#34;func add(a, b int) int {a *= 2b *= 3return a + b}func main() {x, y := 1, 2z := add(x, y)fmt.Printf(&amp;#34;add(%d, %d) = %d&amp;#34;, x, y, z)} 当我们把 x、y 变量作为参数传递到 add 函数时，这两个变量会拷贝出一个副本赋值给 a、b 变量作为参数，因此，在 add 函数中调整 a、b 变量的值并不会影响原变量 x、y 的值，所以上述代码的输出是：
+add(1, 2) = 8 如果想要实在在函数中修改原有参数的值，可以通过引用传参来完成。传入函数内的不再是参数的服务。而是传递存储有变量值地址的指针。所以原变量的值也会被修改（这种情况下，传递的是变量地址值的拷贝，所以从本质上来说还是按值传参）：
+package mainimport &amp;#34;fmt&amp;#34;func add(a, b *int) int {*a *= 2*b *= 3return *a + *b}func main() {x, y := 1, 2z := add(&amp;amp;x, &amp;amp;y)fmt.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(25.变长函数)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/25.%E5%8F%98%E9%95%BF%E5%87%BD%E6%95%B0/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/25.%E5%8F%98%E9%95%BF%E5%87%BD%E6%95%B0/</guid>
+      <description>所谓变长参数指的是函数参数的数量不确定，可以按照需要传递任意数量的参数到指定函数，比如前面演示过的 fmt.Printf 函数的参数显然就是变长参数。
+Go 语言中的变长参数 合适地使用变长参数，可以让代码更简洁，尤其是输入输出类函数，比如日志函数。接下来，作为对比，我们来介绍下 Go 语言中的变长参数的用法，和 PHP 类似，只是把 &amp;hellip; 作用到类型上，这样就可以约束变长参数的类型：
+package mainimport &amp;#34;fmt&amp;#34;func myFunc(numbers ...int) {for _, number := range numbers {fmt.Println(number)}}func main() {myFunc(1, 2, 3, 4, 5)} 或者还可以传递一个数组切片，传递切片时需要在末尾加上 &amp;hellip; 作为标识，表示对应的参数类型是变长参数：
+package mainimport &amp;#34;fmt&amp;#34;func myFunc(numbers ...int) {for _, number := range numbers {fmt.Println(number)}}func main() {myFunc(1, 2, 3, 4, 5)slice1 := []int{7, 8, 9, 10}myFunc(slice1.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(26.匿名函数与闭包)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/26.%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0%E4%B8%8E%E9%97%AD%E5%8C%85/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/26.%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0%E4%B8%8E%E9%97%AD%E5%8C%85/</guid>
+      <description>匿名函数 匿名函数是一种不需要定义函数名称的声明方式，Go 语言中也提供了对匿名函数的支持，并且形式上和 PHP 类似，无非是要声明参数类型和返回值类型而已：
+package mainimport &amp;#34;fmt&amp;#34;func main() {add := func(a, b int) int {return a + b}fmt.Println(add(1, 2)) // 赋值变量调用匿名函数 addc := func(a, b int) int {return a + b}(1, 2)fmt.Println(c) // 直接调用} 闭包 Go 语言的匿名函数是一个闭包（Closure），下面我们先来了解一下闭包的概念、价值和应用场景。
+闭包的概念和价值 所谓闭包是指引用了自由变量的函数，被引用的自由变量将和这个函数一同存在，即使离开了创造它的上下文环境也不会被释放掉。或者通俗点说，「闭」的意思是「封闭外部状态」，即使外部状态已经失效，闭包内部依然保留了一份从外部引用的变量。闭包的价值在于可以作为函数对象或者匿名函数，对于类型系统而言，这意味着不仅要表示数据还要表示代码。支持闭包的多数语言都将函数作为第一类对象（firt-class object，有的地方也译作第一级对象，第一类公民等），就是说这些函数可以存储到变量中作为参数传递给其他函数，能够被函数动态创建和返回。 :::success 注：所谓第一类对象指的是运行期可以被创建并作为参数传递给其他函数或赋值给变量的实体，在绝大多数语言中，数值和基本类型都是第一类对象，在支持闭包的编程语言中（比如 Go、PHP、JavaScript、Python 等），函数也是第一类对象，而像 C、C++ 等不支持闭包的语言中，函数不能在运行期创建，所以在这些语言中，函数不是不是第一类对象。 :::
+Go 语言中闭包的应用场景 Go 语言中的闭包同样也会引用函数外定义的变量，只要闭包还在被使用，那么被闭包引用的变量会一直存在。保证局部变量的安全性闭包内部声明的局部变量无法从外部修改，从而确保了安全性（类似类的私有属性）：
+package mainimport &amp;#34;fmt&amp;#34;func main() {var j = 1f := func() {var i intfmt.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(27.类型系统)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/27.%E7%B1%BB%E5%9E%8B%E7%B3%BB%E7%BB%9F/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/27.%E7%B1%BB%E5%9E%8B%E7%B3%BB%E7%BB%9F/</guid>
+      <description>Go 语言面向对象编程设计得简洁而优雅。简洁之处在于，Go 语言并没有沿袭传统面向对象编程中的诸多概念，比如类的继承、接口的实现、构造函数和析构函数、隐藏的 this 指针等，也没有 public、protected、private 之类的可见性修饰符。顾名思义，类型系统是指一个语言的类型体系结构。一个典型的类型系统通常包含如下基本内容：
+- 基础的数据类型，如byte,int,bool,float,string等等。- 复合类型，如数组，切片，字典，结构体，指针。- 可以指向任意对象的类型- 值语义和引用语义- 面向对象，具备面向对象的特征- 接口Go 语言中的大多数类型都是值语义，并且都可以包含对应的操作方法。在需要的时候，你可以给任何类型（包括内置类型）增加新方法。而在实现某个接口时，无需从该接口继承（事实上，Go 语言根本就不支持面向对象思想中的继承、实现语法），只需要实现该接口要求的所有方法即可。任何类型都可以被 Any 类型引用。在 Go 语言中，Any 类型就是空接口，即 interface{}。</description>
+    </item>
+    
+    <item>
+      <title>golang基础(28.类的定义，初始化和成员方法)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/28.%E7%B1%BB%E7%9A%84%E5%AE%9A%E4%B9%89%E5%88%9D%E5%A7%8B%E5%8C%96%E5%92%8C%E6%88%90%E5%91%98%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/28.%E7%B1%BB%E7%9A%84%E5%AE%9A%E4%B9%89%E5%88%9D%E5%A7%8B%E5%8C%96%E5%92%8C%E6%88%90%E5%91%98%E6%96%B9%E6%B3%95/</guid>
+      <description>类的定义和初始化 Go 语言的面向对象编程与我们之前所熟悉的 PHP、Java 那一套完全不同，没有 class、extends、implements 之类的关键字和相应的概念，而是借助结构体来实现类的声明，比如要定义一个学生类，可以这么做：
+package maintype Student struct {id uintname stringmale boolscore float32} 类名为 Student，并且包含了 id、name、male、score 四个属性，Go 语言中也不支持构造函数、析构函数，取而代之地，可以通过定义形如 NewXXX 这样的全局函数（首字母大写）作为类的初始化函数：
+func NewStudent(id uint, name string, male bool, score float32) *Student {return &amp;amp;Student{id: id,name: name,male: male,score: score,}} 在这个函数中，我们通过传入的属性字段对 Student 类进行初始化并返回一个指向该类的指针，除此之外，还可以初始化指定字段。在 Go 语言中，未进行显式初始化的变量都会被初始化为该类型的零值，例如 bool 类型的零值为 false，int 类型的零值为 0，string 类型的零值为空字符串，float 类型的零值为 0.0。
+为类添加成员方法 为go的结构体成员添加方法，需要在func和方法名之间添加所属类型的声明，以 Student 类为例，要为其添加返回 name 值的方法，可以这么做：</description>
+    </item>
+    
+    <item>
+      <title>golang基础(29.为基本类型添加成员方法)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/29.%E4%B8%BA%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%B7%BB%E5%8A%A0%E6%88%90%E5%91%98%E6%96%B9%E6%B3%95/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/29.%E4%B8%BA%E5%9F%BA%E6%9C%AC%E7%B1%BB%E5%9E%8B%E6%B7%BB%E5%8A%A0%E6%88%90%E5%91%98%E6%96%B9%E6%B3%95/</guid>
+      <description>在 Go 语言中，你可以给任意类型（包括基本类型，但不包括指针类型）添加成员方法，但是如果是基本类型的话，需要借助 type 关键字对类型进行再定义，例如：
+package maintype Integer intfunc (a Integer) Equal(b Integer) bool {return a == b} :::success 注意，这个时候 Integer 已经是一个新的类型了，这与 type Integer = int 不同，后者只是为 int 类型设置一个别名。 ::: 在这个例子中，我们定义了一个新类型 Integer，它和 int 没有本质不同，只是它为内置的 int 类型增加了个新方法 Equal()。 这样一来，就可以让基本类型的整型像一个普通的类一样使用：
+package mainimport &amp;#34;fmt&amp;#34;type Integer intfunc (a Integer) Equal(b Integer) bool {return a == b}func main() {var a Integer = 2if a.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(3.安装go语言之旅)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/3.%E5%AE%89%E8%A3%85go%E8%AF%AD%E8%A8%80%E4%B9%8B%E6%97%85/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/3.%E5%AE%89%E8%A3%85go%E8%AF%AD%E8%A8%80%E4%B9%8B%E6%97%85/</guid>
+      <description>go语言之旅是官方提供的线上实践指南，教程涵盖了基础，方法接口，并发编程等大部分重要特性。鉴于网络问题下载安装到本地直接运行相对来说更便捷。
+开启 go modules go env -w GO111MODULE=on 下载运行 mkdir tourcd tourgo mod init tour go get -u github.com/Go-zh/tour tourtour </description>
+    </item>
+    
+    <item>
+      <title>golang基础(30.通过组合实现类的继承和方法重写)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/30.%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E5%AE%9E%E7%8E%B0%E7%B1%BB%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E6%96%B9%E6%B3%95%E9%87%8D%E5%86%99/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/30.%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E5%AE%9E%E7%8E%B0%E7%B1%BB%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E6%96%B9%E6%B3%95%E9%87%8D%E5%86%99/</guid>
+      <description>GO不想其他类型的语言通过extends关键字来显式定义子类和父类的关系，而是通过组合的方式来实现类似的功能。显式定义继承关系的弊端有两个：一个是导致类的层级复杂，另一个是影响了类的扩展性，设计模式里面推荐的也是通过组合来替代继承提高类的扩展性。我们来看一个例子，现在有一个父类 Animal，有一个属性 name 用于表示名称，和三个成员方法，分别用来获取动物叫声、喜欢的食物和动物的名称：
+package mainimport &amp;#34;fmt&amp;#34;type Animal struct {name string}func (a Animal) Call() string {return &amp;#34;动物的叫声&amp;#34;}func (a Animal) FavorFood() string {return &amp;#34;爱吃的食物&amp;#34;}func (a Animal) GetName() string {return a.name}type Dog struct {Animal}func (d Dog) FavorFood() string {return &amp;#34;骨头&amp;#34;}func (d Dog) Call() string {return &amp;#34;汪汪汪&amp;#34;}func main() {animal := Animal{&amp;#34;狗&amp;#34;}dog := Dog{animal}fmt.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(31.接口的定义和实现)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/31.%E6%8E%A5%E5%8F%A3%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E5%AE%9E%E7%8E%B0/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/31.%E6%8E%A5%E5%8F%A3%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E5%AE%9E%E7%8E%B0/</guid>
+      <description>接口在go中有这至关重要的地位，如果说goroutine和channel是撑起整个GO语言并发的基石，那么接口就是类型系统的基石。
+传统的侵入式接口 什么是侵入式接口，接口作为不同类之间的抽象定义，它是一种契约方式的存在，只要契约存在，就必须要履行契约。通俗地讲只要继承了某一个接口，就必须去实现这个接口中的所有方法。
+// 声明一个&amp;#39;iTemplate&amp;#39;接口interface iTemplate{public function setVariable($name, $var);public function getHtml($template);}// 实现接口// 下面的写法是正确的class Template implements iTemplate{private $vars = array();public function setVariable($name, $var){$this-&amp;gt;vars[$name] = $var;}public function getHtml($template){foreach($this-&amp;gt;vars as $name =&amp;gt; $value) {$template = str_replace(&amp;#39;{&amp;#39; . $name . &amp;#39;}&amp;#39;, $value, $template);}return $template;}} 这个时候如果有一个接口iTemplate2声明了与iTemplate完全一样的接口方法，甚至名字一致，只不过在不同的命名空间下，这时候编译器会认为上面的类只实现了其中某一个接口，而没有实现另一个接口。这些在我们的认知中是理所当然的，如果我们没有在代码中明确地指定接口的层级和继承自哪个接口，那么我们就没有实现这个接口。这个类和这个接口就完全没有任何关系，这些接口中的声明和实现都是显式的。我们把这种接口称之为侵入式接口，尤其是在设计标准库的时候，因为标准库必然涉及到接口设计，接口的需求方是业务实现类，只有具体编写业务实现类的时候才知道需要定义哪些方法，而在此之前，标准库的接口就已经设计好了，我们要么按照约定好的接口进行实现，如果没有合适的接口需要自己去设计，这里的问题就是接口的设计和业务的实现是分离的，接口的设计者并不能总是预判到业务方要实现哪些功能，这就造成了设计与实现的脱节。接口的过度设计会导致某些声明的方法完全不需要去实现，如果设计得太简单又无法满足业务需求。以 PHP 自带的 SessionHandlerInterface 接口为例，该接口声明的接口方法如下：
+SessionHandlerInterface {/* 方法 */abstract public close ( void ) : boolabstract public destroy ( string $session_id ) : boolabstract public gc ( int $maxlifetime ) : intabstract public open ( string $save_path , string $session_name ) : boolabstract public read ( string $session_id ) : stringabstract public write ( string $session_id , string $session_data ) : bool} 用户自定义的 Session 管理器需要实现该接口，也就是要实现该接口声明的所有方法，但是实际在做业务开发的时候，某些方法其实并不需要实现，比如如果我们基于 Redis 或 Memcached 作为 Session 存储器的话，它们自身就包含了过期回收机制，所以 gc 方法根本不需要实现，又比如 close 方法对于大部分驱动来说，也是没有什么意义的。正是因为这种不合理的设计，所以在编写 PHP 类库中的每个接口时都需要纠结以下两个问题（Java 也类似）：</description>
+    </item>
+    
+    <item>
+      <title>golang基础(31.类属性和方法的可见性)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/31.%E7%B1%BB%E5%B1%9E%E6%80%A7%E5%92%8C%E6%96%B9%E6%B3%95%E7%9A%84%E5%8F%AF%E8%A7%81%E6%80%A7/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/31.%E7%B1%BB%E5%B1%9E%E6%80%A7%E5%92%8C%E6%96%B9%E6%B3%95%E7%9A%84%E5%8F%AF%E8%A7%81%E6%80%A7/</guid>
+      <description>在 Go 语言中，没有类似 PHP 和 Java 那种命名空间的概念，不过 Go 语言也是通过包来管理源代码的，包往往与文件系统的目录结构存在映射关系，Go 语言在寻找变量、函数、类属性及方法的时候，会先查看 GOPATH 这个系统环境变量，然后根据该变量配置的路径列表依次去对应路径下的 src 目录下根据包名查找对应的目录，如果对应目录存在，则再到该目录下查找对应的变量、函数、类属性和方法，因此我们可以把归属于同一个目录的文件看作归属于同一个包，归属同一个包的代码具备以下特性：
+归属于同一个包的代码包声明语句要一致，即同一级目录的源文件必须属于同一个包； 在同一个包下不同的不同文件中不能重复声明同一个变量、函数和类； 另外，需要注意的是 main 函数作为程序的入口函数，只能存在于 main 包中，main 包通常对应 src 目录，但也可以将其它子目录声明为 main 包。</description>
+    </item>
+    
+    <item>
+      <title>golang基础(32.接口赋值)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/32.%E6%8E%A5%E5%8F%A3%E8%B5%8B%E5%80%BC/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/32.%E6%8E%A5%E5%8F%A3%E8%B5%8B%E5%80%BC/</guid>
+      <description>接口是不能直接实例化的，因为它只是一个契约的存在，只能通过具体类来实例化。但是在go中我们支持接口赋值操作，从而快速实现接口和示例的映射和转换。接口赋值有两种情况：
+将实现的类实例化后赋值给接口 将一个接口赋值给另一个接口 将类赋值给接口 在go中，只要我们的某个类实现了某个接口，实例化后我们就可以将这个对象赋值给接口。
+package mainimport &amp;#34;fmt&amp;#34;type Integer intfunc (i Integer) Add(a, b Integer) Integer {return a + b}func (i Integer) Multiply(b Integer) Integer {return i * b}type Math interface {Add(a, b Integer) IntegerMultiply(i Integer) Integer}func main() {var a Integer = 1var m Mathm = afmt.Println(m.Add(2, 1))} 按照 Go 语言的约定，Integer 类型实现了 Math 接口。然后我们可以这样将 Integer 类型的实例 a 直接赋值给 Math 接口类型的变量 m：</description>
+    </item>
+    
+    <item>
+      <title>golang基础(33.接口类型以及转化)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/33.%E6%8E%A5%E5%8F%A3%E7%B1%BB%E5%9E%8B%E4%BB%A5%E5%8F%8A%E8%BD%AC%E5%8C%96/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/33.%E6%8E%A5%E5%8F%A3%E7%B1%BB%E5%9E%8B%E4%BB%A5%E5%8F%8A%E8%BD%AC%E5%8C%96/</guid>
+      <description>在其他编程语言中，我们可以使用instanceof关键字来判断某个对象是否属于某个类（包括他的父类），而再GO语言中也同样有这样的机制。
+接口的断言 package mainimport &amp;#34;fmt&amp;#34;type String1 interface {func1(s string)func2(s string)}type String2 interface {func1(s string)}type String stringfunc (s String) func1(str string) {fmt.Println(str)}func (s String) func2(str string) {}func main() {var s String = &amp;#34;test&amp;#34;var s1 String2 = sif s2, ok := s1.(String2); ok {s2.func1(&amp;#34;test2&amp;#34;)}} 上述代码中我们定义了两个接口`String1`和`String2`,其中`String1`作为`String2`的子集。然后定义了一个String类型，实现了这两个接口。在main中我们实例化了一个`String`类型，然后讲其赋值给`String2`接口得到变量`s1`,通过`变量.(类型)`的方式断言变量是否属于`String2`接口。如果是，ok 值为 true，然后执行 if 语句块中的代码；否则 ok 值为 false，不执行 if 语句块中的代码。需要注意的是，类型断言是否成功要在运行期才能够确定，它不像接口赋值，编译器只需要通过静态类型检查即可判断赋值是否可行。结构体类型断言 结构体类型断言实现语法和接口类型断言一样，基本一致。由于类型断言语法 .</description>
+    </item>
+    
+    <item>
+      <title>golang基础(34.空接口，反射，泛型)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/34.%E7%A9%BA%E6%8E%A5%E5%8F%A3%E5%8F%8D%E5%B0%84%E6%B3%9B%E5%9E%8B/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/34.%E7%A9%BA%E6%8E%A5%E5%8F%A3%E5%8F%8D%E5%B0%84%E6%B3%9B%E5%9E%8B/</guid>
+      <description>空接口的引入 Go 语言打破了传统面向对象编程中类与类之间继承的概念，而是通过组合实现方法和属性的复用，所以不存在类似的继承关系树，也就没有所谓的祖宗类，而且类与接口之间也不再通过 implements 关键字强制绑定实现关系，所以 Go 语言的面向对象编程非常灵活。在 Go 语言中，类与接口的实现关系是通过类所实现的方法在编译期推断出来的，如果我们定义一个空接口的话，那么显然所有的类都实现了这个接口，反过来，我们也可以通过空接口来指向任意类型，从而实现类似 Java 中 Object 类所承担的功能，而且显然 Go 的空接口实现更加简洁，通过一个简单的字面量即可完成：
+interface{} :::warning 需要注意的是空接口和接口零值不是一个概念，前者是 interface{}，后者是 nil。 :::
+空接口的基本使用 指向任意类型
+package mainfunc main() {var a interface{} = 1var b interface{} = &amp;#34;sss&amp;#34;var c interface{} = 1.11var d interface{} = truevar e interface{} = []int{1, 2, 3}var f interface{} = [2]int{1, 2}var g interface{} = struct {id int}{id: 1}} 声明任意类型参数func test(args .</description>
+    </item>
+    
+    <item>
+      <title>golang基础(35.通过高阶函数来实现装饰器模式)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/35.%E9%80%9A%E8%BF%87%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0%E6%9D%A5%E5%AE%9E%E7%8E%B0%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/35.%E9%80%9A%E8%BF%87%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0%E6%9D%A5%E5%AE%9E%E7%8E%B0%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F/</guid>
+      <description>高阶函数 高阶函数是指，接收其他函数作为参数或者作为返回值的函数。将匿名函数作为参数传入或者将匿名函数作为返回值，这都是高阶函数的一种。
+装饰器模式 装饰器模式，顾名思义其特征在于装饰。在编程语言中它代表着在程序原有的基础上，在不侵入其代码，为其添加更多的功能。
+通过高阶函数实现装饰器 package mainimport (&amp;#34;fmt&amp;#34;&amp;#34;time&amp;#34;)// AddFunc 定义一个方法类型type AddFunc func(int, int) int//Add 基础的Add方法func Add(a, b int) int {return a + b}//AddDecorator 装饰器方法func AddDecorator(f AddFunc) AddFunc {return func(a, b int) int {start := time.Now() // 起始时间c := f(a, b) // 执行乘法运算函数end := time.Since(start) // 函数执行完毕耗时fmt.Printf(&amp;#34;--- 执行耗时: %v ---&amp;#34;, end)return c // 返回计算结果}}func main() {a := 8b := 10decorator := AddDecorator(Add)result := decorator(a, b)fmt.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(36.error 接口及其使用)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/36.error-%E6%8E%A5%E5%8F%A3%E5%8F%8A%E5%85%B6%E4%BD%BF%E7%94%A8/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/36.error-%E6%8E%A5%E5%8F%A3%E5%8F%8A%E5%85%B6%E4%BD%BF%E7%94%A8/</guid>
+      <description>PHP错误处理以及异常处理一直比较混乱，在 PHP 5 中是通过 error_reporting 函数设置错误报告级别，然后通过 set_error_handler 函数注册全局的错误处理器。PHP中抛弃了错误的报告方式，转而通过抛出将错误当做异常抛出，可以通过try catch语句进行捕获，还可以通过 set_exception_handler 注册全局异常处理器，将应用中未处理的异常统一兜底。
+GO语言错误处理机制 GO语言的错误处理机制相对来说比较简洁，它提供了一个标准的error接口。
+type error interface { Error() string } 其中`error`接口值只有一个标准方法，`Error()`,用于返回错误信息。在大多数函数中一般将一个`error`作为一个返回值，交由上级调用来进行判断。func Foo(param int) (n int, err error) { // ...} 然后在调用返回错误信息的函数/方法时，按照如下「卫述语句」模板编写处理代码即可：
+n, err := Foo(0)if err != nil { // 错误处理 } else {// 使用返回值 n } 错误消息返回及处理 我们可以使用errors.new()方法返回我们需要自定的错误信息。
+func add(a, b *int) (c int, err error) {if (*a &amp;lt; 0 || *b &amp;lt; 0) {err = errors.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(37.defer 语句及使用示例)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/37.defer-%E8%AF%AD%E5%8F%A5%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/37.defer-%E8%AF%AD%E5%8F%A5%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B/</guid>
+      <description>在go中当我们使用完某个资源需要将其释放，比如(网络连接，文件句柄)，或者在代码运行过程中抛出错误时执行一段兜底逻辑，要怎么做呢？通过 defer 关键字声明兜底执行或者释放资源的语句可以轻松解决这个问题。比如我们看 Go 内置的 io/ioutil 包中提供的读取文件方法 ReadFile 实现源码，其中就有 defer 语句的使用：
+func ReadFile(filename string) ([]byte, error) {f, err := os.Open(filename)if err != nil {return nil, err}defer f.Close()var n int64 = bytes.MinReadif fi, err := f.Stat(); err == nil {if size := fi.Size() + bytes.MinRead; size &amp;gt; n {n = size}}return readAll(f, n)} defer 修饰的 f.Close() 方法会在函数执行完成后或读取文件过程中抛出错误时执行，以确保已经打开的文件资源被关闭，从而避免内存泄露。如果一条语句干不完清理的工作，也可以在 defer 后加一个匿名函数来执行对应的兜底逻辑：</description>
+    </item>
+    
+    <item>
+      <title>golang基础(38.panic和recover)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/38.panic%E5%92%8Crecover/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/38.panic%E5%92%8Crecover/</guid>
+      <description>GO语言通过error接口进行统一的错误处理，这些都是我们在编写代码时就可以预见并且返回的。但是面对一些我们不可知的，比如数组越界、除数为0、空指针引用，这些 Go 语言是怎么处理的呢？
+panic Go 语言没有像 PHP 那样引入异常的概念，也没有提供 try&amp;hellip;catch 这样的语法对运行时异常进行捕获和处理，当代码运行时出错，而又没有在编码时显式返回错误时，Go 语言会抛出 panic，中文译作「运行时恐慌」，我们也可以将其看作 Go 语言版的异常。除了 Go 语言底层抛出 panic，我们还可以在代码中显式抛出 panic，以便对错误和异常信息进行自定义，仍然以上篇教程除数为0的示例代码为例，我们可以这样显式返回 panic 中断代码执行：
+package mainimport &amp;#34;fmt&amp;#34;func main() {defer func() {fmt.Println(&amp;#34;代码清理逻辑&amp;#34;)}()var i = 1var j = 0if j == 0 {panic(&amp;#34;除数不能为0！&amp;#34;)}k := i / jfmt.Printf(&amp;#34;%d / %d = %d&amp;#34;, i, j, k)} 这样，当我们执行这段代码时，就会抛出 panic：panic 函数支持的参数类型是 interface{}：
+func panic(v interface{}) 所以可以传入任意类型的参数：</description>
+    </item>
+    
+    <item>
+      <title>golang基础(39.多进程，多线程，携程)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/39.%E5%A4%9A%E8%BF%9B%E7%A8%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%90%BA%E7%A8%8B/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/39.%E5%A4%9A%E8%BF%9B%E7%A8%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%90%BA%E7%A8%8B/</guid>
+      <description>为什么需要并发编程 在PHP中并不存在并发的概念，PHP中所有的操作都是串行执行，同步阻塞的。这就是很多人诟病PHP性能低下的原因。但串行执行虽然性能上存在问题，但是相对的也有它的好处。
+保证了PHP的简单性，不需要考虑并发引入的线程安全问题 不需要考虑加锁来保证某个操作的原子性 不存在线程间的通讯问题 与并发相对的是串行，即按照代码顺序一步一步往下执行，当遇到某个IO操作时，比如发送邮件，读取文件，查询数据库。CPU会进行等待，等到IO操作完成后才会继续执行代码。这种情况在某些要求高并发高性能的业务场景显然是不合适的，从操作系统上来讲，多个任务是可以同时执行的，因为CPU本身就是多核的，能同时执行多任务的计算。哪怕是单核CPU，也可利用时间分片的方式在多个进程和线程之间来回切换执行。比如说当某个任务执行时遇到了IO操作，这个时候CPU不会一直傻傻等待，而是挂起这个任务，让出CPU时间片给到其他任务。然后等这个IO操作完成后，通知CPU恢复后续代码的执行。实际上CPU大部分时间都在做这种调度，并发编程就是最大程度的压榨CPU，从而提高程序的性能和效率 。
+并发编程的常见实现 多进程。多进程是基于操作系统层面的并发基本模式，同时也是开销最大的模式。在linux上很多工具都采用这种模式在工作，比如PHP-FPM,他有专门的主进程监听端口以及管理连接，还有多个工作进程对具体请求进行处理。这种方式好处是在于简单，进程间互相不影响，不同进程间数据相互隔离。缺点是系统开销大，每个进程都是由内核管理的。 多线程。多线层是基于系统层面的并发模式，它是基于进程内的，也是使用较多也相对有效的方式。线程比进程开销更小，线程间会共享数据，线程切换和调度会加锁会造成额外的性能开销。线程比进程轻量，但在高并发的情况下效率依然有影响，例如C10K问题，即支持一万个并发需要一万个线程，这样对系统资源有较高的要求，而且CPU管理这些线程带来巨大负担 携程。一种用户态线程，可以交由程序员调度的，你可以将其看作是轻量级别的线程，不许要操作系统来进行抢占式调度，系统开销极小，携程内有自己独立的堆栈调度间没有线程的加锁开销。 基于回调的非阻塞IO/异步IO。为了解决C10K的问题，在很多高并发的开发实践中，都会通过事件驱动的方式来使用异步IO,在这种模式下，一个线程维护多个Socket连接，从而降低了系统的开销。 传统并发模式的缺陷 在串行化模式下执行的程序，所有的事务都具备确定性的，比如程序预设了123个步骤，代码会严格按照顺序执行下去，即使在某哥步骤中阻塞了，也会一直等待代码执行结束才会进行下一步。多线程的并发模式下，就彻底打破了这种缺定性。比如我们原先的123，第2步是一个耗时操作，这时候我们启动了一个新的线程对其进行处理，这时候我们无法确定的是，主线程拉起2的子线程后继续往下执行代码，我们无法确定是主线程先执行完毕退出程序，还是2的线程先完成。如果是主线程完成退出会导致2的子线程操作中断。或者我们在第3步的时候依赖第2步的某个返回结果，我们不知道啥时候能够返回这个结果，如果第2、3步有相互依赖的变量，甚至可能出现死锁，以及我们如何在主线程中获取新线程的异常和错误信息并进行相应的处理，等等，这种不确定性给程序的行为带来了意外和危害，也让程序变得不可控。不同的线程好比平行时空，我们需要通过线程间通信来告知不同线程目前各自运行的状态和结果，以便使程序可控，线程之间通信可以通过共享内存的方式（参考 Swoole 中的 Swoole Table），即在不同线程中操作的是同一个内存地址上存储的值。为了保证共享内存的有效性，需要采取很多措施，比如加锁来避免死锁或资源竞争，还是以上面的主线程和新线程为例，如果我们在第1步获取了一个中间结果，第2步和第3步都要对这个中间结果进行操作，如果不加锁保证操作的原子性，很有可能产生脏数据。诸如此类的问题在生产环境极有可能造成重大故障甚至事故，而且不易察觉和调试。我们可以将线程加共享内存的方式称为「共享内存系统」。为了解决共享内存系统存在的问题，计算机科学家们又提出了「消息传递系统」。「消息传递系统」指的是将线程间共享状态的各种操作都封装在线程之间传递的消息中，这通常要求发送消息时对状态进行复制，并且在消息传递的边界上交出这个状态的所有权。从表明上来看，这个操作与「共享内存系统」中执行的通过加锁实现原子更新操作相同，但从底层实现上来看则不同：一个对同一个内存地址持有的值进行操作，一个是从消息通道读取数据并处理。由于需要执行状态复制操作，所以大多数消息传递的实现在性能上并不优越，但线程中的状态管理工作则会变得更加简单，这就有点像我们在开篇讲 PHP 不支持并发编程提到的那样，如果想让编码简单，性能就要做牺牲，如果想追求性能，代码编写起来就比较费劲，这也是我们为什么通常不会直接通过事件驱动的异步 IO 来实现并发编程一样，因为这涉及到直接调用操作系统底层的库函数（select、epoll、libevent 等）来实现，非常复杂。
+Go 语言协程支持 与传统的系统级线程和进程相比，协程的最大优势在于轻量级（可以看作用户态的轻量级线程），我们可以轻松创建上百万个协程而不会导致系统资源衰竭，而线程和进程通常最多也不能超过 1 万个（C10K问题）。多数语言在语法层面并不直接支持协程，而是通过库的方式支持，比如 PHP 的 Swoole 扩展库，但用库的方式支持的功能通常并不完整，比如仅仅提供轻量级线程的创建、销毁与切换等能力。如果在这样的轻量级线程中调用一个同步 IO 操作，比如网络通信、本地文件读写，都会阻塞其他的并发执行轻量级线程，从而无法真正达到轻量级线程本身期望达到的目标。Go 语言在语言级别支持协程，称之为 goroutine。Go 语言标准库提供的所有系统调用操作（当然也包括所有同步 IO 操作），都有协程的身影。协程间的切换管理不依赖于系统的线程和进程，也不依赖于 CPU 的核心数量，这让我们在 Go 语言中通过协程实现并发编程变得非常简单。</description>
+    </item>
+    
+    <item>
+      <title>golang基础(4.代码包)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/4.%E4%BB%A3%E7%A0%81%E5%8C%85/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/4.%E4%BB%A3%E7%A0%81%E5%8C%85/</guid>
+      <description>程序入口包 在go程序中，包作为基本的代码组织单位，其中main包是程序的执行的入口。
+导入包 使用import可以对代码包进行导入，导入后可以在当前包中使用导入包的公开代码
+package mainimport (&amp;#34;fmt&amp;#34;&amp;#34;math&amp;#34;)func main() {fmt.Printf(&amp;#34;Now you have %g problems.&amp;#34;, math.Sqrt(7))} 导出包 一个包中如果包中的方法名或者变量或者其他成员的命名以大写开头，意味着它是可以被其他包导入访问的。如果以小写开头，只能在当前包中进行访问。
+package mainimport (&amp;#34;fmt&amp;#34;&amp;#34;math&amp;#34;)func main() {//会报错，不可访问fmt.Println(math.pi)//正常，可以访问fmt.Println(math.Pi)} </description>
+    </item>
+    
+    <item>
+      <title>golang基础(40.GO携程实现原理)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/40.go%E6%90%BA%E7%A8%8B%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/40.go%E6%90%BA%E7%A8%8B%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/</guid>
+      <description>GO并发编程原理 GO语言的携程实现称之为goroutine,由GO运行时管理。我们可以在一个处理进程中通过关键字go来启动多个携程，然后在携程中完成不同的子任务。这些用户在代码中穿件和维护的携程本质上是用户级别的线程，GO语言运行时会在底层通过调度器将用户线程交给系统级别的线程处理，如果在运行过程当中遇到某个IO操作暂停运行，调度器会将用户级线程和系统级线程剥离，以便让系统级别的线程去处理其他用户级别的线程。当用户级线程IO操作完成后，调度器又会调用其他空闲的系统级线程对其进行处理。从而达到并发处理多个携程的目的。此外调度器还会在系统级别线程数量不足的时候向操作系统申请创建新的系统级别线程，而在系统线程过多的情况下也会自动销毁一些空闲的系统级线程，实际上这也是很多进程/线程池管理器的工作机制，这样一来，可以保证对系统资源的高效利用，避免系统资源的浪费。</description>
+    </item>
+    
+    <item>
+      <title>golang基础(41.基于共享内存的携程通信)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/41.%E5%9F%BA%E4%BA%8E%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98%E7%9A%84%E6%90%BA%E7%A8%8B%E9%80%9A%E4%BF%A1/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/41.%E5%9F%BA%E4%BA%8E%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98%E7%9A%84%E6%90%BA%E7%A8%8B%E9%80%9A%E4%BF%A1/</guid>
+      <description>package mainimport (&amp;#34;fmt&amp;#34;&amp;#34;runtime&amp;#34;&amp;#34;sync&amp;#34;&amp;#34;time&amp;#34;)var counter int = 0var lock *sync.Mutexfunc add(a, b int) {c := a + block.Lock()counter++lock.Unlock()fmt.Printf(&amp;#34;%d: %d + %d = %d&amp;#34;, counter, a, b, c)}func main() {startTime := time.Now()lock = &amp;amp;sync.Mutex{}for i := 0; i &amp;lt; 10; i++ {go add(1, i)}for {lock.Lock()c := counterlock.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(42.基于消息的携程通信)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/42.%E5%9F%BA%E4%BA%8E%E6%B6%88%E6%81%AF%E7%9A%84%E6%90%BA%E7%A8%8B%E9%80%9A%E4%BF%A1/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/42.%E5%9F%BA%E4%BA%8E%E6%B6%88%E6%81%AF%E7%9A%84%E6%90%BA%E7%A8%8B%E9%80%9A%E4%BF%A1/</guid>
+      <description>通道 Go 语言推荐使用消息传递实现并发通信，这种消息通信机制被称为 channel，中文译作「通道」，可理解为传递消息的通道。通道是 Go 语言在语言级别提供的协程通信方式，它是一种数据类型，本身是并发安全的，我们可以使用它在多个 goroutine 之间传递消息，而不必担心通道中的值被污染。通道是一种数据类型，和数组/切片类型类似，一个通道只能传递一种类型的值，这个类型需要在声明 通道时指定。在使用通道时，需要通过 make 进行声明，通道对应的类型关键字是 chan：
+ch := make(chan int) 我们可以把通道看作是一个先进先出（FIFO）的队列，通道中的元素会严格按照发送顺序排列，继而按照排列顺序被接收，通道元素的发送和接收都可以通过 &amp;lt;- 操作符来实现，发送时元素值在右，通道变量在左：
+ch &amp;lt;- 1 // 表示把元素 1 发送到通道 ch 接收时通道变量在右，可以通过指定变量接收元素值：
+element := &amp;lt;-ch 也可以留空表示忽略：
+&amp;lt;-ch package mainimport (&amp;#34;fmt&amp;#34;&amp;#34;time&amp;#34;)func channelAdd(a, b int, ch chan int) {c := a + bfmt.Printf(&amp;#34;%d+%d = %d &amp;#34;, a, b, c)ch &amp;lt;- c}func main() {start := time.Now()chs := make([]chan int, 10)for i := 0; i &amp;lt; 10; i++ {chs[i] = make(chan int)go channelAdd(1, i, chs[i])}for _, ch := range chs {&amp;lt;- ch}end := time.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(43.通道基本语法和缓冲通道)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/43.%E9%80%9A%E9%81%93%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95%E5%92%8C%E7%BC%93%E5%86%B2%E9%80%9A%E9%81%93/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/43.%E9%80%9A%E9%81%93%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95%E5%92%8C%E7%BC%93%E5%86%B2%E9%80%9A%E9%81%93/</guid>
+      <description>通道声明和初始化 可以通过 chan类型关键字来声明通道类型变量：
+var ch chan int 上面这个表达式表示声明一个通道类型变量 ch，并且通道中只能传递 int 类型数据。与其他数据类型不同，通道类型变量除了声明通道类型本身外，还要声明通道中传递数据的类型，比如这里我们指定这个数据类型为 int 。通道是类型相关的，我们必须在声明通道的时候同时指定通道中传递数据的类型，并且一个通道只能传递一种类型的数据，这一点和数组/切片类似。我们还可以通过如下方式声明通道数组、切片、字典，以下声明方式表示chs中的元素都是 chan int 类型的通道：
+var chs [10]chan intvar chs []chan intvar chs map[string]chan int 不过，实际编码时，我们更多使用的是下面这种快捷方式同时声明和初始化通道类型：
+ch := make(chan int) 由于在 Go 语言中，通道也是引用类型（和切片、字典一样），所以可以通过 make函数进行初始化，在通过 make 函数初始化通道时，还可以传递第二个参数，表示通道的容量：
+ch := make(chan int,10) 第二个参数是可选的，用于指定通道最多可以缓存多少个元素，默认值是 0，此时通道可以被称作非缓冲通道，`表示往通道中发送一个元素后，只有该元素被接收后才能存入下一个元素`，与之相对的，当缓存值大于 0 时，通道可以称作缓冲通道，即使通道元素没有被接收，也可以继续往里面发送元素，直到超过缓冲值，显然设置这个缓冲值可以提高通道的操作效率。通道操作符 通道类型变量只支持发送和接收操作，即往通道中写入数据和从通道中读取数据，对应的操作符都是 &amp;lt;-，我们判断是发送还是接收操作的依据是通道类型变量位于 &amp;lt;- 左侧还是右侧，位于左侧是发送操作，位于右侧是接收操作：
+ch &amp;lt;- 1 // 往通道中写入数据 1x := &amp;lt;- ch // 从通道中读取数据并赋值给变量 当我们将数据发送到通道时，发送的是数据的副本，同理，从通道中接收数据时，接收的也是数据的副本。发送和接收操作都是原子操作，同时只能进行发送或接收操作，不存在数据发送一半被接收，或者接收一半发送新数据的情况，并且两者都是阻塞的，如果通道中没有数据，进行读取操作的话会导致读取操作所在的协程阻塞，直到通道中写入了数据；反过来，如果通道中已经有了数据，再往里面写入数据的话，也会导致写入操作所在的协程阻塞，直到其中的数据被其他协程接收。
+使用缓冲通道提升性能 上面这种情况发生在非缓冲通道中，对于缓冲通道，情况略有不同，假设 ch 是通过 make(chan int, 10) 进行初始化的通道，则其缓冲区大小是 10，这意味着，在没有被任何其他协程接收的情况下，我们可以一直往 ch 通道中写入 10 个数据，超过 10 个数据才会阻塞当前协程，直到通道被其他协程读取，显然，合理设置缓冲区可以提高通道的操作效率，尤其是在需要持续传输大量数据的场景。我们可以通过如下示例代码简单测试下通道的缓冲机制：</description>
+    </item>
+    
+    <item>
+      <title>golang基础(44.单向通道)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/44.%E5%8D%95%E5%90%91%E9%80%9A%E9%81%93/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/44.%E5%8D%95%E5%90%91%E9%80%9A%E9%81%93/</guid>
+      <description>通常，管道都是支持双向操作的：既可以往管道发送数据，也可以从管道接收数据。但在某些场景下，可能我们需要限制只能往管道发送数据，或者只能从管道接收数据，这个时候，就需要用到单向通道。通道本身还是要支持读写的，如果某个通道只支持写入操作，那么即便数据写进去了，不能被读取也毫无意义，同理，如果某个通道只支持读取操作，不能写入数据，那么通道永远是空的，从一个空的通道读取数据会导致协程的阻塞，无法执行后续代码。Go 语言支持的单向管道，实际上是在使用层面对通道进行限制，而不是语法层面：即我们在某个协程中只能对通道进行写入操作，而在另一个协程中只能对该通道进行读取操作。从这个层面来说，单向通道的作用是约束在生产协程中只能发送数据到通道，而在消费协程中只能从通道接收数据，从而让代码遵循「最小权限原则」，避免误操作和通道使用的混乱，让代码更加稳健。当我们将一个通道类型变量传递到一个函数时（通常是在另外一个协程中执行），如果这个函数只能发送数据到通道，可以通过如下将其指定为单向只写通道（发送通道）：
+func test(ch chan&amp;lt;- int) 上述代码限定在 test 函数中只能写入 int 类型数据到通道 ch。反过来，如果我们将一个通道类型变量传递到一个只允许从该通道读取数据的函数，可以通过如下方式将通道指定为单向只读通道（接收通道）：
+func test(ch &amp;lt;-chan int) 虽然我们也可以像声明正常通道类型那样声明单向通道，但我们一般不这么做，因为这样一来，就是从语法上限定通道的操作类型了，对于只读通道只能接收数据，对于只写通道只能发送数据：
+var ch1 chan intvar ch2 chan&amp;lt;- int var ch3 &amp;lt;-chan int 单向通道的初始化和双向通道一样：ch1 := make(chan int)ch2 := make(chan&amp;lt;- int)ch3 := make(&amp;lt;-chan int) 此外，我们还可以通过如下方式实现双向通道和单向通道的转化：ch1 := make(chan int) ch2 := &amp;lt;-chan int(ch1)ch3 := chan&amp;lt;- int(ch1) 基于双向通道 ch1，我们通过类型转化初始化了两个单向通道：单向只读的 ch2 和单向只写的 ch3。注意这个转化是不可逆的，双向通道可以转化为任意类型的单向通道，但单向通道不能转化为双向通道，读写通道之间也不能相互转化。实际上，我们在将双向通道传递到限定通道参数操作类型的函数时，就应用到了类型转化。合理使用单向通道，可以有效约束不同业务对通道的操作，避免越权使用和滥用，此外，也提高了代码的可读性，一看函数参数就可以判断出业务对通道的操作类型。</description>
+    </item>
+    
+    <item>
+      <title>golang基础(45.使用select等待通道就绪)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/45.%E4%BD%BF%E7%94%A8select%E7%AD%89%E5%BE%85%E9%80%9A%E9%81%93%E5%B0%B1%E7%BB%AA/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/45.%E4%BD%BF%E7%94%A8select%E7%AD%89%E5%BE%85%E9%80%9A%E9%81%93%E5%B0%B1%E7%BB%AA/</guid>
+      <description>Go 语言还支持通过 select 分支语句选择指定分支代码执行，select 语句和之前介绍的 switch 语句语法结构类似，不同之处在于 select 的每个 case 语句必须是一个通道操作，要么是发送数据到通道，要么是从通道接收数据，此外 select 语句也支持 default 分支：
+select { case &amp;lt;-chan1:// 如果从 chan1 通道成功接收数据，则执行该分支代码case chan2 &amp;lt;- 1:// 如果成功向 chan2 通道成功发送数据，则执行该分支代码 default:// 如果上面都没有成功，则进入 default 分支处理流程 } :::warning 注：Go 语言的 select 语句借鉴自 Unix 的 select() 函数，在 Unix 中，可以通过调用 select() 函数来监控一系列的文件句柄，一旦其中一个文件句柄发生了 IO 动作，该 select() 调用就会被返回（C 语言中就是这么做的），后来该机制也被用于实现高并发的 Socket 服务器程序。Go 语言直接在语言级别支持 select 关键字，用于处理并发编程中通道之间异步 IO 通信问题。 ::: 可以看出，select 不像 switch，case 后面并不带判断条件，而是直接去查看 case 语句，每个 case 语句都必须是一个面向通道的操作，比如上面的示例代码中，第一个 case 试图从 chan1 接收数据并直接忽略读到的数据，第二个 case 试图向 chan2 通道发送一个整型数据 1，需要注意的是这两个 case 的执行不是 if&amp;hellip;else&amp;hellip; 那种先后关系，而是会并发执行，然后 select 会选择先操作成功返回的那个 case 分支去执行，如果两者同时返回，则随机选择一个执行，如果这两者都没有返回，则进入 default 分支，这里也不会出现阻塞，如果 chan1 通道为空，或者 chan2 通道已满，就会立即进入 default 分支，但是如果没有 default 语句，则会阻塞直到某个通道操作成功。这些通道操作是并发的，任何一个操作成功，就会进入该分支执行代码，否则程序就会处于挂起状态，如果要实现非阻塞操作，可以引入 default 语句。下面我们基于 select 语句来实现一个简单的示例代码：</description>
+    </item>
+    
+    <item>
+      <title>golang基础(46.通道错误和异常处理)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/46.%E9%80%9A%E9%81%93%E9%94%99%E8%AF%AF%E5%92%8C%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/46.%E9%80%9A%E9%81%93%E9%94%99%E8%AF%AF%E5%92%8C%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/</guid>
+      <description>在并发编程的通信过程中，最需要处理的就是超时问题：比如向通道发送数据时发现通道已满，或者从通道接收数据时发现通道为空。如果不正确处理这些情况，很可能会导致整个协程阻塞并产生死锁。此外，如果我们试图向一个已经关闭的通道发送数据或关闭已经关闭的通道，也会引发 panic。以上都是我们在使用通道进行并发通信时需要尤其注意的。
+超时处理机制实现 Go 语言没有提供直接的超时处理机制，但我们可以借助 select 语句来实现类似机制解决超时问题，因为 select 语句的特点是只要其中一个 case 对应的通道操作已经完成，程序就会继续往下执行，而不会考虑其他 case 的情况。基于此特性，我们来为通道操作实现超时处理机制。
+package mainimport (&amp;#34;fmt&amp;#34;&amp;#34;time&amp;#34;)func main() {// 1.创建生产管道ch := make(chan int, 10)// 2.创建超时管道timeout := make(chan bool)// 3.开启超时携程go func() {time.Sleep(time.Minute)timeout &amp;lt;- true}()// 4.使用select结束阻塞select {case &amp;lt;-ch:fmt.Println(&amp;#34;接收到数据&amp;#34;)case &amp;lt;-timeout:fmt.Println(&amp;#34;执行超时！&amp;#34;)}} 使用 select 语句可以避免永久等待的问题，因为程序会在从 timeout 通道中接收到数据后继续执行，无论对 ch 的读取是否还处于等待状态，从而实现 1 秒超时的效果。这种写法看起来是一个编程小技巧，但却是在 Go 语言并发编程中避免通道通信超时的最有效方法。
+避免对已关闭通道进行操作 为了避免对已关闭通道再度执行关闭操作引发 panic，一般我们约定只能在发送方关闭通道，而在接收方，我们则通过通道接收操作返回的第二个参数是否为 false 判定通道是否已经关闭，如果已经关闭，则不再执行发送操作。</description>
+    </item>
+    
+    <item>
+      <title>golang基础(47.利用多核 CPU 实现并行计算)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/47.%E5%88%A9%E7%94%A8%E5%A4%9A%E6%A0%B8-cpu-%E5%AE%9E%E7%8E%B0%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/47.%E5%88%A9%E7%94%A8%E5%A4%9A%E6%A0%B8-cpu-%E5%AE%9E%E7%8E%B0%E5%B9%B6%E8%A1%8C%E8%AE%A1%E7%AE%97/</guid>
+      <description>开始之前，我们先澄清两个概念，「多核」指的是有效利用 CPU 的多核提高程序执行效率，「并行」和「并发」一字之差，但其实是两个完全不同的概念。
+「并发」一般是由 CPU 内核通过时间片或者中断来控制的，遇到 IO 阻塞或者时间片用完时会交出线程的使用权，从而实现在一个内核上处理多个任务 而「并行」则是多个处理器或者多核处理器同时执行多个任务，同一时间有多个任务在调度，因此，一个内核是无法实现并行的，因为同一时间只有一个任务在调度 多进程、多线程以及协程显然都是属于「并发」范畴的，可以实现程序的并发执行，至于是否支持「并行」，则要看程序运行系统是否是多核，以及编写程序的语言是否可以利用 CPU 的多核特性。我们来模拟一个可以并行的计算任务：启动多个子协程，子协程数量和 CPU 核心数保持一致，以便充分利用多核并行运算，每个子协程计算分给它的那部分计算任务，最后将不同子协程的计算结果再做一次累加，这样就可以得到所有数据的计算总和。
+package mainimport (&amp;#34;fmt&amp;#34;&amp;#34;runtime&amp;#34;&amp;#34;time&amp;#34;)func sum(seq int, ch chan int) {defer close(ch)sum := 0for i := 1; i &amp;lt;= 10000000; i++ {sum += i}fmt.Printf(&amp;#34;子协程%d运算结果:%d&amp;#34;, seq, sum)ch &amp;lt;- sum}func main() {start := time.Now()cpus := runtime.NumCPU()fmt.Println(cpus)runtime.GOMAXPROCS(cpus)chs := make([]chan int, cpus)for i := 0; i &amp;lt; cpus; i++ {chs[i] = make(chan int)go sum(i, chs[i])}sum := 0for _, ch := range chs {res := &amp;lt;-chsum += res}end := time.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(48.sync 包：sync.Mutex 和 sync.RWMutex)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/48.sync-%E5%8C%85sync.mutex-%E5%92%8C-sync.rwmutex/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/48.sync-%E5%8C%85sync.mutex-%E5%92%8C-sync.rwmutex/</guid>
+      <description>sync 包 我们前面反复强调，在 Go 语言并发编程中，倡导「使用通信共享内存，不要使用共享内存通信」，而这个通信的媒介就是我们前面花大量篇幅介绍的通道（Channel），通道是线程安全的，不需要考虑数据冲突问题，面对并发问题，我们始终应该优先考虑使用通道，它是 first class 级别的，但是纵使有主角光环加持，通道也不是万能的，它也需要配角，这也是共享内存存在的价值，其他语言中主流的并发编程都是通过共享内存实现的，共享内存必然涉及并发过程中的共享数据冲突问题，而为了解决数据冲突问题，Go 语言沿袭了传统的并发编程解决方案 —— 锁机制，这些锁都位于 sync 包中。锁的作用都是为了解决并发情况下共享数据的原子操作和最终一致性问题，在系统介绍 sync 包提供的各种锁之前，我们先来聊聊什么情况下需要用到锁。
+竞态条件与同步机制 一旦数据被多个线程共享，那么就很可能会产生争用和冲突的情况，这种情况也被称为竞态条件（race condition），这往往会破坏共享数据的一致性。举个例子，同时有多个线程连续向同一个缓冲区写入数据块，如果没有一个机制去协调这些线程的写入操作的话，那么被写入的数据块就很可能会出现错乱。比如，学院君的支付宝账户余额还有 500 元，代表银行自动转账的线程 A 正在向账户转入 3000 元本月工资，同时代表花呗自动扣费的线程 B 正在从账户余额扣除 2000 元还上个月的花呗账单。假设用 money 标识账户余额，那么初始值 money = 500，线程 A 的操作就等价于 money = money + 3000，线程 B 的操作就等价于 money = money - 2000，我们本来期望的结果是 money = 1500，但是现在线程 A 和线程 B 同时对 money 进行读取和写入，所以他们拿到的 money 都是 500，如果线程 A 后执行完毕，那么 money = 3500，如果线程 B 后执行完毕，那么 money = 0（扣除所有余额，花呗欠款1500），这就出现了和预期结果不一致的现象，我们说，这个操作破坏了数据的一致性。在这种情况下，我们就需要采取一些措施来协调它们对共享数据的修改，这通常就会涉及到同步操作。一般来说，同步的用途有两个，一个是避免多个线程在同一时刻操作同一个数据块，另一个是协调多个线程避免它们在同一时刻执行同一个代码块。但是目的是一致的，那就是保证共享数据原子操作和一致性。由于这样的数据块和代码块的背后都隐含着一种或多种资源（比如存储资源、计算资源、I/O 资源、网络资源等等），所以我们可以把它们看做是共享资源。我们所说的同步其实就是在控制多个线程对共享资源的访问：一个线程在想要访问某一个共享资源的时候，需要先申请对该资源的访问权限，并且只有在申请成功之后，访问才能真正开始；而当线程对共享资源的访问结束时，它还必须归还对该资源的访问权限，若要再次访问仍需申请。你可以把这里所说的访问权限想象成一块令牌，线程一旦拿到了令牌，就可以进入指定的区域，从而访问到资源，而一旦线程要离开这个区域了，就需要把令牌还回去，绝不能把令牌带走。或者我们把共享资源看作是有锁的资源，当某个线程获取到共享资源的访问权限后，给资源上锁，这样，其他线程就不能访问它，直到该线程执行完毕，释放锁，这样其他线程才能通过竞争获取对资源的访问权限，依次类推。这样一来，我们就可以保证多个并发运行的线程对这个共享资源的访问是完全串行的，只要一个代码片段需要实现对共享资源的串行化访问，就可以被视为一个临界区（critical section），也就是我刚刚说的，由于要访问到资源而必须进入的那个区域。比如，在前面举的那个例子中，实现了账户余额写入操作的代码就组成了一个临界区。临界区总是需要通过同步机制进行保护的，否则就会产生竞态条件，导致数据不一致。</description>
+    </item>
+    
+    <item>
+      <title>golang基础(49.sync 包：条件变量 sync.Cond)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/49.sync-%E5%8C%85%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F-sync.cond/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/49.sync-%E5%8C%85%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F-sync.cond/</guid>
+      <description>sync 包还提供了一个条件变量类型 sync.Cond，它可以和互斥锁或读写锁（以下统称互斥锁）组合使用，用来协调想要访问共享资源的线程。不过，与互斥锁不同，条件变量 sync.Cond 的主要作用并不是保证在同一时刻仅有一个线程访问某一个共享资源，而是在对应的共享资源状态发生变化时，通知其它因此而阻塞的线程。条件变量总是和互斥锁组合使用，互斥锁为共享资源的访问提供互斥支持，而条件变量可以就共享资源的状态变化向相关线程发出通知，重在「协调」。下面，我们来看看如何使用条件变量 sync.Cond。sync.Cond 是一个结构体：
+type Cond struct {noCopy noCopy// L is held while observing or changing the conditionL Lockernotify notifyListchecker copyChecker} 提供了三个方法：
+// 等待通知func (c *Cond) Wait() {c.checker.check()t := runtime_notifyListAdd(&amp;amp;c.notify)c.L.Unlock()runtime_notifyListWait(&amp;amp;c.notify, t)c.L.Lock() }// 单发通知func (c *Cond) Signal() {c.checker.check()runtime_notifyListNotifyOne(&amp;amp;c.notify) }// 广播通知func (c *Cond) Broadcast() {c.checker.check()runtime_notifyListNotifyAll(&amp;amp;c.notify) } 我们可以通过 sync.NewCond 返回对应的条件变量实例，初始化的时候需要传入互斥锁，该互斥锁实例会赋值给 sync.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(5.变量声明，初始化，赋值，作用域)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/5.%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E%E5%88%9D%E5%A7%8B%E5%8C%96%E8%B5%8B%E5%80%BC%E4%BD%9C%E7%94%A8%E5%9F%9F/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/5.%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E%E5%88%9D%E5%A7%8B%E5%8C%96%E8%B5%8B%E5%80%BC%E4%BD%9C%E7%94%A8%E5%9F%9F/</guid>
+      <description>变量相当于计算机中一块存储区域的命名，通过定义变量能像系统申请到一块存储空间。通过使用变量名，能对这块存储空间进行操作。
+定义变量 在go中，可以使用var关键字来定义变量，且要将值类型放置到变量定义后面。
+var i int 可以同时定义多个同类型变量
+var i1,i2 int 可以分组定义
+var (a,a1 intb stringc bool) 需要注意的是定义变量后，系统会将变量初始化为该类型的初始值，入`i`会为`0`，`b`是`空字符串`，`c`是`flase`package mainimport &amp;#34;fmt&amp;#34;// 定义一个var i int// 定义多个同类型var i1, i2 int// 分组定义var (a, a1 intb string)func main() {fmt.Printf(&amp;#34;i is %d &amp;#34;, i)fmt.Printf(&amp;#34;i1 is %d &amp;#34;, i1)fmt.Printf(&amp;#34;i2 is %d &amp;#34;, i2)fmt.Printf(&amp;#34;a is %d &amp;#34;, a)fmt.Printf(&amp;#34;a1 is %d &amp;#34;, a1)fmt.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(50.sync 包：原子操作)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/50.sync-%E5%8C%85%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/50.sync-%E5%8C%85%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C/</guid>
+      <description>我们在前两篇教程中讨论了互斥锁、读写锁以及基于它们的条件变量。互斥锁是一个同步工具，它可以保证每一时刻进入临界区的协程只有一个；读写锁对共享资源的写操作和读操作区别看待，并消除了读操作之间的互斥；条件变量主要用于协调想要访问共享资源的那些线程，当共享资源的状态发生变化时，它可以被用来通知被互斥锁阻塞的线程，它既可以基于互斥锁，也可以基于读写锁（当然了，读写锁也是互斥锁，是对后者的一种扩展）。通过对互斥锁的合理使用，我们可以使一个 Go 协程在执行临界区中的代码时，不被其他的协程打扰，实现串行执行，不过，虽然不会被打扰，但是它仍然可能会被中断（interruption）。所谓中断其实是 CPU 和操作系统级别的术语，并发执行的协程并不是真的并行执行，而是通过 CPU 的调度不断从运行状态切换到非运行状态，或者从非运行状态切换到运行状态，在用户看来，好像是「同时」在执行。我们把代码从运行状态切换到非运行状态称之为**中断**。中断的时机很多，比如任何两条语句执行的间隙，甚至在某条语句执行的过程中都是可以的，即使这些语句在临界区内也是如此。所以我们说互斥锁只能保证临界区代码的串行执行，不能保证这些代码执行的原子性，因为原子操作不能被中断。原子操作通常是 CPU 和操作系统提供支持的，由于执行过程中不会中断，所以可以完全消除竞态条件，从而绝对保证并发安全性，此外，由于不会中断，所以原子操作本身要求也很高，既要简单，又要快速。Go 语言的原子操作也是基于 CPU 和操作系统的，由于简单和快速的要求，只针对少数数据类型的值提供了原子操作函数，这些函数都位于标准库代码包 sync/atomic 中。这些原子操作包括加法（Add）、比较并交换（Compare And Swap，简称 CAS）、加载（Load）、存储（Store）和交换（Swap）。
+Go 语言中的原子操作 加减法 我们可以通过 atomic 包提供的下列函数实现加减法的原子操作，第一个参数是操作数对应的指针，第二个参数是加/减值：虽然这些函数都是以 Add 前缀开头，但是对于减法可以通过传递负数实现，不过对于后三个函数，由于操作数类型是无符号的，所以无法显式传递负数来实现减法。比如我们测试下 AddInt32 函数：
+package mainimport (&amp;#34;fmt&amp;#34;&amp;#34;sync/atomic&amp;#34;&amp;#34;time&amp;#34;)var counter int32 = 0func testAdd(i int32) {atomic.AddInt32(&amp;amp;counter, 1)//counter += 1fmt.Println(counter)}func main() {for i := 0; i &amp;lt; 100; i++ {go testAdd(int32(i))go testAdd(int32(i))go testAdd(int32(i))}time.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(51.sync 包：sync.WaitGroup 和 sync.Once)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/51.sync-%E5%8C%85sync.waitgroup-%E5%92%8C-sync.once/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/51.sync-%E5%8C%85sync.waitgroup-%E5%92%8C-sync.once/</guid>
+      <description>在介绍通道的时候，如果启用了多个子协程，我们是这样实现主协程等待子协程执行完毕并退出的：声明一个和子协程数量一致的通道数组，然后为每个子协程分配一个通道元素，在子协程执行完毕时向对应的通道发送数据；然后在主协程中，我们依次读取这些通道接收子协程发送的数据，只有所有通道都接收到数据才会退出主协程。
+chs := make([]chan int, 10)for i := 0; i &amp;lt; 10; i++ {chs[i] = make(chan int)go add(1, i, chs[i])}for _, ch := range chs {&amp;lt;- ch} sync.WaitGroup 类型 sync.WaitGroup 类型是开箱即用的，也是并发安全的。该类型提供了以下三个方法：
+Add：WaitGroup 类型有一个计数器，默认值是0，我们可以通过 Add 方法来增加这个计数器的值，通常我们可以通过个方法来标记需要等待的子协程数量； Done：当某个子协程执行完毕后，可以通过 Done 方法标记已完成，该方法会将所属 WaitGroup 类型实例计数器值减一，通常可以通过 defer 语句来调用它； Wait：Wait 方法的作用是阻塞当前协程，直到对应 WaitGroup 类型实例的计数器值归零，如果在该方法被调用的时候，对应计数器的值已经是 0，那么它将不会做任何事情。 至此，你可能已经看出来了，我们完全可以组合使用 sync.WaitGroup 类型提供的方法来替代之前通道中等待子协程执行完毕的实现方法，对应代码如下：
+package mainimport (&amp;#34;fmt&amp;#34;&amp;#34;sync&amp;#34;)var wg *sync.WaitGroupfunc addSum(a, b int) {defer wg.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(52.通过 context 包提供的函数实现多协程之间的协作)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/52.%E9%80%9A%E8%BF%87-context-%E5%8C%85%E6%8F%90%E4%BE%9B%E7%9A%84%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%A4%9A%E5%8D%8F%E7%A8%8B%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8D%8F%E4%BD%9C/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/52.%E9%80%9A%E8%BF%87-context-%E5%8C%85%E6%8F%90%E4%BE%9B%E7%9A%84%E5%87%BD%E6%95%B0%E5%AE%9E%E7%8E%B0%E5%A4%9A%E5%8D%8F%E7%A8%8B%E4%B9%8B%E9%97%B4%E7%9A%84%E5%8D%8F%E4%BD%9C/</guid>
+      <description>除此之外，我们还可以通过另一种工具实现类似需求，这就是我们今天要介绍的 context 包，这个包为我们提供了以下方法和类型：我们可以先通过 withXXX 方法返回一个从父 Context 拷贝的新的可撤销子 Context 对象和对应撤销函数 CancelFunc，CancelFunc 是一个函数类型，调用它时会撤销对应的子 Context 对象，当满足某种条件时，我们可以通过调用该函数结束所有子协程的运行，主协程在接收到信号后可以继续往后执行。
+package mainimport (&amp;#34;context&amp;#34;&amp;#34;fmt&amp;#34;&amp;#34;time&amp;#34;)func go2(ctx context.Context) {select {case &amp;lt;-ctx.Done():println(&amp;#34;携程2已结束&amp;#34;)return}}func go1(ctx context.Context) {go go2(ctx)select {case &amp;lt;-ctx.Done():println(&amp;#34;携程1已结束&amp;#34;)return}}func main() {ctx, cancelFunc := context.WithCancel(context.Background())go go1(ctx)for i := 1; i &amp;lt; 100; i++ {if i &amp;gt; 10 {cancelFunc()}}time.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(53.sync 包：临时对象池 sync.Pool)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/53.sync-%E5%8C%85%E4%B8%B4%E6%97%B6%E5%AF%B9%E8%B1%A1%E6%B1%A0-sync.pool/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/53.sync-%E5%8C%85%E4%B8%B4%E6%97%B6%E5%AF%B9%E8%B1%A1%E6%B1%A0-sync.pool/</guid>
+      <description>在高并发场景下，我们会遇到很多问题，垃圾回收（GC）就是其中之一。Go 语言中的垃圾回收是自动执行的，这有利有弊，好处是避免了程序员手动对垃圾进行回收，简化了代码编写和维护，坏处是垃圾回收的时机无处不在，这在无形之中增加了系统运行时开销。在对系统性能要求较高的高并发场景下，这是我们应该主动去避免的，因此这需要对对象进行重复利用，以避免产生太多垃圾，而这也就引入了我们今天要讨论的主题 —— sync 包提供的 Pool 类型：
+type Pool struct {noCopy noCopylocal unsafe.Pointer // local fixed-size per-P pool, actual type is [P]poolLocallocalSize uintptr // size of the local array// New optionally specifies a function to generate// a value when Get would otherwise return nil.// It may not be changed concurrently with calls to Get.New func() interface{}} sync.Pool 是一个临时对象池，可用来临时存储对象，下次使用时从对象池中获取，避免重复创建对象。相应的，该类型提供了 Put 和 Get 方法，分别对临时对象进行存储和获取。我们可以把 sync.</description>
+    </item>
+    
+    <item>
+      <title>golang基础(6.常量和枚举)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/6.%E5%B8%B8%E9%87%8F%E5%92%8C%E6%9E%9A%E4%B8%BE/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/6.%E5%B8%B8%E9%87%8F%E5%92%8C%E6%9E%9A%E4%B8%BE/</guid>
+      <description>常量指的是在编译期间已知的且不可改变的数据类型，常量可以是数值类型、浮点型、复合类型、布尔类型、字符串类型，在go中任何编译器后试图改变常量的操作都会导致编译报错。
+定义常量 在go中我们可以使用const来定义常量，以下是常见的击中定义方式
+package _constconst Pi float64 = 3.14159265358979323846const zero = 0.0 // 无类型浮点常量const ( // 通过一个 const 关键字定义多个常量，和 var 类似size int64 = 1024eof = -1 // 无类型整型常量)const u, v float32 = 0, 3 // u = 0.0, v = 3.0，常量的多重赋值const a, b, c = 3, 4, &amp;#34;foo&amp;#34; // a = 3, b = 4, c = &amp;#34;foo&amp;#34;, 无类型整型和字符串常量 预定义常量 go中预定义的常量有 true,false,iotaiota比较特殊，它是一个可以被编译器修改的常量。在编译期间每次const关键字出现时iota都会被重置为0，直到下一个const出现前，每出现一次iota都会递增。</description>
+    </item>
+    
+    <item>
+      <title>golang基础(7.数据类型概述，以及布尔类型)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/7.%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%A6%82%E8%BF%B0%E4%BB%A5%E5%8F%8A%E5%B8%83%E5%B0%94%E7%B1%BB%E5%9E%8B/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/7.%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E6%A6%82%E8%BF%B0%E4%BB%A5%E5%8F%8A%E5%B8%83%E5%B0%94%E7%B1%BB%E5%9E%8B/</guid>
+      <description>基本类型 作为静态语言，go有7种基础数据类型。
+布尔类型：bool 整型：int8、byte、int16、int、uint、uintptr （有符号，无符号） 浮点类型：float32、float64 （有符号，无符号） 复数类型：complex64、complex128 字符串：string 字符类型：rune 错误类型：error 在go中的整形以及浮点类型都区分有有符号以及无符号，即1，1.0（无符号）``-1，-1.9（有符号）。浮点类型通过，float 以及double 来区分精度。
+复合类型 除去以上7种以为还支持多种复合类型
+指针（pointer） 数组（array） 切片（slice） 字典（map） 通道（chan） 结构体（struct） 接口（interface） </description>
+    </item>
+    
+    <item>
+      <title>golang基础(8.布尔类型)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/8.%E5%B8%83%E5%B0%94%E7%B1%BB%E5%9E%8B/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/8.%E5%B8%83%E5%B0%94%E7%B1%BB%E5%9E%8B/</guid>
+      <description>布尔类型定义的关键字为 bool，只支持预定义常量true和false,不支持其他数据类型强制转换。
+package mainimport &amp;#34;fmt&amp;#34;func main() {var a bool = truevar b = falsec := (1 != 2)fmt.Println(a, b, c)} </description>
+    </item>
+    
+    <item>
+      <title>golang基础(9.整形以及运算符)</title>
+      <link>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/9.%E6%95%B4%E5%BD%A2%E4%BB%A5%E5%8F%8A%E8%BF%90%E7%AE%97%E7%AC%A6/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/9.%E6%95%B4%E5%BD%A2%E4%BB%A5%E5%8F%8A%E8%BF%90%E7%AE%97%E7%AC%A6/</guid>
+      <description>go支持的整形 类型 长度（单位：字节） 说明 值范围 默认值 int8 1 带符号8位整型 -128~127 0 uint8 1 无符号8位整型，与 byte 类型等价 0~255 0 int16 2 带符号16位整型 -32768~32767 0 uint16 2 无符号16位整型 0~65535 0 int32 4 带符号32位整型，与 rune 类型等价 -2147483648~2147483647 0 uint32 4 无符号32位整型 0~4294967295 0 int64 8 带符号64位整型 -9223372036854775808~9223372036854775807 0 uint64 8 无符号64位整型 0~18446744073709551615 0 int 32位或64位 与具体平台相关 与具体平台相关 0 uint 32位或64位 与具体平台相关 与具体平台相关 0 uintptr 与对应指针相同 无符号整型，足以存储指针值的未解释位 32位平台下为4字节，64位平台下为8字节 0 在PHP中只有一种int类型且不区分符号，最大存储数量基于运行平台决定。在 32 位平台下其最大值为 20 亿左右（等同于 Go 语言中的 int32），64 位平台下的最大值通常是大约 9E18（等同于 Go 语言中的 int64），并且 PHP 中的整型不支持无符号类型，你可以通过 PHP_INT_MAX 常量在 PHP 中获取当前平台的最大整型值。在go中不同类型的int不支持类型自动转换，需要转换类型后才能进行运算</description>
+    </item>
+    
+  </channel>
+</rss>

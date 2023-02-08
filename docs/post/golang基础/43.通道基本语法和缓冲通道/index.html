@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(43.通道基本语法和缓冲通道) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="通道声明和初始化 可以通过 chan类型关键字来声明通道类型变量：
+var ch chan int 上面这个表达式表示声明一个通道类型变量 ch，并且通道中只能传递 int 类型数据。与其他数据类型不同，通道类型变量除了声明通道类型本身外，还要声明通道中传递数据的类型，比如这里我们指定这个数据类型为 int 。通道是类型相关的，我们必须在声明通道的时候同时指定通道中传递数据的类型，并且一个通道只能传递一种类型的数据，这一点和数组/切片类似。我们还可以通过如下方式声明通道数组、切片、字典，以下声明方式表示chs中的元素都是 chan int 类型的通道：
+var chs [10]chan intvar chs []chan intvar chs map[string]chan int 不过，实际编码时，我们更多使用的是下面这种快捷方式同时声明和初始化通道类型：
+ch := make(chan int) 由于在 Go 语言中，通道也是引用类型（和切片、字典一样），所以可以通过 make函数进行初始化，在通过 make 函数初始化通道时，还可以传递第二个参数，表示通道的容量：
+ch := make(chan int,10) 第二个参数是可选的，用于指定通道最多可以缓存多少个元素，默认值是 0，此时通道可以被称作非缓冲通道，`表示往通道中发送一个元素后，只有该元素被接收后才能存入下一个元素`，与之相对的，当缓存值大于 0 时，通道可以称作缓冲通道，即使通道元素没有被接收，也可以继续往里面发送元素，直到超过缓冲值，显然设置这个缓冲值可以提高通道的操作效率。通道操作符 通道类型变量只支持发送和接收操作，即往通道中写入数据和从通道中读取数据，对应的操作符都是 &lt;-，我们判断是发送还是接收操作的依据是通道类型变量位于 &lt;- 左侧还是右侧，位于左侧是发送操作，位于右侧是接收操作：
+ch &lt;- 1 // 往通道中写入数据 1x := &lt;- ch // 从通道中读取数据并赋值给变量 当我们将数据发送到通道时，发送的是数据的副本，同理，从通道中接收数据时，接收的也是数据的副本。发送和接收操作都是原子操作，同时只能进行发送或接收操作，不存在数据发送一半被接收，或者接收一半发送新数据的情况，并且两者都是阻塞的，如果通道中没有数据，进行读取操作的话会导致读取操作所在的协程阻塞，直到通道中写入了数据；反过来，如果通道中已经有了数据，再往里面写入数据的话，也会导致写入操作所在的协程阻塞，直到其中的数据被其他协程接收。
+使用缓冲通道提升性能 上面这种情况发生在非缓冲通道中，对于缓冲通道，情况略有不同，假设 ch 是通过 make(chan int, 10) 进行初始化的通道，则其缓冲区大小是 10，这意味着，在没有被任何其他协程接收的情况下，我们可以一直往 ch 通道中写入 10 个数据，超过 10 个数据才会阻塞当前协程，直到通道被其他协程读取，显然，合理设置缓冲区可以提高通道的操作效率，尤其是在需要持续传输大量数据的场景。我们可以通过如下示例代码简单测试下通道的缓冲机制：" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(43.通道基本语法和缓冲通道)" />
+<meta property="og:description" content="golang基础(43.通道基本语法和缓冲通道)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/43.%E9%80%9A%E9%81%93%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95%E5%92%8C%E7%BC%93%E5%86%B2%E9%80%9A%E9%81%93/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(43.通道基本语法和缓冲通道)">
+<meta itemprop="description" content="golang基础(43.通道基本语法和缓冲通道)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="164">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(43.通道基本语法和缓冲通道)"/>
+<meta name="twitter:description" content="golang基础(43.通道基本语法和缓冲通道)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(43.通道基本语法和缓冲通道)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="通道声明和初始化">通道声明和初始化</h2>
+<p>可以通过 <code>chan</code>类型关键字来声明通道类型变量：</p>
+<pre tabindex="0"><code>var ch chan int 
+</code></pre><p>上面这个表达式表示声明一个通道类型变量 <code>ch</code>，并且通道中只能传递 <code>int </code>类型数据。<!-- raw HTML omitted -->与其他数据类型不同，通道类型变量除了声明通道类型本身外，<code>还要声明通道中传递数据的类型</code>，比如这里我们指定这个数据类型为 <code>int </code>。通道是类型相关的，<code>我们必须在声明通道的时候同时指定通道中传递数据的类型，并且一个通道只能传递一种类型的数据</code>，这一点和数组/切片类似。<!-- raw HTML omitted -->我们还可以通过如下方式声明通道数组、切片、字典，以下声明方式表示<code>chs</code>中的元素都是 <code>chan int</code> 类型的通道：</p>
+<pre tabindex="0"><code>var chs [10]chan int
+var chs []chan int
+var chs map[string]chan int
+</code></pre><p>不过，实际编码时，我们更多使用的是下面这种快捷方式同时声明和初始化通道类型：</p>
+<pre tabindex="0"><code>ch := make(chan int)
+</code></pre><p>由于在 Go 语言中，<code>通道也是引用类型</code>（和切片、字典一样），所以可以通过 <code>make</code>函数进行初始化，在通过 <code>make </code>函数初始化通道时，还可以传递第二个参数，表示通道的容量：</p>
+<pre tabindex="0"><code>ch := make(chan int,10)
+</code></pre><pre><code>第二个参数是可选的，用于指定通道最多可以缓存多少个元素，默认值是 0，此时通道可以被称作非缓冲通道，`表示往通道中发送一个元素后，只有该元素被接收后才能存入下一个元素`，与之相对的，当缓存值大于 0 时，通道可以称作缓冲通道，即使通道元素没有被接收，也可以继续往里面发送元素，直到超过缓冲值，显然设置这个缓冲值可以提高通道的操作效率。
+</code></pre>
+<h2 id="通道操作符">通道操作符</h2>
+<p>通道类型变量<code>只支持发送和接收操作</code>，即往通道中写入数据和从通道中读取数据，对应的操作符都是 &lt;-，我们判断是发送还是接收操作的依据是通道类型变量位于 &lt;- 左侧还是右侧，位于左侧是发送操作，位于右侧是接收操作：</p>
+<pre tabindex="0"><code>ch &lt;- 1   // 往通道中写入数据 1
+x := &lt;- ch     // 从通道中读取数据并赋值给变量
+</code></pre><p>当我们将数据发送到通道时，<code>发送的是数据的副本</code>，同理，从通道中接收数据时，接收的也是数据的副本。<!-- raw HTML omitted -->发送和接收操作都是原子操作，同时只能进行发送或接收操作，不存在数据发送一半被接收，或者接收一半发送新数据的情况，并且两者都是阻塞的，<code>如果通道中没有数据，进行读取操作的话会导致读取操作所在的协程阻塞</code>，直到通道中写入了数据；反过来，如果通道中已经有了数据，再往里面写入数据的话，也会导致写入操作所在的协程阻塞，直到其中的数据被其他协程接收。</p>
+<h2 id="使用缓冲通道提升性能">使用缓冲通道提升性能</h2>
+<p>上面这种情况发生在非缓冲通道中，对于缓冲通道，情况略有不同，假设 ch 是通过 make(chan int, 10) 进行初始化的通道，则其缓冲区大小是 10，这意味着，<code>在没有被任何其他协程接收的情况下，我们可以一直往 ch 通道中写入 10 个数据，超过 10 个数据才会阻塞当前协程，直到通道被其他协程读取</code>，显然，合理设置缓冲区可以提高通道的操作效率，尤其是在需要持续传输大量数据的场景。<!-- raw HTML omitted -->我们可以通过如下示例代码简单测试下通道的缓冲机制：</p>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;time&#34;
+)
+
+func test(ch chan int) {
+	for i := 0; i &lt; 100; i++ {
+		ch &lt;- i
+	}
+	close(ch)
+}
+
+func main() {
+	start := time.Now()
+	ch := make(chan int, 20)
+	go test(ch)
+
+	for v := range ch {
+		fmt.Println(v)
+	}
+	end := time.Now()
+	consume := end.Sub(start).String()
+	fmt.Printf(&#34;consume %s s&#34;, consume)
+}
+</code></pre><p>我们在主协程中初始化了一个带缓冲的通道，缓冲大小是 20，然后将其传递到子协程，并且在子协程中发送数据到通道，子协程执行完毕后，调用 close(ch) 显式关闭通道，这一行不能漏掉，否则主协程不知道子协程什么时候执行完毕，<code>从一个空的通道接收数据会报如下运行时错误</code>（死锁）：</p>
+<pre tabindex="0"><code>fatal error: all goroutines are asleep - deadlock!
+</code></pre><p>关闭通道的操作只能执行一次，</p>
+<ul>
+<li>试图关闭已关闭的通道会引发 panic。</li>
+<li>此外，关闭通道的操作只能在发送数据的一方关闭，如果在接收一方关闭，会导致 panic，因为接收方不知道发送方什么时候执行完毕。</li>
+<li>向一个已经关闭的通道发送数据会导致 panic。</li>
+</ul>
+<p>回到主协程，我们通过 i := range ch 循环从通道中读取数据，并将其打印出来。当通道关闭后会退出循环。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/42.%E5%9F%BA%E4%BA%8E%E6%B6%88%E6%81%AF%E7%9A%84%E6%90%BA%E7%A8%8B%E9%80%9A%E4%BF%A1/"
+      ><span class="mr-1.5">←</span><span>golang基础(42.基于消息的携程通信)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/44.%E5%8D%95%E5%90%91%E9%80%9A%E9%81%93/"
+      ><span>golang基础(44.单向通道)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

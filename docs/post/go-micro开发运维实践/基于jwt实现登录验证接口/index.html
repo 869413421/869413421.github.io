@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>go-micro开发运维实践(基于jwt实现登录验证接口) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="定义登录验证protobuf 修改proto/user/user.proto syntax = &#34;proto3&#34;;package micro.service.user;option go_package = &#34;proto/user&#34;;service UserService {rpc Pagination(PaginationRequest) returns(PaginationResponse){}rpc Get(GetRequest) returns(UserResponse){}rpc Create(CreateRequest) returns(UserResponse){}rpc Update(UpdateRequest) returns(UserResponse){}rpc Delete(DeleteRequest) returns(UserResponse){}rpc Auth(AuthRequest) returns(TokenResponse){}rpc ValidateToken(TokenRequest) returns(TokenResponse){}}message User{uint64 id = 1;string name = 3;string email = 4;string real_name = 6;string avatar = 7;string create_at = 9;string update_at = 10;}//UserResponse 单个用户响应message UserResponse{User user = 1;}//PaginationResponse 用户分页数据响应message PaginationResponse{repeated User users = 1;uint64 total = 2;}//PaginationRequest 用户分页请求message PaginationRequest{uint64 page = 1;uint32 perPage = 2;}//GetRequest 获取单个用户请求message GetRequest{uint64 id = 1;}//CreateRequest 创建用户请求message CreateRequest{string name = 1;string password = 2;string email = 3;string real_name = 4;string avatar = 5;}//UpdateRequest 更新用户请求message UpdateRequest{uint64 id = 1;string name = 2;string email = 3;string real_name = 4;string avatar = 6;}//DeleteRequest 删除用户请求message DeleteRequest{uint64 id = 1;}//AuthRequest 登录请求message AuthRequest{string email = 1;string password = 2;}//TokenRequest token验证接口message TokenRequest{string token = 1;}//TokenResponse token响应接口message TokenResponse{string token = 1;bool valid = 2;} 生成protobuf代码 make proto 引用jwt编写获取token业务 获取jwt生成包 go get -u github." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="go-micro开发运维实践(基于jwt实现登录验证接口)" />
+<meta property="og:description" content="go-micro开发运维实践(基于jwt实现登录验证接口)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%9F%BA%E4%BA%8Ejwt%E5%AE%9E%E7%8E%B0%E7%99%BB%E5%BD%95%E9%AA%8C%E8%AF%81%E6%8E%A5%E5%8F%A3/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="go-micro开发运维实践(基于jwt实现登录验证接口)">
+<meta itemprop="description" content="go-micro开发运维实践(基于jwt实现登录验证接口)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="567">
+<meta itemprop="keywords" content="go-micro开发运维实践," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="go-micro开发运维实践(基于jwt实现登录验证接口)"/>
+<meta name="twitter:description" content="go-micro开发运维实践(基于jwt实现登录验证接口)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">go-micro开发运维实践(基于jwt实现登录验证接口)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="定义登录验证protobuf">定义登录验证protobuf</h2>
+<h3 id="修改protouseruserproto">修改proto/user/user.proto</h3>
+<pre tabindex="0"><code>syntax = &#34;proto3&#34;;
+
+package micro.service.user;
+option go_package = &#34;proto/user&#34;;
+
+service UserService {
+  rpc Pagination(PaginationRequest) returns(PaginationResponse){}
+  rpc Get(GetRequest) returns(UserResponse){}
+  rpc Create(CreateRequest) returns(UserResponse){}
+  rpc Update(UpdateRequest) returns(UserResponse){}
+  rpc Delete(DeleteRequest) returns(UserResponse){}
+  rpc Auth(AuthRequest) returns(TokenResponse){}
+  rpc ValidateToken(TokenRequest) returns(TokenResponse){}
+}
+
+message User{
+  uint64 id = 1;
+  string name = 3;
+  string email = 4;
+  string real_name = 6;
+  string avatar = 7;
+  string create_at = 9;
+  string update_at = 10;
+}
+
+//UserResponse 单个用户响应
+message UserResponse{
+  User user = 1;
+}
+
+//PaginationResponse 用户分页数据响应
+message PaginationResponse{
+  repeated User users = 1;
+  uint64 total = 2;
+}
+
+//PaginationRequest 用户分页请求
+message PaginationRequest{
+  uint64 page = 1;
+  uint32 perPage = 2;
+}
+
+//GetRequest 获取单个用户请求
+message GetRequest{
+  uint64 id = 1;
+}
+
+//CreateRequest 创建用户请求
+message CreateRequest{
+  string name = 1;
+  string password = 2;
+  string email = 3;
+  string real_name = 4;
+  string avatar = 5;
+}
+
+//UpdateRequest 更新用户请求
+message UpdateRequest{
+  uint64 id = 1;
+  string name = 2;
+  string email = 3;
+  string real_name = 4;
+  string avatar = 6;
+}
+
+//DeleteRequest 删除用户请求
+message DeleteRequest{
+  uint64 id = 1;
+}
+
+//AuthRequest 登录请求
+message AuthRequest{
+  string email = 1;
+  string password = 2;
+}
+
+//TokenRequest token验证接口
+message TokenRequest{
+  string token = 1;
+}
+
+//TokenResponse token响应接口
+message TokenResponse{
+  string token = 1;
+  bool valid = 2;
+}
+</code></pre><h3 id="生成protobuf代码">生成protobuf代码</h3>
+<pre tabindex="0"><code>make proto
+</code></pre><h2 id="引用jwt编写获取token业务">引用jwt编写获取token业务</h2>
+<h3 id="获取jwt生成包">获取jwt生成包</h3>
+<pre tabindex="0"><code>go get -u github.com/dgrijalva/jwt-go
+</code></pre><h3 id="创建service目录">创建service目录</h3>
+<pre tabindex="0"><code>mkdir service
+touch service/token.go
+</code></pre><pre tabindex="0"><code>package service
+
+import (
+	&#34;github.com/869413421/micro-service/user/pkg/model&#34;
+	&#34;github.com/869413421/micro-service/user/pkg/repo&#34;
+	&#34;github.com/dgrijalva/jwt-go&#34;
+	&#34;time&#34;
+)
+
+var (
+	key = []byte(&#34;microServiceUserTokenKeySecret&#34;)
+)
+
+// CustomClaims jwt认证对象
+type CustomClaims struct {
+	User *model.User
+	jwt.StandardClaims
+}
+
+// Authble jwt实现接口
+type Authble interface {
+	Decode(token string) (*CustomClaims, error)
+	Encode(user *model.User) (string, error)
+}
+
+// TokenService token业务对象
+type TokenService struct {
+	Repo repo.UserRepositoryInterface
+}
+
+// NewTokenService token业务初始化
+func NewTokenService() Authble {
+	return &amp;TokenService{Repo: repo.NewUserRepository()}
+}
+
+// Decode 将token字符串转换为token对象
+func (srv *TokenService) Decode(tokenString string) (*CustomClaims, error) {
+
+	// Parse the token
+	token, err := jwt.ParseWithClaims(tokenString, &amp;CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return key, nil
+	})
+
+	// Validate the token and return the custom claims
+	if claims, ok := token.Claims.(*CustomClaims); ok &amp;&amp; token.Valid {
+		return claims, nil
+	} else {
+		return nil, err
+	}
+}
+
+// Encode 将token对象串转换为token字符串
+func (srv *TokenService) Encode(user *model.User) (string, error) {
+
+	expireToken := time.Now().Add(time.Hour * 72).Unix()
+
+	// Create the Claims
+	claims := CustomClaims{
+		user,
+		jwt.StandardClaims{
+			ExpiresAt: expireToken,
+			Issuer:    &#34;micro.service.user&#34;,
+		},
+	}
+
+	// Create token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Sign token and return
+	return token.SignedString(key)
+}
+</code></pre><h2 id="实现服务处理器">实现服务处理器</h2>
+<h3 id="为userservicehandler增加token业务层">为UserServiceHandler增加token业务层</h3>
+<pre tabindex="0"><code>...
+
+//UserServiceHandler 用户服务处理器
+type UserServiceHandler struct {
+	UserRepo     repo.UserRepositoryInterface
+	TokenService service.Authble
+}
+
+// NewUserServiceHandler 用户服务初始化
+func NewUserServiceHandler() *UserServiceHandler {
+	return &amp;UserServiceHandler{
+		UserRepo:     repo.NewUserRepository(),
+		TokenService: service.NewTokenService(),
+	}
+}
+
+...
+</code></pre><h3 id="实现登录验证token接口">实现登录验证token接口</h3>
+<p>为<code>UserServiceHandler</code>加上实现方法</p>
+<pre tabindex="0"><code>...
+
+// Auth 认证获取token
+func (srv UserServiceHandler) Auth(ctx context.Context, req *pb.AuthRequest, rsp *pb.TokenResponse) error {
+	// 1.根据邮箱回去用户
+	log.Println(&#34;Logging in with:&#34;, req.Email, req.Password)
+	user, err := srv.UserRepo.GetByEmail(req.Email)
+	if err != nil &amp;&amp; err != gorm.ErrRecordNotFound {
+		return err
+	}
+	if err == gorm.ErrRecordNotFound {
+		return errors.NotFound(&#34;User.Auth.GetByEmail.Error&#34;, &#34;user not found ,check you password or email&#34;)
+	}
+
+	// 2.检验用户密码
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	if err != nil {
+		return errors.Unauthorized(&#34;User.Auth.CheckPassword.Error&#34;, err.Error())
+	}
+
+	// 3.生成token
+	token, err := srv.TokenService.Encode(user)
+	if err != nil {
+		return err
+	}
+
+	// 4.返回token字符串
+	rsp.Token = token
+	return nil
+}
+
+// ValidateToken 验证token
+func (srv *UserServiceHandler) ValidateToken(ctx context.Context, req *pb.TokenRequest, rsp *pb.TokenResponse) error {
+	// 1.将token字符串转换为token对象
+	claims, err := srv.TokenService.Decode(req.Token)
+	if err != nil {
+		return err
+	}
+
+	// 2.判断转换是否成功
+	if claims.User.ID == 0 {
+		return errors.BadRequest(&#34;User.ValidateToken.Error&#34;, &#34;user invalid&#34;)
+	}
+
+	// 3.返回验证状态
+	rsp.Token = req.Token
+	rsp.Valid = true
+	return nil
+}
+
+...
+</code></pre><h3 id="编译代码准备测试">编译代码准备测试</h3>
+<pre tabindex="0"><code>make build
+</code></pre><h3 id="打开micro工具测试接口">打开micro工具测试接口</h3>
+<p><a href="http://127.0.0.1:8082/client">http://127.0.0.1:8082/client</a></p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5"
+      >go-micro开发运维实践</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%88%9D%E5%A7%8B%E5%8C%96%E9%A1%B9%E7%9B%AE%E5%AE%89%E8%A3%85micro/"
+      ><span class="mr-1.5">←</span><span>go-micro开发运维实践(初始化项目，安装micro)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%AE%89%E8%A3%85etcd%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83/"
+      ><span>go-micro开发运维实践(安装etcd集群，部署注册中心)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

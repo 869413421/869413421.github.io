@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>网络基础(一次完整的网络请求生命周期) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="客户端发起请求 以访问百度为例，用户在浏览器输入www.baidu.com。用户输入的www.baidu.com仅仅是一个域名，这时候计算机并不清楚需要去哪里访问到响应的资源。这时候就需要通过DNS协议来对域名进行解析，从DNS服务商中取得与域名相对应的IP地址。从而通过HTTP协议或者HTTPS协议，打包请求头和请求体向IP地址发起请求。DNS，HTTP，HTTPS所在的层为应用层，经过应用层的封装后，浏览器将包交由下一层来进行处理，这个过程是通过socket编程来实现的。下一层即是传输层，传输层主要有两种协议。一种是无连接的UDP协议，一种是面向连接的TCP协议。UDP协议不需要建立连接即可进行通讯，不需要额外的性能开销，传输速度更快，但是不可靠，可能会发生丢包的情况。TCP协议需要通过三次握手来建立连接才可以进行通信，相对来说有额外的性能开销，传输速度低于UPD，但是TCP能保证数据到底目的地，更加安全以及可靠。HTTP以及HTTPS都是基于TPC协议的可靠连接。TCP协议中有两个主要端口，一个是基于浏览器的端口（用于监听服务器的响应），一个是基于服务器的端口，HTTP对应的端口为80，HTTPS对应的端口为443，主要用于监听对服务器的请求。操作系统会根据端口将包转发给相应的处理进程。传输层封装完毕后会讲包交给操作系统的网络层，网络层的基本协议是IP协议，网络层会将传输层传递过来的包加上IP头，其中包含发送方的IP地址，以及接收方的IP地址。操作系统得到IP头中的IP地址后会寻找目标地址，如果服务端的IP地址是内网地址（局域网），便会直接传递请求数据。如果是外网的就需要通过网关去寻找目标机器。操作系统在启动的时候会通过DHCP协议来配置计算机的IP地址，以及默认的网关地址。计算会通过ARP协议通过IP地址获取网关的MAC地址，并且将网关以及MAC地址写到MAC头中。这样经过封装后，会将IP包交由下一层链路层，再经由网卡发送出去。（客户端机器与网关之间还有物理层的线路连接）。 :::warning MAC地址是唯一的，从网卡正式使用开始就具有全球唯一性。MAC地址相当于身份证，IP地址是动态分配的，有可能会重复。 ::: 网关会根据路由表，判断目标IP怎么走，经过多个网关的跳转最终找到目标服务器的网关，最终通过APR协议和目标IP取得目标机器的MAC地址，网络包最终可以根据MAC地址到达目的地。
+服务端接收请求 服务端和客户端的流程正好相反，服务端是自下而上的。目标服务器接收到请求包后，会取下请求中的MAC头交由网络层中发现IP也对上了，就会取下IP头交由传输层，传输层会原路返回包，告诉客户端请求接收到了。如果过了一段时间（超时时间），客户端还是没有收到来自服务器的回复，会重新发送这个包，直到收到回复为止。同样，这个重发也不是重新发起上面那个客户端请求，而是传输层将同一个请求反复重试，对用户来说，只有一次请求。回到目标服务器，当网络包到达传输层后，TCP头中有一个服务器监听端口号，通过这个端口号，可以找到 服务端正在监听的端口，即 Nginx 中配置的 443 端口，端口对上之后，取下 TCP 头，将网络包交给应用层，开始对 HTTP/HTTPS 请求进行处理。如果是前端资源的话，直接通过 Nginx 进行响应，如果是 PHP 动态请求的话，再由 Nginx 将请求转发给后台运行的 PHP-FPM 进程进行处理。当然如果 Nginx 做了负载均衡，以及后端服务是分布式系统或者提供了微服务的化（涉及到RPC远程调用），还有更加复杂的处理逻辑，这些我们放到后面去讲。当后台服务处理完成后，就会返回一个 HTTPS 的响应包，告知用户请求成功，并返回响应内容，同样这个网络响应包和请求包一样，自上而下经过层层打包，顺着来路经过层层「关卡」（网关），回到发起请求的客户端，然后再经过自下而上的处理，最终在客户端浏览器显示。" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="网络基础(一次完整的网络请求生命周期)" />
+<meta property="og:description" content="网络基础(一次完整的网络请求生命周期)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/%E4%B8%80%E6%AC%A1%E5%AE%8C%E6%95%B4%E7%9A%84%E7%BD%91%E7%BB%9C%E8%AF%B7%E6%B1%82%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="网络基础(一次完整的网络请求生命周期)">
+<meta itemprop="description" content="网络基础(一次完整的网络请求生命周期)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="29">
+<meta itemprop="keywords" content="网络基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="网络基础(一次完整的网络请求生命周期)"/>
+<meta name="twitter:description" content="网络基础(一次完整的网络请求生命周期)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">网络基础(一次完整的网络请求生命周期)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1656641295414-d64c1894-29e1-46ab-9805-193304af3ca9.png#clientId=u46f7d221-36b1-4&amp;from=paste&amp;id=u1d82902c&amp;originHeight=634&amp;originWidth=1110&amp;originalType=url&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;status=done&amp;style=none&amp;taskId=u4e0e821d-1b78-4650-83e7-6efc7f351ed&amp;title=" alt=""></p>
+<h2 id="客户端发起请求">客户端发起请求</h2>
+<p><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1656655018303-e38db36d-72b2-4ce7-980f-0845331e70bf.png#clientId=ucb682f45-dc3c-4&amp;from=paste&amp;id=u09dc64c7&amp;originHeight=970&amp;originWidth=1680&amp;originalType=url&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;status=done&amp;style=none&amp;taskId=u62e54af8-197a-4aa6-988c-65878a75bb2&amp;title=" alt=""><!-- raw HTML omitted -->以访问百度为例，用户在浏览器输入www.baidu.com。用户输入的www.baidu.com仅仅是一个域名，这时候计算机并不清楚需要去哪里访问到响应的资源。这时候就需要通过<code>DNS协议</code>来对域名进行解析，从<code>DNS服务商</code>中取得与域名相对应的<code>IP地址</code>。从而通过<code>HTTP协议</code>或者<code>HTTPS协议</code>，打包请求头和请求体向<code>IP地址</code>发起请求。<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1656644669885-a6869016-0c8d-45bc-9331-d43ee1c96515.png#clientId=u46f7d221-36b1-4&amp;from=paste&amp;id=ua082067d&amp;originHeight=288&amp;originWidth=796&amp;originalType=url&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;status=done&amp;style=none&amp;taskId=u7e86b9b2-298e-40c9-9c63-9f0531f133f&amp;title=" alt=""><!-- raw HTML omitted -->DNS，HTTP，HTTPS所在的层为<code>应用层</code>，经过<code>应用层</code>的封装后，浏览器将包交由下一层来进行处理，这个过程是通过socket编程来实现的。<!-- raw HTML omitted -->下一层即是<code>传输层</code>，传输层主要有两种协议。一种是<code>无连接的UDP协议</code>，一种是<code>面向连接的TCP协议</code>。<code>UDP</code>协议不需要建立连接即可进行通讯，不需要额外的性能开销，传输速度更快，但是不可靠，可能会发生丢包的情况。<code>TCP</code>协议需要通过三次握手来建立连接才可以进行通信，相对来说有额外的性能开销，传输速度低于<code>UPD</code>，但是<code>TCP</code>能保证数据到底目的地，更加安全以及可靠。<!-- raw HTML omitted --><code>HTTP</code>以及<code>HTTPS</code>都是基于<code>TPC</code>协议的可靠连接。<code>TCP协议</code>中有两个主要端口，一个是基于浏览器的端口<code>（用于监听服务器的响应）</code>，一个是基于服务器的端口，HTTP对应的端口为80，HTTPS对应的端口为443，<code>主要用于监听对服务器的请求</code>。操作系统会根据端口将包转发给相应的处理进程。<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1656645694278-5188fb0c-20e2-43c8-885f-c85232c1ccb6.png#clientId=u46f7d221-36b1-4&amp;from=paste&amp;id=ue5faa07d&amp;originHeight=366&amp;originWidth=838&amp;originalType=url&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;status=done&amp;style=none&amp;taskId=u1177aa83-82df-4bc1-8f70-0ec5d832af0&amp;title=" alt=""><!-- raw HTML omitted --><code>传输层</code>封装完毕后会讲包交给操作系统的<code>网络层</code>，网络层的基本协议是<code>IP协议</code>，<code>网络层</code>会将传输层传递过来的包加上<code>IP头</code>，其中包含<code>发送方的IP地址</code>，以及<code>接收方的IP地址</code>。操作系统得到<code>IP头</code>中的<code>IP地址</code>后会寻找目标地址，如果服务端的IP地址是内网地址（局域网），便会直接传递请求数据。如果是外网的就需要通过<code>网关</code>去寻找目标机器。<!-- raw HTML omitted -->操作系统在启动的时候会通过<code>DHCP协议</code>来配置计算机的I<code>P地址</code>，以及<code>默认的网关地址</code>。计算会通过<code>ARP协议</code>通过IP地址<code>获取网关的MAC地址</code>，并且将网关以及<code>MAC地址写到MAC头中</code>。<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1656647135315-e5efd974-0b9e-473f-b8f6-ab8cbd6c80e5.png#clientId=u46f7d221-36b1-4&amp;from=paste&amp;id=u22a421c3&amp;originHeight=602&amp;originWidth=840&amp;originalType=url&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;status=done&amp;style=none&amp;taskId=uac8944bb-5880-4e84-a4c7-620a61e1d9c&amp;title=" alt=""><!-- raw HTML omitted -->这样经过封装后，会将IP包交由下一层<code>链路层</code>，再经由网卡发送出去。（客户端机器与网关之间还有物理层的线路连接）。
+:::warning
+MAC地址是唯一的，从网卡正式使用开始就具有全球唯一性。MAC地址相当于身份证，IP地址是动态分配的，有可能会重复。
+:::
+<code>网关会根据路由表，判断目标IP怎么走</code>，经过多个网关的跳转最终找到目标服务器的网关，最终通过<code>APR协议</code>和<code>目标IP</code>取得目标机器的<code>MAC地址</code>，网络包最终可以根据<code>MAC地址</code>到达目的地。</p>
+<h2 id="服务端接收请求">服务端接收请求</h2>
+<p>服务端和客户端的流程正好相反，服务端是自下而上的。<!-- raw HTML omitted -->目标服务器接收到请求包后，会取下请求中的MAC头交由<code>网络层</code>中发现IP也对上了，就会取下IP头交由<code>传输层</code>，传输层会原路返回包，告诉客户端请求接收到了。<!-- raw HTML omitted -->如果过了一段时间（超时时间），<code>客户端还是没有收到来自服务器的回复，会重新发送这个包，直到收到回复为止</code>。同样，这个重发也不是重新发起上面那个客户端请求，而是传输层将同一个请求反复重试，对用户来说，只有一次请求。<!-- raw HTML omitted -->回到目标服务器，当网络包到达传输层后，TCP头中有一个服务器监听端口号，通过这个端口号，可以找到 服务端正在监听的端口，即 Nginx 中配置的 443 端口，端口对上之后，取下 TCP 头，将网络包交给应用层，开始对 HTTP/HTTPS 请求进行处理。<!-- raw HTML omitted -->如果是前端资源的话，直接通过 Nginx 进行响应，如果是 PHP 动态请求的话，再由 Nginx 将请求转发给后台运行的 PHP-FPM 进程进行处理。当然如果 Nginx 做了负载均衡，以及后端服务是分布式系统或者提供了微服务的化（涉及到RPC远程调用），还有更加复杂的处理逻辑，这些我们放到后面去讲。<!-- raw HTML omitted -->当后台服务处理完成后，就会返回一个 HTTPS 的响应包，告知用户请求成功，并返回响应内容，同样这个网络响应包和请求包一样，自上而下经过层层打包，顺着来路经过层层「关卡」（网关），回到发起请求的客户端，然后再经过自下而上的处理，最终在客户端浏览器显示。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80"
+      >网络基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/data/"
+      ><span class="mr-1.5">←</span><span>数据结构（基础）</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/%E7%BD%91%E7%BB%9C%E5%9F%BA%E7%A1%80/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80/"
+      ><span>网络基础(计算机网络协议基础)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

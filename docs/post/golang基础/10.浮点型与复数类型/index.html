@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(10.浮点型与复数类型) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="浮点型也叫做浮点数，用于表示包含小数点的数据，比如3.14,1.00
+浮点数表示 在go中浮点数定义了两种类型，分别是float32和float64,其中float32是单精度，精确到小数点后面7位数。float64为双精度（double），精确到小数点后15位。在实际开发中，应该尽可能地使用 float64 类型，因为 math 包中所有有关数学运算的函数都会要求接收这个类型。
+var a float32 = 0.1var b float64 = 0.2c := 8.0 //需要加小数点，否则会自动推导为整 :::tips 浮点数的运算和整型一样，也要保证操作数的类型一致，float32 和 float64 类型数据不能混合运算，需要手动进行强制转化才可以 :::
+浮点数的精度问题 浮点数不是一个精确的表达，因为二进制无法表达所有十进制小数，在双精度的时候会存在精度丢失问题。
+package mainimport &#34;fmt&#34;func main() {var a float64= 0.7var b float64 = 0.1c := a &#43; bfmt.Printf(&#34;a&#43;b=%v &#34;, c) // 输出0.7999999999999999fmt.Printf(&#34;0.8 == 0.1&#43;0.7 ? %v&#34;, (0.8 == a&#43;b)) // 输出false} 浮点数运算 浮点数可以通过算术运算符四则运算加减乘除，也可以进行比较运算（两个值得类型相等）。但在进行相等比较时，看起来相等的两个十进制浮点数，在底层转化为二进制时会丢失精度，因此不能被表象蒙蔽。如果需要比较可以使用以下方案。
+package mainimport (&#34;fmt&#34;&#34;math&#34;)func main() {var a float64 = 0." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(10.浮点型与复数类型)" />
+<meta property="og:description" content="golang基础(10.浮点型与复数类型)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/10.%E6%B5%AE%E7%82%B9%E5%9E%8B%E4%B8%8E%E5%A4%8D%E6%95%B0%E7%B1%BB%E5%9E%8B/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(10.浮点型与复数类型)">
+<meta itemprop="description" content="golang基础(10.浮点型与复数类型)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="208">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(10.浮点型与复数类型)"/>
+<meta name="twitter:description" content="golang基础(10.浮点型与复数类型)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(10.浮点型与复数类型)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>浮点型也叫做浮点数，用于表示包含小数点的数据，比如3.14,1.00</p>
+<h2 id="浮点数表示">浮点数表示</h2>
+<p>在go中浮点数定义了两种类型，分别是<code>float32</code>和<code>float64</code>,其中<code>float32</code>是单精度，精确到小数点后面7位数。<code>float64</code>为双精度（<code>double</code>），精确到小数点后15位。<!-- raw HTML omitted -->在实际开发中，应该尽可能地使用 <code>float64 </code>类型，因为 <a href="https://golang.org/pkg/math/">math</a> 包中所有有关数学运算的函数都会要求接收这个类型。</p>
+<pre tabindex="0"><code>var a float32 = 0.1
+var b float64 = 0.2
+c := 8.0 //需要加小数点，否则会自动推导为整
+</code></pre><p>:::tips
+浮点数的运算和整型一样，也要保证操作数的类型一致，float32 和 float64 类型数据不能混合运算，需要手动进行强制转化才可以
+:::</p>
+<h2 id="浮点数的精度问题">浮点数的精度问题</h2>
+<p>浮点数不是一个精确的表达，因为二进制无法表达所有十进制小数，在双精度的时候会存在精度丢失问题。</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	var a float64= 0.7
+	var b float64 = 0.1
+	c := a + b
+	fmt.Printf(&#34;a+b=%v 
+&#34;, c) // 输出0.7999999999999999
+	fmt.Printf(&#34;0.8 == 0.1+0.7 ? %v&#34;, (0.8 == a+b)) // 输出false
+}
+</code></pre><h2 id="浮点数运算">浮点数运算</h2>
+<p>浮点数可以通过算术运算符四则运算加减乘除，也可以进行比较运算（两个值得类型相等）。但在进行相等比较时，看起来相等的两个十进制浮点数，在底层转化为二进制时会丢失精度，因此不能被表象蒙蔽。如果需要比较可以使用以下方案。</p>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;math&#34;
+)
+
+func main() {
+	var a float64 = 0.7
+	var b float64 = 0.1
+	c := a + b
+	fmt.Printf(&#34;a+b=%v 
+&#34;, c)                      // 输出0.7999999999999999
+	fmt.Printf(&#34;0.8 == 0.1+0.7 ? %v&#34;, (0.8 == a+b)) // 输出false
+	var p float64 = 0.00001
+	if math.Dim(0.8, c) &lt; p {
+		fmt.Printf(&#34;两个偏差小于0.0001，相等&#34;)
+	}
+}
+</code></pre><h2 id="复数类型">复数类型</h2>
+<p>除了整型和浮点型之外，Go 语言还支持复数类型，与复数相对，我们可以把整型和浮点型这种日常比较常见的数字称为实数，复数是实数的延伸，可以通过两个实数（在计算机中用浮点数表示）构成，一个表示实部（real），一个表示虚部（imag），常见的表达形式如下：</p>
+<pre tabindex="0"><code>z = a + bi
+</code></pre><p>其中 a、b 均为实数，i 称为虚数单位，当 b = 0 时，z 就是常见的实数，当 a = 0 而 b ≠ 0 时，将 z 称之为纯虚数，如果你理解数学概念中的复数概念，这些都很好理解，下面我们来看下复数在 Go 语言中的表示和使用。<!-- raw HTML omitted -->在 Go 语言中，复数支持两种类型：complex64（32位实部和虚部） 和 complex128（64位实部与虚部），对应的表示示例如下，和数学概念中的复数表示形式一致：</p>
+<pre tabindex="0"><code>var complex_value_1 complex64        
+
+complex_value_1 = 1.10 + 10i          // 由两个 float32 实数构成的复数类型
+complex_value_2 := 1.10 + 10i         // 和浮点型一样，默认自动推导的实数类型是 float64，所以 complex_value_2 是 complex128 类型
+complex_value_3 := complex(1.10, 10)  // 与 complex_value_2 等价
+</code></pre><p>对于一个复数 z = complex(x, y)，就可以通过 Go 语言内置函数 real(z) 获得该复数的实部，也就是 x，通过 imag(z) 获得该复数的虚部，也就是 y。<!-- raw HTML omitted -->复数支持和其它数字类型一样的算术运算符。当你使用 == 或者 != 对复数进行比较运算时，由于构成复数的实数部分也是浮点型，需要注意对精度的把握。<!-- raw HTML omitted -->更多关于复数的函数，请查阅 <a href="https://golang.org/pkg/math/cmplx/">math/cmplx</a> 标准库的文档。如果你对内存的要求不是特别高，最好使用 complex128 作为计算类型，因为相关函数大都使用这个类型的参数。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/1.gopath%E5%92%8C%E5%B7%A5%E4%BD%9C%E5%8C%BA/"
+      ><span class="mr-1.5">←</span><span>golang基础(1.GOPATH和工作区)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/11.%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%92%8C%E5%AD%97%E7%AC%A6%E7%B1%BB%E5%9E%8B/"
+      ><span>golang基础(11.字符串和字符类型)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

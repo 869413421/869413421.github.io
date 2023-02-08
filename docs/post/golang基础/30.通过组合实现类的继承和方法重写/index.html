@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(30.通过组合实现类的继承和方法重写) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="GO不想其他类型的语言通过extends关键字来显式定义子类和父类的关系，而是通过组合的方式来实现类似的功能。显式定义继承关系的弊端有两个：一个是导致类的层级复杂，另一个是影响了类的扩展性，设计模式里面推荐的也是通过组合来替代继承提高类的扩展性。我们来看一个例子，现在有一个父类 Animal，有一个属性 name 用于表示名称，和三个成员方法，分别用来获取动物叫声、喜欢的食物和动物的名称：
+package mainimport &#34;fmt&#34;type Animal struct {name string}func (a Animal) Call() string {return &#34;动物的叫声&#34;}func (a Animal) FavorFood() string {return &#34;爱吃的食物&#34;}func (a Animal) GetName() string {return a.name}type Dog struct {Animal}func (d Dog) FavorFood() string {return &#34;骨头&#34;}func (d Dog) Call() string {return &#34;汪汪汪&#34;}func main() {animal := Animal{&#34;狗&#34;}dog := Dog{animal}fmt." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(30.通过组合实现类的继承和方法重写)" />
+<meta property="og:description" content="golang基础(30.通过组合实现类的继承和方法重写)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/30.%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E5%AE%9E%E7%8E%B0%E7%B1%BB%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E6%96%B9%E6%B3%95%E9%87%8D%E5%86%99/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(30.通过组合实现类的继承和方法重写)">
+<meta itemprop="description" content="golang基础(30.通过组合实现类的继承和方法重写)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="156">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(30.通过组合实现类的继承和方法重写)"/>
+<meta name="twitter:description" content="golang基础(30.通过组合实现类的继承和方法重写)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(30.通过组合实现类的继承和方法重写)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>GO不想其他类型的语言通过extends关键字来显式定义子类和父类的关系，而是通过组合的方式来实现类似的功能。显式定义继承关系的弊端有两个：一个是导致类的层级复杂，另一个是影响了类的扩展性，设计模式里面推荐的也是通过组合来替代继承提高类的扩展性。<!-- raw HTML omitted -->我们来看一个例子，现在有一个父类 Animal，有一个属性 name 用于表示名称，和三个成员方法，分别用来获取动物叫声、喜欢的食物和动物的名称：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+type Animal struct {
+	name string
+}
+
+func (a Animal) Call() string {
+	return &#34;动物的叫声&#34;
+}
+
+func (a Animal) FavorFood() string {
+	return &#34;爱吃的食物&#34;
+}
+
+func (a Animal) GetName() string {
+	return a.name
+}
+
+type Dog struct {
+	Animal
+}
+
+func (d Dog) FavorFood() string {
+	return &#34;骨头&#34;
+}
+
+func (d Dog) Call() string {
+	return &#34;汪汪汪&#34;
+}
+
+func main() {
+	animal := Animal{&#34;狗&#34;}
+	dog := Dog{animal}
+	fmt.Println(dog.GetName(), &#34;叫声:&#34;, dog.Call(), &#34;喜爱的食物:&#34;, dog.FavorFood())
+}
+</code></pre><p>对应的打印结果如下：</p>
+<pre tabindex="0"><code>狗 叫声: 汪汪汪 喜爱的食物: 骨头
+</code></pre><p>与其他语言机制不同的是，这种组合方式更加灵活。不用考虑单继承或者多继承，你想服用哪个类的方法，直接组合进来就好了。（需要注意组合的类型中包含同名方法，如果子类没有重写，调用的时候会报错），另外，我们可以通过任意调整被组合类型位置改变类的内存布局：</p>
+<pre tabindex="0"><code>type Puppy struct {
+	Animal
+	Dog
+}
+</code></pre><pre tabindex="0"><code>type Puppy struct {
+   Dog
+   Animal
+}
+</code></pre><p>虽然功能一致，但是内存结构不同。需要注意的是，这种情况下，如果两个类型包含同名方法和属性并且 Puppy 中没有定义这些属性或重写对应的方法，直接在 Puppy 实例上调用的话，会因冲突而报错。<!-- raw HTML omitted -->另外，在 Go 语言中，你还可以以指针方式继承某个类型的属性和方法：</p>
+<pre tabindex="0"><code>type Dog struct { 
+    *Animal
+}
+</code></pre><p>这种情况下，除了传入 animal 实例的时候要传入指针引用之外，其它调用无需修改：</p>
+<pre tabindex="0"><code>animal := Animal{&#34;狗&#34;}
+dog := Dog{&amp;animal}
+fmt.Println(dog.GetName(), &#34;叫声:&#34;, dog.Call(), &#34;喜爱的食物:&#34;, dog.FavorFood())
+</code></pre><p><code>结构体是值类型</code>，如果传入值字面量的话，实际上传入的是结构体值的副本，对内存耗费更大，所以传入指针性能更好。<!-- raw HTML omitted -->最后，Go 语言没有类似 PHP 的 parent 关键字，我们可以把组合进来的类型当做子类的一个匿名字段，直接通过引用类型名调用父类被重写的方法或属性：</p>
+<pre tabindex="0"><code>fmt.Println(dog.Animal.name, &#34;叫声:&#34;, dog.Animal.Call(), &#34;喜爱的食物:&#34;, dog.Animal.FavorFood())
+</code></pre><p>也可以将其作为一个类型为其指定一个属性名称来调用对应的方法和属性：</p>
+<pre tabindex="0"><code>type Dog struct {
+    name string
+    animal *Animal
+}
+
+...
+
+fmt.Println(dog.animal.name, &#34;叫声:&#34;, dog.animal.Call(), &#34;喜爱的食物:&#34;, dog.animal.FavorFood())
+</code></pre></section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/3.%E5%AE%89%E8%A3%85go%E8%AF%AD%E8%A8%80%E4%B9%8B%E6%97%85/"
+      ><span class="mr-1.5">←</span><span>golang基础(3.安装go语言之旅)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/31.%E6%8E%A5%E5%8F%A3%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E5%AE%9E%E7%8E%B0/"
+      ><span>golang基础(31.接口的定义和实现)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

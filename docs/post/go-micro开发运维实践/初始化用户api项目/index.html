@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>go-micro开发运维实践(初始化用户API项目) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="服务与API分离 在开篇前头，我们已经明确过，用户服务与用户API的用途与关系，用户服务是基于内网调用不对外暴露的，用户API是暴露到外网提供给外部访问的，用户API的实际用途可以归结为以下几点。
+作为用户服务的客户端，提供对外访问路由，提高系统安全性 作为中间层，对web客户端提交信息进行验证过滤。 作为中间层，基于限流熔断等机制，控制访问流量。 初始化项目 mkdir user-apicd user-apigo mod init github.com/869413421/micro-service/user-apigo get -u github.com/gin-gonic/gin 编写web服务注册代码 touch main.go package mainimport (&#34;github.com/micro/go-micro/v2/web&#34;&#34;log&#34;&#34;time&#34;)func main() {var serviceName = &#34;micro.api.user&#34;service := web.NewService(web.Name(serviceName),web.Address(&#34;:81&#34;),// 指定服务注册信息在注册中心的有效期。 默认为一分种web.RegisterTTL(time.Minute*2),// 指定服务主动向注册中心报告健康状态的时间间隔,默认为 30 秒。web.RegisterInterval(time.Minute*1),)err := service.Init()if err != nil {log.Fatal(&#34;Init api error:&#34;, err)}err = service.Run()if err != nil {log." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="go-micro开发运维实践(初始化用户API项目)" />
+<meta property="og:description" content="go-micro开发运维实践(初始化用户API项目)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%88%9D%E5%A7%8B%E5%8C%96%E7%94%A8%E6%88%B7api%E9%A1%B9%E7%9B%AE/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="go-micro开发运维实践(初始化用户API项目)">
+<meta itemprop="description" content="go-micro开发运维实践(初始化用户API项目)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="249">
+<meta itemprop="keywords" content="go-micro开发运维实践," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="go-micro开发运维实践(初始化用户API项目)"/>
+<meta name="twitter:description" content="go-micro开发运维实践(初始化用户API项目)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">go-micro开发运维实践(初始化用户API项目)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="服务与api分离">服务与API分离</h2>
+<p>在开篇前头，我们已经明确过，<code>用户服务</code>与<code>用户API</code>的用途与关系，<code>用户服务</code>是基于内网调用不对外暴露的，<code>用户API</code>是暴露到外网提供给外部访问的，用户API的实际用途可以归结为以下几点。</p>
+<ul>
+<li>作为用户服务的客户端，<code>提供对外访问路由</code>，提高系统安全性</li>
+<li>作为中间层，对web客户端提交信息进行<code>验证过滤</code>。</li>
+<li>作为中间层，基于<code>限流熔断</code>等机制，控制访问流量。</li>
+</ul>
+<h2 id="初始化项目">初始化项目</h2>
+<pre tabindex="0"><code>mkdir user-api
+cd user-api
+go mod init github.com/869413421/micro-service/user-api
+go get -u github.com/gin-gonic/gin
+</code></pre><h2 id="编写web服务注册代码">编写web服务注册代码</h2>
+<pre tabindex="0"><code>touch main.go
+</code></pre><pre tabindex="0"><code>package main
+
+import (
+	&#34;github.com/micro/go-micro/v2/web&#34;
+	&#34;log&#34;
+	&#34;time&#34;
+)
+
+func main() {
+	var serviceName = &#34;micro.api.user&#34;
+	service := web.NewService(
+		web.Name(serviceName),
+		web.Address(&#34;:81&#34;),
+		// 指定服务注册信息在注册中心的有效期。 默认为一分种
+		web.RegisterTTL(time.Minute*2),
+		// 指定服务主动向注册中心报告健康状态的时间间隔,默认为 30 秒。
+		web.RegisterInterval(time.Minute*1),
+	)
+
+	err := service.Init()
+	if err != nil {
+		log.Fatal(&#34;Init api error:&#34;, err)
+	}
+	err = service.Run()
+	if err != nil {
+		log.Fatal(&#34;start api error:&#34;, err)
+		return
+	}
+}
+</code></pre><p>执行<code>go mod tidy</code> 下载相关依赖</p>
+<h2 id="编写dockerfile">编写dockerfile</h2>
+<p>:::warning
+因为gin依赖的包和低版本golang有冲突，修改为1.16
+:::</p>
+<pre tabindex="0"><code>touch Dockerfile
+</code></pre><pre tabindex="0"><code># user-api/Dockerfile
+
+# 使用golang官方镜像，并命名为builder
+FROM golang:1.16-alpine as builder
+
+# 启用go Modules
+ENV GO111MODULE on
+
+# 设置工作目录
+WORKDIR /app/micro-user-api
+
+# 将目录中代码拷贝到镜像中
+COPY . .
+
+# 下载依赖，
+RUN  go env -w GOPROXY=https://mirrors.aliyun.com/goproxy,direct &amp;&amp; go mod tidy
+
+# 构建二进制文件，添加一些额外参数方便在alpin中运行它
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o micro-user-api
+
+# 第二阶段构造
+FROM alpine:latest
+
+# 更新依赖软件
+RUN sed -i &#39;s/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g&#39; /etc/apk/repositories &amp;&amp; \
+	apk update &amp;&amp; \
+	apk add --no-cache bash ca-certificates &amp;&amp;\
+	apk add curl
+
+# 和上个阶段一样设置工作目录
+RUN mkdir /app
+WORKDIR /app
+
+# 这一步不再从宿主机拷贝二进制文件，而是从上一个阶段构建的 builder 容器中拉取
+COPY --from=builder /app/micro-user-api/micro-user-api .
+
+# 启动用户API服务
+CMD [&#34;./micro-user-api&#34;]
+</code></pre><h2 id="编写makefile">编写makefile</h2>
+<pre tabindex="0"><code>touch Makefile
+</code></pre><pre tabindex="0"><code>
+GOPATH:=$(shell go env GOPATH)
+
+.PHONY: build
+build:
+	 CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags &#39;-w&#39; -i -o micro-user-api ./main.go
+
+.PHONY: test
+test:
+	go test -v ./... -cover
+
+.PHONY: docker
+docker:
+	docker build . -t micro-user-api:latest
+</code></pre><p>执行<code>make build</code>编译二进制文件，方便测试</p>
+<h2 id="修改docker-composeyaml">修改docker-compose.yaml</h2>
+<pre tabindex="0"><code>...
+
+  micro-user-api:
+    build: ./user-api
+    depends_on:
+      - micro-user-service
+    volumes:
+      - ./user-api:/app
+    ports:
+      - 81:81
+    environment:
+      MICRO_REGISTRY: &#34;etcd&#34;
+      MICRO_REGISTRY_ADDRESS: &#34;etcd1:2379,etcd2:2379,etcd3:2379&#34;
+    networks:
+      - micro-network
+      
+ ...
+</code></pre><p>到项目主目录下执行<code>docker-compose up micro-user-api</code>启动容器</p>
+<h2 id="检查服务是否正常启动">检查服务是否正常启动</h2>
+<p><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651761614601-0f88dd88-e984-4ef5-8f34-1e5623883066.png#clientId=ud9913f7d-8a65-4&amp;from=paste&amp;height=655&amp;id=ua92ddc43&amp;name=image.png&amp;originHeight=720&amp;originWidth=1270&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=105304&amp;status=done&amp;style=none&amp;taskId=ubc7a2674-f987-491e-85e9-45cc3358a46&amp;title=&amp;width=1154.5454295213563" alt="image.png"><!-- raw HTML omitted -->打开<a href="http://127.0.0.1:8082/services">http://127.0.0.1:8082/services</a><!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651761642514-dfb079c2-b441-48a7-8882-8f58867d768a.png#clientId=ud9913f7d-8a65-4&amp;from=paste&amp;height=845&amp;id=uf8d8c4a3&amp;name=image.png&amp;originHeight=929&amp;originWidth=1920&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=24918&amp;status=done&amp;style=none&amp;taskId=u6d31dab3-ac02-41f7-9115-a6021300677&amp;title=&amp;width=1745.4545076228378" alt="image.png"><!-- raw HTML omitted -->可以看到看到api服务已经注册</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5"
+      >go-micro开发运维实践</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E4%B8%9A%E5%8A%A1%E6%9E%B6%E6%9E%84/"
+      ><span class="mr-1.5">←</span><span>go-micro开发运维实践(业务架构)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%88%9D%E5%A7%8B%E5%8C%96%E9%A1%B9%E7%9B%AE%E5%AE%89%E8%A3%85micro/"
+      ><span>go-micro开发运维实践(初始化项目，安装micro)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

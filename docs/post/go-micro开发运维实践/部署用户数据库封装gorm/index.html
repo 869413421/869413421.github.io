@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>go-micro开发运维实践(部署用户数据库，封装gorm) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="微服务数据库拆分原则 数据库拆分是微服务中的一个关键点，在进行拆分时需要遵循一些原则。
+每个微服务都拥有属于自己的数据库，且只允许当前服务调用。 微服务中，依赖数据（如主表依赖从表，用户与用户订单这种关系）应该通过服务进行调用。 共享数据（如国家，地区），可能需要被许多微服务进行访问，将其拆分后虽然起到了解耦的作用，如果通过服务来进行访问对性能会有损耗。这种情况下就需要斟酌处理了，其中一种方式是直接对数据异构解耦。比如一个地区表，用户服务需要直接对其join进行访问，订单服务也需要对其join进行访问。这时候我们在两个服务的数据库中都建立一个地区表，再通过binlog或者mq的方式让这两个表的数据进行同步。推荐一下chanl,阿里开源的一种binlog同步方案，支持多种语言客户端。 docker-compose安装用户数据库 修改.env ...#数据库版本MYSQL_VERSION=latest#用户数据库用户名USER_DB_USER=&#34;micro_user&#34;#用户数据库密码USER_DB_PASSWORD=&#34;micro_user&#34;#用户数据库初始dbUSER_DB_DATABASE=&#34;micro_user&#34;#用户数据库root密码USER_DB_ROOT_PASSWORD=&#34;root&#34;#用户数据库映射端口USER_DB_PORT=33061#用户数据库最大链接数USER_DB_MAX_CONNECTIONS=200#用户数据库最大空闲链接数USER_DB_MAX_IDE_CONNECTIONS=50#用户数据库空闲链接最大存活时间，分USER_DB_CONNECTIONS_MAX_LIFE_TIME=5... 创建持久化挂载目录 mkdir -p data/user-db 修改docker-compose.yaml ...micro-user-db:image: mysql:${MYSQL_VERSION}ports:- ${USER_DB_PORT}:3306volumes:- ./data/user-db:/var/lib/mysqlrestart: alwaysenvironment:TZ: ${TZ}MYSQL_USER: ${USER_DB_USER} # 设置用户名MYSQL_PASSWORD: ${USER_DB_PASSWORD} # 设置用户民吗MYSQL_DATABASE: ${USER_DB_DATABASE} # 初始数据库MYSQL_ROOT_PASSWORD: ${USER_DB_ROOT_PASSWORD} # root用户密码networks:- micro-network... 启动数据库 docker-compose up -d micro-user-db查看容器是否正常运行使用." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="go-micro开发运维实践(部署用户数据库，封装gorm)" />
+<meta property="og:description" content="go-micro开发运维实践(部署用户数据库，封装gorm)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E9%83%A8%E7%BD%B2%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE%E5%BA%93%E5%B0%81%E8%A3%85gorm/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="go-micro开发运维实践(部署用户数据库，封装gorm)">
+<meta itemprop="description" content="go-micro开发运维实践(部署用户数据库，封装gorm)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="855">
+<meta itemprop="keywords" content="go-micro开发运维实践," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="go-micro开发运维实践(部署用户数据库，封装gorm)"/>
+<meta name="twitter:description" content="go-micro开发运维实践(部署用户数据库，封装gorm)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">go-micro开发运维实践(部署用户数据库，封装gorm)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h3 id="微服务数据库拆分原则">微服务数据库拆分原则</h3>
+<p>数据库拆分是微服务中的一个关键点，在进行拆分时需要遵循一些原则。</p>
+<ul>
+<li>每个微服务都拥有属于自己的数据库，且<code>只允许当前服务调用</code>。</li>
+<li>微服务中，<code>依赖数据（如主表依赖从表，用户与用户订单这种关系）</code>应该通过<code>服务</code>进行调用。</li>
+<li><code>共享数据（如国家，地区）</code>，可能需要被许多微服务进行访问，将其拆分后虽然起到了解耦的作用，如果通过<code>服务</code>来进行访问对性能会有损耗。这种情况下就需要斟酌处理了，其中一种方式是直接对数据异构解耦。比如一个<code>地区表</code>，用户服务需要直接对其join进行访问，订单服务也需要对其join进行访问。这时候我们在两个服务的数据库中都建立一个<code>地区表</code>，再通过<code>binlog</code>或者<code>mq</code>的方式让这两个表的数据进行同步。推荐一下<a href="https://github.com/alibaba/canal">chanl</a>,阿里开源的一种binlog同步方案，支持多种语言客户端。</li>
+</ul>
+<h3 id="docker-compose安装用户数据库">docker-compose安装用户数据库</h3>
+<h4 id="修改env">修改.env</h4>
+<pre tabindex="0"><code>...
+
+#数据库版本
+MYSQL_VERSION=latest
+#用户数据库用户名
+USER_DB_USER=&#34;micro_user&#34;
+#用户数据库密码
+USER_DB_PASSWORD=&#34;micro_user&#34;
+#用户数据库初始db
+USER_DB_DATABASE=&#34;micro_user&#34;
+#用户数据库root密码
+USER_DB_ROOT_PASSWORD=&#34;root&#34;
+#用户数据库映射端口
+USER_DB_PORT=33061
+#用户数据库最大链接数
+USER_DB_MAX_CONNECTIONS=200
+#用户数据库最大空闲链接数
+USER_DB_MAX_IDE_CONNECTIONS=50
+#用户数据库空闲链接最大存活时间，分
+USER_DB_CONNECTIONS_MAX_LIFE_TIME=5
+
+...
+</code></pre><h4 id="创建持久化挂载目录">创建持久化挂载目录</h4>
+<pre tabindex="0"><code>mkdir -p data/user-db
+</code></pre><h4 id="修改docker-composeyaml">修改docker-compose.yaml</h4>
+<pre tabindex="0"><code>...
+
+  micro-user-db:
+    image: mysql:${MYSQL_VERSION}
+    ports:
+      - ${USER_DB_PORT}:3306
+    volumes:
+      - ./data/user-db:/var/lib/mysql
+    restart: always
+    environment:
+      TZ: ${TZ}
+      MYSQL_USER: ${USER_DB_USER} # 设置用户名
+      MYSQL_PASSWORD: ${USER_DB_PASSWORD} # 设置用户民吗
+      MYSQL_DATABASE: ${USER_DB_DATABASE} # 初始数据库
+      MYSQL_ROOT_PASSWORD: ${USER_DB_ROOT_PASSWORD} # root用户密码
+    networks:
+      - micro-network
+      
+ ...
+</code></pre><h4 id="启动数据库">启动数据库</h4>
+<p><code>docker-compose up -d micro-user-db</code><!-- raw HTML omitted -->查看容器是否正常运行<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651071062308-bc5d835a-95a7-4a49-a107-f08a3246afcb.png#clientId=u289b69b0-a033-4&amp;from=paste&amp;height=655&amp;id=uf704b3e0&amp;name=image.png&amp;originHeight=720&amp;originWidth=1270&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=100156&amp;status=done&amp;style=none&amp;taskId=uf1ce5588-8c12-4238-a91f-759fba7c1e0&amp;title=&amp;width=1154.5454295213563" alt="image.png"><!-- raw HTML omitted -->使用.env中配置的账号密码端口测试数据库链接<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651071208073-e81de8b0-9529-4383-afaa-09414a4fd94a.png#clientId=u289b69b0-a033-4&amp;from=paste&amp;height=545&amp;id=u0f4d4b42&amp;name=image.png&amp;originHeight=600&amp;originWidth=900&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=53949&amp;status=done&amp;style=none&amp;taskId=u48f0f106-95da-4f7a-9198-5c61cf40a2b&amp;title=&amp;width=818.1818004482052" alt="image.png"></p>
+<h2 id="封装gorm">封装gorm</h2>
+<p>在web系统中，我们大部分时间都需要程序与数据库交互，实际开发中我们其实很多代码都是基于业务的CURD,使用数据库关系映射能大大提高我们的开发效率与安全性，学习到这个阶段的同学相信对<a href="https://gorm.io/zh_CN">gorm</a>应该不会很陌生。gorm在新版本中为我们提供了读写分离，分表中间件，连接池，性能监控等高级特性，而这些特性能免去我们要安装许多侵入性的组件。</p>
+<h3 id="封装通用代码">封装通用代码</h3>
+<p>在多个微服务中，每个微服务都需要我们去初始化连接池，获取数据库链接等操作。而这些功能都是单一可复用的，因此我们需要封装一些通用代码给多个微服务功能，不做复制粘贴的程序员，是进步的基本要求。</p>
+<h4 id="初始化通用代码项目go-mod">初始化通用代码项目go mod</h4>
+<pre tabindex="0"><code>mkdir common
+cd common
+go mod init github.com/869413421/micro-service/common
+</code></pre><h4 id="封装通用数据结构转换方法">封装通用数据结构转换方法</h4>
+<pre tabindex="0"><code>mkdir -p pkg/types
+touch pkg/types/converter.go
+</code></pre><pre tabindex="0"><code>package types
+
+import (
+	&#34;reflect&#34;
+	&#34;strconv&#34;
+)
+
+// Int64ToString INT64转字符串
+func Int64ToString(num int64) string {
+	return strconv.FormatInt(num, 10)
+}
+
+// UInt64ToString UINT64转字符串
+func UInt64ToString(num uint64) string {
+	return strconv.FormatUint(num, 10)
+}
+
+// StringToInt 字符串转INT
+func StringToInt(str string) (int, error) {
+	num, err := strconv.Atoi(str)
+	if err != nil {
+		return 0, err
+	}
+	return num, nil
+}
+
+// Fill 通过反射将对象2的值填充给对象1
+func Fill(obj1 interface{}, obj2 interface{}) {
+	//1.通过反射获取两个结构的字段
+	v1 := reflect.ValueOf(obj1).Elem()
+	v2 := reflect.ValueOf(obj2).Elem()
+
+	//2.循环填充
+	for i := 0; i &lt; v1.NumField(); i++ {
+		//2.1获取结构1字段详细信息
+		fieldInfo1 := v1.Type().Field(i)
+		field1Name := fieldInfo1.Name
+		field1Type := fieldInfo1.Type
+
+		//2.2 循环结构2的字段
+		for i2 := 0; i2 &lt; v2.NumField(); i2++ {
+			//2.2.1获取解构2的详细信息
+			fieldInfo2 := v2.Type().Field(i2)
+			field2Name := fieldInfo2.Name
+			field2Type := fieldInfo2.Type
+
+			//2.2.2如果两个结构的字段名相等，而且值类型相等且有值，将结构2的值赋给结构1,
+			if field1Name == field2Name &amp;&amp; field1Type == field2Type {
+
+				//2.2.2.1 判断是否有值
+				//TODO 需增加更多值类型的判断
+				if v2.FieldByName(fieldInfo2.Name).IsValid() {
+					switch v2.FieldByName(fieldInfo2.Name).Type().String() {
+					case &#34;int&#34;:
+						if v2.FieldByName(fieldInfo2.Name).Int() == 0 {
+							continue
+						}
+					case &#34;string&#34;:
+						if v2.FieldByName(fieldInfo2.Name).String() == &#34;&#34; {
+							continue
+						}
+					}
+				}
+
+				//2.2.2.1 设置值
+				newValue := v2.FieldByName(field2Name)
+				if newValue.IsValid(){
+					v1.FieldByName(field1Name).Set(newValue)
+				}
+			}
+		}
+	}
+}
+</code></pre><h4 id="封装-config结构">封装 config结构</h4>
+<pre tabindex="0"><code>mkdir -p pkg/config
+touch pkg/config/config.go
+</code></pre><pre tabindex="0"><code>package config
+
+import (
+	&#34;github.com/869413421/micro-service/common/pkg/types&#34;
+	&#34;os&#34;
+	&#34;sync&#34;
+	&#34;time&#34;
+)
+
+var once sync.Once
+var config *Configuration
+
+type Configuration struct {
+	Db *Db `json:&#34;db&#34;`
+}
+
+type Db struct {
+	Address               string        `json:&#34;address&#34;`
+	Database              string        `json:&#34;database&#34;`
+	User                  string        `json:&#34;user&#34;`
+	Password              string        `json:&#34;password&#34;`
+	Charset               string        `json:&#34;charset&#34;`
+	MaxConnections        int           `json:&#34;max_connections&#34;`
+	MaxIdeConnections     int           `json:&#34;max_ide_connections&#34;`
+	ConnectionMaxLifeTime time.Duration `json:&#34;connection_max_life_time&#34;`
+}
+
+// LoadConfig 加载配置文件
+func LoadConfig() *Configuration {
+	//1.适用sync.one，使配置只加载一次，后续不需要读取直接返回
+	once.Do(func() {
+		//1.1从环境变量中读取配置信息
+		host := os.Getenv(&#34;DB_HOST&#34;)
+		user := os.Getenv(&#34;DB_USER&#34;)
+		database := os.Getenv(&#34;DB_DATABASE&#34;)
+		password := os.Getenv(&#34;DB_PASSWORD&#34;)
+		dbMaxConnections, _ := types.StringToInt(os.Getenv(&#34;DB_MAX_CONNECTIONS&#34;))
+		dbMaxIdeConnections, _ := types.StringToInt(os.Getenv(&#34;DB_MAX_IDE_CONNECTIONS&#34;))
+		dbConnectionMaxLifeTime, _ := types.StringToInt(os.Getenv(&#34;DB_CONNECTIONS_MAX_LIFE_TIME&#34;))
+
+		//1.2初始化配置结构体
+		dbConfig := &amp;Db{
+			Address:               host,
+			Database:              database,
+			User:                  user,
+			Password:              password,
+			Charset:               &#34;utf8&#34;,
+			MaxConnections:        dbMaxConnections,
+			MaxIdeConnections:     dbMaxIdeConnections,
+			ConnectionMaxLifeTime: time.Duration(dbConnectionMaxLifeTime) * time.Minute,
+		}
+
+		config = &amp;Configuration{Db: dbConfig}
+	})
+
+	return config
+}
+</code></pre><p>封装方法，能使配置能够被规范化管理。上述代码中我们暂时通过简单地从系统环境变量中读取配置信息，使用<code>sync.Once</code>确保只会被初始化一次，后续调用中能减少我们对配置文件的加载，不再初始化直接返回配置信息。这里我们只是封装了数据库配置，但在我们系统中依然会有很多组件的配置信息需要读取，以及配置更改后如何热更新。这些我们在后续讲到配置中心的时候再深入了解</p>
+<h3 id="获取gorm">获取gorm</h3>
+<pre tabindex="0"><code>go get -u gorm.io/gorm
+go get -u gorm.io/driver/mysql
+</code></pre><h3 id="封装gorm初始化化链接池">封装gorm，初始化化链接池</h3>
+<h4 id="创建db目录">创建db目录</h4>
+<pre tabindex="0"><code>mkdir -p pkg/db
+touch pkg/db/db.go
+</code></pre><h4 id="封装初始化连接池代码">封装初始化连接池代码</h4>
+<pre tabindex="0"><code>package db
+
+import (
+	&#34;fmt&#34;
+	&#34;github.com/869413421/micro-service/common/pkg/config&#34;
+	&#34;gorm.io/driver/mysql&#34;
+	&#34;gorm.io/gorm&#34;
+	&#34;strconv&#34;
+	&#34;time&#34;
+)
+
+type BaseModel struct {
+	ID        uint64    &#34;gorm:column:id;primaryKey;autoIncrement;not null&#34;
+	CreatedAt time.Time `gorm:&#34;column:created_at;index&#34;`
+	UpdatedAt time.Time `gorm:&#34;column:updated_at;index&#34;`
+}
+
+//GetStringID 主键转字符串
+func (model BaseModel) GetStringID() string {
+	return strconv.Itoa(int(model.ID))
+}
+
+// CreatedAtDate 获取模型创建时间
+func (model BaseModel) CreatedAtDate() string {
+	return model.CreatedAt.Format(&#34;2006-01-02 15:04:05&#34;)
+}
+
+// UpdatedAtDate 获取模型更新时间
+func (model BaseModel) UpdatedAtDate() string {
+	return model.UpdatedAt.Format(&#34;2006-01-02 15:04:05&#34;)
+}
+
+var gormDb *gorm.DB
+var dbConfig *config.Db
+
+// connectDB 链接数据库
+func connectDB() (*gorm.DB, error) {
+	// 1.获取配置
+	serviceConfig := config.LoadConfig()
+	dbConfig = serviceConfig.Db
+
+	//2.链接数据库
+	gormDb, err := gorm.Open(mysql.Open(fmt.Sprintf(
+		&#34;%s:%s@(%s)/%s?charset=%s&amp;parseTime=True&amp;loc=Local&#34;,
+		dbConfig.User, dbConfig.Password, dbConfig.Address, dbConfig.Database, dbConfig.Charset,
+	)), &amp;gorm.Config{})
+
+	if err != nil {
+		return nil, err
+	}
+
+	//3.返回数据库链接
+	return gormDb, nil
+}
+
+func setupDB() {
+	//1.获取链接
+	conn, err := connectDB()
+	if err != nil {
+		panic(err)
+	}
+	conn.Set(&#34;gorm:table_options&#34;, &#34;ENGINE=InnoDB&#34;)
+	conn.Set(&#34;gorm:table_options&#34;, &#34;Charset=utf8&#34;)
+	sqlDB, err := conn.DB()
+	if err != nil {
+		panic(fmt.Sprintf(&#34;connection to db error %v&#34;, err))
+	}
+
+	//2.设置最大连接数
+	sqlDB.SetMaxOpenConns(dbConfig.MaxConnections)
+
+	//3.设置最大空闲连接数
+	sqlDB.SetMaxIdleConns(dbConfig.MaxIdeConnections)
+
+	//4. 设置每个链接的过期时间
+	sqlDB.SetConnMaxLifetime(dbConfig.ConnectionMaxLifeTime * time.Minute)
+
+	//5.设置好连接池，重新赋值
+	gormDb = conn
+}
+
+// GetDB 开放给外部获得db连接
+func GetDB() *gorm.DB {
+	//1.如果db为空，初始化链接池
+	if gormDb == nil {
+		setupDB()
+	}
+
+	//2.返回db对象给外部使用
+	return gormDb
+}
+</code></pre><h4 id="提交代码到github供其他服务使用">提交代码到github，供其他服务使用</h4>
+<p>:::warning
+记得在项目下添加.gitignore
+:::</p>
+<pre tabindex="0"><code>git add .
+git commit -m &#34;数据库连接池封装&#34;
+git push
+</code></pre><h2 id="用户服务链接数据库">用户服务链接数据库</h2>
+<p>打开用户服务项目,引用通用代码包</p>
+<pre tabindex="0"><code>go get -u github.com/869413421/micro-service/common
+</code></pre><p>:::warning
+在我们测试如果我们修改了common的代码，需要我们将代码推送到github，然后引用包的项目更新才能看到效果，这样在开发阶段效率低下，可以修改go.mod 将common包替换成我们本地的路径，然后编译到可执行文件中，将可执行文件挂载在容器里，方法跟我们上一节中一样。但是切记，正式上线前需要讲挂载和替换去掉。
+:::</p>
+<pre tabindex="0"><code>module github.com/869413421/micro-service/user
+
+go 1.13
+
+// This can be removed once etcd becomes go gettable, version 3.4 and 3.5 is not,
+// see https://github.com/etcd-io/etcd/issues/11154 and https://github.com/etcd-io/etcd/issues/11931.
+replace google.golang.org/grpc =&gt; google.golang.org/grpc v1.26.0
+
+# 替换成本地common包，方便开发阶段调试
+replace github.com/869413421/micro-service/common =&gt; ../common
+
+require (
+	github.com/869413421/micro-service/common v0.0.0-20220428152058-528eea77a565 // indirect
+	github.com/golang/protobuf v1.5.2
+	github.com/micro/go-micro/v2 v2.9.1
+	google.golang.org/protobuf v1.28.0
+)
+</code></pre><h4 id="将数据库配置设置为环境变量">将数据库配置设置为环境变量</h4>
+<p>修改<code>docker-compose.yaml</code></p>
+<pre tabindex="0"><code>...
+
+  micro-user-service:
+    depends_on: # 启动依赖，需要等etcd集群启动后才启动当前容器
+      - etcd1
+      - etcd2
+      - etcd3
+      - micro-user-db
+    build: ./user # dockerfile所在目录
+    environment:
+      TZ: ${TZ}
+      MICRO_SERVER_ADDRESS: &#34;:9091&#34; # 服务端口
+      MICRO_REGISTRY: &#34;etcd&#34; # 注册中心类型
+      MICRO_REGISTRY_ADDRESS: &#34;etcd1:2379,etcd2:2379,etcd3:2379&#34; # 注册中心集群地址
+      DB_HOST: &#34;micro-user-db:3306&#34;
+      DB_DATABASE: ${USER_DB_DATABASE}
+      DB_USER: ${USER_DB_USER}
+      DB_PASSWORD: ${USER_DB_PASSWORD}
+      DB_MAX_CONNECTIONS: ${USER_DB_MAX_CONNECTIONS}
+      DB_MAX_IDE_CONNECTIONS: ${USER_DB_MAX_IDE_CONNECTIONS}
+      DB_CONNECTIONS_MAX_LIFE_TIME: ${USER_DB_CONNECTIONS_MAX_LIFE_TIME}
+    ports:
+      - 9092:9091
+    volumes:
+      - ./user:/app
+    networks:
+      - micro-network
+      
+...
+</code></pre><h4 id="建立用户model">建立用户model</h4>
+<pre tabindex="0"><code>mkdir -p pkg/model
+touch pkg/model/user.go
+</code></pre><pre tabindex="0"><code>package model
+
+import (
+	db &#34;github.com/869413421/micro-service/common/pkg/db&#34;
+)
+
+// User 用户模型
+type User struct {
+	db.BaseModel
+	Name     string `gorm:&#34;column:name;type:varchar(255);not null;unique;default:&#39;&#39;&#34; valid:&#34;name&#34;`
+	Email    string `gorm:&#34;column:email;type:varchar(255) not null;unique;default:&#39;&#39;&#34; valid:&#34;email&#34;`
+	RealName string `gorm:&#34;column:real_name;type:varchar(255);not null;default:&#39;&#39;&#34; valid:&#34;realName&#34;`
+	Avatar   string `gorm:&#34;column:avatar;type:varchar(255);not null;default:&#39;&#39;&#34; valid:&#34;avatar&#34;`
+	Status   int    `gorm:&#34;column:status;type:tinyint(1);not null;default:0&#34; `
+	Password string `gorm:&#34;column:password;type:varchar(255) not null;;default:&#39;&#39;&#34; valid:&#34;password&#34;`
+}
+</code></pre><h4 id="加入模型迁移">加入模型迁移</h4>
+<p>修改main.go</p>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;github.com/869413421/micro-service/common/pkg/db&#34;
+	&#34;github.com/869413421/micro-service/user/handler&#34;
+	&#34;github.com/869413421/micro-service/user/pkg/model&#34;
+	&#34;github.com/869413421/micro-service/user/subscriber&#34;
+	&#34;github.com/micro/go-micro/v2&#34;
+	log &#34;github.com/micro/go-micro/v2/logger&#34;
+
+	proto &#34;github.com/869413421/micro-service/user/proto/user&#34;
+)
+
+func main() {
+
+	//1.准备数据库连接，并且执行数据库迁移
+	db := db.GetDB()
+	db.AutoMigrate(&amp;model.User{})
+
+	// New Service
+	service := micro.NewService(
+		micro.Name(&#34;micro.service.user&#34;),
+		micro.Version(&#34;v1&#34;),
+	)
+	
+	// Initialise service
+	service.Init()
+
+	// Register Handler
+	proto.RegisterUserHandler(service.Server(), new(handler.User))
+
+	// Register Struct as Subscriber
+	micro.RegisterSubscriber(&#34;micro.service.user&#34;, service.Server(), new(subscriber.User))
+
+	// Run service
+	if err := service.Run(); err != nil {
+		log.Fatal(err)
+	}
+}
+</code></pre><p><code>编译可以执行代码</code></p>
+<pre tabindex="0"><code>make build
+</code></pre><p>如果没有安装make命令，可手动执行</p>
+<pre tabindex="0"><code>CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags &#39;-w&#39; -i -o micro-user-service ./main.go
+</code></pre><h2 id="重新运行服务执行模型迁移">重新运行服务，执行模型迁移</h2>
+<h3 id="重启用户服务容器">重启用户服务容器</h3>
+<pre tabindex="0"><code>docker-compose up -d micro-user-service
+</code></pre><p><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651200382426-9d156e16-38db-489e-a872-e290666cffbd.png#clientId=u0fbf61ea-aa42-4&amp;from=paste&amp;height=720&amp;id=u28b5d003&amp;name=image.png&amp;originHeight=720&amp;originWidth=1250&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=47692&amp;status=done&amp;style=none&amp;taskId=u61df695c-0b11-459d-93aa-f0ff90dbdf8&amp;title=&amp;width=1250" alt="image.png"></p>
+<h4 id="检查迁移是否执行成功">检查迁移是否执行成功</h4>
+<p><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651200590099-5cbae831-8510-494e-a006-5f9e9ebe79f3.png#clientId=u0fbf61ea-aa42-4&amp;from=paste&amp;height=498&amp;id=ufcaaca0f&amp;name=image.png&amp;originHeight=498&amp;originWidth=1011&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=44043&amp;status=done&amp;style=none&amp;taskId=u159f14cd-4841-49ef-9bbc-559a261922d&amp;title=&amp;width=1011" alt="image.png"><!-- raw HTML omitted -->至此我们已经完成了gorm的封装，以及编写好用户服务交互的代码</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5"
+      >go-micro开发运维实践</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E8%A1%8C%E6%96%87%E5%88%9D%E8%A1%B7/"
+      ><span class="mr-1.5">←</span><span>go-micro开发运维实践(行文初衷)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/1.gopath%E5%92%8C%E5%B7%A5%E4%BD%9C%E5%8C%BA/"
+      ><span>golang基础(1.GOPATH和工作区)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(24.函数的传参和返回值) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="按值传参和引用传参 go中默认按值来进行参数传递，就是传递传入参数的一个副本。函数只对副本操作，不会对原值有任何影响。
+package mainimport &#34;fmt&#34;func add(a, b int) int {a *= 2b *= 3return a &#43; b}func main() {x, y := 1, 2z := add(x, y)fmt.Printf(&#34;add(%d, %d) = %d&#34;, x, y, z)} 当我们把 x、y 变量作为参数传递到 add 函数时，这两个变量会拷贝出一个副本赋值给 a、b 变量作为参数，因此，在 add 函数中调整 a、b 变量的值并不会影响原变量 x、y 的值，所以上述代码的输出是：
+add(1, 2) = 8 如果想要实在在函数中修改原有参数的值，可以通过引用传参来完成。传入函数内的不再是参数的服务。而是传递存储有变量值地址的指针。所以原变量的值也会被修改（这种情况下，传递的是变量地址值的拷贝，所以从本质上来说还是按值传参）：
+package mainimport &#34;fmt&#34;func add(a, b *int) int {*a *= 2*b *= 3return *a &#43; *b}func main() {x, y := 1, 2z := add(&amp;x, &amp;y)fmt." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(24.函数的传参和返回值)" />
+<meta property="og:description" content="golang基础(24.函数的传参和返回值)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/24.%E5%87%BD%E6%95%B0%E7%9A%84%E4%BC%A0%E5%8F%82%E5%92%8C%E8%BF%94%E5%9B%9E%E5%80%BC/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(24.函数的传参和返回值)">
+<meta itemprop="description" content="golang基础(24.函数的传参和返回值)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="260">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(24.函数的传参和返回值)"/>
+<meta name="twitter:description" content="golang基础(24.函数的传参和返回值)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(24.函数的传参和返回值)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="按值传参和引用传参">按值传参和引用传参</h2>
+<p>go中默认按值来进行参数传递，就是传递传入参数的一个副本。函数只对副本操作，不会对原值有任何影响。</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func add(a, b int) int {
+	a *= 2
+	b *= 3
+	return a + b
+}
+
+func main() {
+	x, y := 1, 2
+	z := add(x, y)
+	fmt.Printf(&#34;add(%d, %d) = %d
+&#34;, x, y, z)
+}
+</code></pre><p>当我们把 x、y 变量作为参数传递到 add 函数时，这两个变量会拷贝出一个副本赋值给 a、b 变量作为参数，因此，在 add 函数中调整 a、b 变量的值并不会影响原变量 x、y 的值，所以上述代码的输出是：</p>
+<pre tabindex="0"><code>add(1, 2) = 8
+</code></pre><p>如果想要实在在函数中修改原有参数的值，可以通过引用传参来完成。传入函数内的不再是参数的服务。而是传递存储有变量值地址的指针。所以原变量的值也会被修改（这种情况下，传递的是<code>变量地址值的拷贝</code>，所以从本质上来说还是按值传参）：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func add(a, b *int) int {
+	*a *= 2
+	*b *= 3
+	return *a + *b
+}
+
+func main() {
+	x, y := 1, 2
+	z := add(&amp;x, &amp;y)
+	fmt.Printf(&#34;add(%d, %d) = %d
+&#34;, x, y, z)
+}
+</code></pre><p>在函数调用时，像切片（slice）、字典（map）、接口（interface）、通道（channel）这样的引用类型 默认使用引用传参（即使没有显示的指出指针，类似 PHP 中把对象实例作为函数参数）。</p>
+<h2 id="多返回值及返回值命名">多返回值及返回值命名</h2>
+<p>Go 语言函数与其他编程语言一大不同之处在于支持多返回值，这在处理程序出错的时候非常有用，比如，如果上述 add 函数只支持非负整数相加，传入负数则会报错，换做是在其他语言如 PHP 中，我们需要对返回结果做各种判断，才能实现预期的效果，在 Go 语言中，只需要通过在返回值中多返回一个错误信息即可：</p>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;errors&#34;
+	&#34;fmt&#34;
+)
+
+func add1(a, b *int) (int, error) {
+	if *a &lt; 0 || *b &lt; 0 {
+		err := errors.New(&#34;error1&#34;)
+		return 0, err
+	}
+	*a *= 2
+	*b *= 3
+	return *a + *b, nil
+}
+
+func add(a, b *int) int {
+	*a *= 2
+	*b *= 3
+	return *a + *b
+}
+
+func main() {
+	x, y := 1, 2
+	z := add(&amp;x, &amp;y)
+	fmt.Printf(&#34;add(%d, %d) = %d
+&#34;, x, y, z)
+
+	z, err := add1(&amp;x, &amp;y)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	fmt.Printf(&#34;add(%d, %d) = %d
+&#34;, x, y, z)
+}
+</code></pre><p>此外，在设置多返回值时，还可以对返回值进行变量命名，这样，我们就可以在函数中直接对返回值变量进行赋值，而不必每次都按照指定的返回值格式返回多个变量了：</p>
+<pre tabindex="0"><code>func add2(a, b *int) (c int, err error) {
+	if *a &lt; 0 || *b &lt; 0 {
+		err := errors.New(&#34;error1&#34;)
+		return 0, err
+	}
+	*a *= 2
+	*b *= 3
+	c = *a + *b
+	return
+}
+</code></pre><p>这种机制避免了每次进行 return 操作时都要关注函数需要返回哪些返回值，为开发者节省了精力，尤其是在复杂的函数中。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/23.%E5%87%BD%E6%95%B0%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%B0%83%E7%94%A8%E5%92%8C%E5%AE%9A%E4%B9%89/"
+      ><span class="mr-1.5">←</span><span>golang基础(23.函数的基本调用和定义)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/25.%E5%8F%98%E9%95%BF%E5%87%BD%E6%95%B0/"
+      ><span>golang基础(25.变长函数)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

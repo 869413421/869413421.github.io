@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>go-micro开发运维实践(引入rabbitmq作为消息驱动) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="为什么需要异步通信？ 在我们预设定的接口中，我们需要完成一个重置密码的功能。基本流程为，用户提交需要重置密码的邮箱，系统接收到后向邮箱发送一则消息，用户点击邮箱中带有加密信息的邮件再次向系统发起请求，系统通过验证后重置用户的密码。在这一个流程当中，发送邮件是一个耗时操作，如果采用同步的方式，一方面这会导致大量的请求浪费（因为要监听状态需要发起轮询请求），另一方面会导致接口数量不断增长变得臃肿，另外，对一些耗时操作同步请求会影响用户体验。基于上面的种种原因，我们有必要为系统接入基于事件异步通信，这样不仅为系统带来解耦，同时可以基于消息队列进行多个订阅处理，从而提高系统的运行效率。在go-micro中，我们可以通过broker组件来实现上述的异步通信。这里我们选择go-micro插件支持rabbitmq作为broker的驱动。
+docker-compose安装rabbitmq .env中添加配置信息 ...#设置rabbitmq镜像版本RABBITMQ_VERSION=3.8.3-management#rabbitmq默认用户名称RABBITMQ_USER=root#rabbitmq默认密码RABBTIMQ_PASSWORD=root... 修改docker-compose.yaml micro-rabbitmq:image: rabbitmq:${RABBITMQ_VERSION}restart: alwaysports:- 15672:15672- 5672:5672environment:- RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}- RABBITMQ_DEFAULT_PASS=${RABBTIMQ_PASSWORD}networks:- micro-network 检查rabbitmq是否正常运行 检查容器是否正常运行 访问rabbitmq可视化管理界面 打开http://127.0.0.1:15672输入配置的用户名密码
+编写重置密码服务 创建重置密码记录模型 touch pkg/model/password.go package modelimport (db &#34;github.com/869413421/micro-service/common/pkg/db&#34;)// PasswordReset 重置密码模型type PasswordReset struct {db.BaseModelToken string `gorm:&#34;column:token;type:varchar(255) not null;index&#34; `Email string `gorm:&#34;column:email;type:varchar(255) not null;index&#34; valid:&#34;email&#34;`Verify int8 `gorm:&#34;column:verify;type:tinyint(1);not null;default:0&#34;`}// Store 创建重置记录func (model *PasswordReset) Store() (err error) {result := db." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="go-micro开发运维实践(引入rabbitmq作为消息驱动)" />
+<meta property="og:description" content="go-micro开发运维实践(引入rabbitmq作为消息驱动)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%BC%95%E5%85%A5rabbitmq%E4%BD%9C%E4%B8%BA%E6%B6%88%E6%81%AF%E9%A9%B1%E5%8A%A8/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="go-micro开发运维实践(引入rabbitmq作为消息驱动)">
+<meta itemprop="description" content="go-micro开发运维实践(引入rabbitmq作为消息驱动)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="1264">
+<meta itemprop="keywords" content="go-micro开发运维实践," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="go-micro开发运维实践(引入rabbitmq作为消息驱动)"/>
+<meta name="twitter:description" content="go-micro开发运维实践(引入rabbitmq作为消息驱动)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">go-micro开发运维实践(引入rabbitmq作为消息驱动)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="为什么需要异步通信">为什么需要异步通信？</h2>
+<p>在我们预设定的接口中，我们需要完成一个重置密码的功能。基本流程为，用户提交需要重置密码的邮箱，系统接收到后向邮箱发送一则消息，用户点击邮箱中带有加密信息的邮件再次向系统发起请求，系统通过验证后重置用户的密码。在这一个流程当中，发送邮件是一个<code>耗时操作</code>，如果采用同步的方式，一方面这会导致大量的请求浪费（因为要监听状态需要发起轮询请求），另一方面会导致接口数量不断增长变得臃肿，另外，对一些耗时操作同步请求会影响用户体验。基于上面的种种原因，我们有必要为系统接入<code>基于事件异步通信</code>，这样不仅为系统带来解耦，同时可以基于消息队列进行多个订阅处理，从而提高系统的运行效率。在go-micro中，我们可以通过<code>broker</code>组件来实现上述的异步通信。这里我们选择go-micro插件支持<code>rabbitmq</code>作为broker的驱动。</p>
+<h2 id="docker-compose安装rabbitmq">docker-compose安装rabbitmq</h2>
+<h3 id="env中添加配置信息">.env中添加配置信息</h3>
+<pre tabindex="0"><code>...
+
+#设置rabbitmq镜像版本
+RABBITMQ_VERSION=3.8.3-management
+#rabbitmq默认用户名称
+RABBITMQ_USER=root
+#rabbitmq默认密码
+RABBTIMQ_PASSWORD=root
+
+...
+</code></pre><h3 id="修改docker-composeyaml">修改docker-compose.yaml</h3>
+<pre tabindex="0"><code>  micro-rabbitmq:
+    image: rabbitmq:${RABBITMQ_VERSION}
+    restart: always
+    ports:
+      - 15672:15672
+      - 5672:5672
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBTIMQ_PASSWORD}
+    networks:
+      - micro-network
+</code></pre><h3 id="检查rabbitmq是否正常运行">检查rabbitmq是否正常运行</h3>
+<h4 id="检查容器是否正常运行">检查容器是否正常运行</h4>
+<p><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651651760623-45b5aa96-d512-4bff-80f7-49f9f15aae55.png#clientId=u62d2d31b-9fad-4&amp;from=paste&amp;height=655&amp;id=ucf2ca5bd&amp;name=image.png&amp;originHeight=720&amp;originWidth=1270&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=105484&amp;status=done&amp;style=none&amp;taskId=u267587f1-bb50-4901-a580-2f5b6a22efb&amp;title=&amp;width=1154.5454295213563" alt="image.png"></p>
+<h4 id="访问rabbitmq可视化管理界面">访问rabbitmq可视化管理界面</h4>
+<p>打开<a href="http://127.0.0.1:15672/#/">http://127.0.0.1:15672</a>输入配置的用户名密码<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651651825849-cf2e57c8-1c45-430e-b1b2-999697a000e6.png#clientId=u62d2d31b-9fad-4&amp;from=paste&amp;height=845&amp;id=u60569ec7&amp;name=image.png&amp;originHeight=929&amp;originWidth=1920&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=65726&amp;status=done&amp;style=none&amp;taskId=u3fa00dc5-108c-4f0c-b82f-497a1ed17ed&amp;title=&amp;width=1745.4545076228378" alt="image.png"></p>
+<h2 id="编写重置密码服务">编写重置密码服务</h2>
+<h3 id="创建重置密码记录模型">创建重置密码记录模型</h3>
+<pre tabindex="0"><code>touch pkg/model/password.go
+</code></pre><pre tabindex="0"><code>package model
+
+import (
+	db &#34;github.com/869413421/micro-service/common/pkg/db&#34;
+)
+
+// PasswordReset 重置密码模型
+type PasswordReset struct {
+	db.BaseModel
+	Token  string `gorm:&#34;column:token;type:varchar(255) not null;index&#34; `
+	Email  string `gorm:&#34;column:email;type:varchar(255) not null;index&#34; valid:&#34;email&#34;`
+	Verify int8   `gorm:&#34;column:verify;type:tinyint(1);not null;default:0&#34;`
+}
+
+// Store 创建重置记录
+func (model *PasswordReset) Store() (err error) {
+	result := db.GetDB().Create(&amp;model)
+	err = result.Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Delete 删除数据库重置记录
+func (model *PasswordReset) Delete() (rowsAffected int64, err error) {
+	result := db.GetDB().Delete(&amp;model)
+	err = result.Error
+	if err != nil {
+		return 0, err
+	}
+	rowsAffected = result.RowsAffected
+	return rowsAffected, nil
+}
+
+// Update 更新数据库重置记录
+func (model *PasswordReset) Update() (rowsAffected int64, err error) {
+	result := db.GetDB().Save(&amp;model)
+	err = result.Error
+	if err != nil {
+		return 0, err
+	}
+	rowsAffected = result.RowsAffected
+	return rowsAffected, nil
+}
+</code></pre><h3 id="创建重置密码模型数据库交互层">创建重置密码模型数据库交互层</h3>
+<pre tabindex="0"><code>touch pkg/repo/password.go
+</code></pre><pre tabindex="0"><code>package repo
+
+import (
+	db &#34;github.com/869413421/micro-service/common/pkg/db&#34;
+	&#34;github.com/869413421/micro-service/user/pkg/model&#34;
+	&#34;gorm.io/gorm&#34;
+)
+
+//PasswordRestRepositoryInterface 重置记录操作接口
+type PasswordRestRepositoryInterface interface {
+	GetByEmail(email string) (*model.PasswordReset, error)
+	GetByToken(token string) (*model.PasswordReset, error)
+}
+
+//PasswordResetRepository 重置记录操作仓库
+type PasswordResetRepository struct {
+	DB *gorm.DB
+}
+
+// NewPasswordResetRepository 新建仓库
+func NewPasswordResetRepository() PasswordRestRepositoryInterface {
+	return &amp;PasswordResetRepository{DB: db.GetDB()}
+}
+
+// GetByEmail 根据邮件获取
+func (repo *PasswordResetRepository) GetByEmail(email string) (*model.PasswordReset, error) {
+	passwordReset := &amp;model.PasswordReset{}
+	err := repo.DB.Where(&#34;email = ?&#34;, email).First(&amp;passwordReset).Error
+	if err != nil {
+		return nil, err
+	}
+	return passwordReset, nil
+}
+
+// GetByToken 根据token获取
+func (repo *PasswordResetRepository) GetByToken(token string) (*model.PasswordReset, error) {
+	passwordReset := &amp;model.PasswordReset{}
+	err := repo.DB.Where(&#34;token = ?&#34;, token).First(&amp;passwordReset).Error
+	if err != nil {
+		return nil, err
+	}
+	return passwordReset, nil
+}
+</code></pre><h3 id="定义protobuf">定义protobuf</h3>
+<p>在proto/user/user.proto添加相应的定义</p>
+<pre tabindex="0"><code>...
+
+service UserService {
+  rpc Pagination(PaginationRequest) returns(PaginationResponse){}
+  rpc Get(GetRequest) returns(UserResponse){}
+  rpc Create(CreateRequest) returns(UserResponse){}
+  rpc Update(UpdateRequest) returns(UserResponse){}
+  rpc Delete(DeleteRequest) returns(UserResponse){}
+  rpc Auth(AuthRequest) returns(TokenResponse){}
+  rpc ValidateToken(TokenRequest) returns(TokenResponse){}
+  rpc CreatePasswordReset(CreatePasswordResetRequest) returns(PasswordReset){}
+  rpc ResetPassword(ResetPasswordRequest) returns(ResetPasswordResponse){}
+}
+
+...
+
+...
+// PasswordReset 重置密码记录
+message PasswordReset{
+  uint64 id = 1;
+  string email = 2;
+  string token = 3;
+  string create_at = 4;
+}
+
+// CreatePasswordResetRequest 创建重置密码请求
+message CreatePasswordResetRequest{
+  string email = 1;
+}
+
+// ResetPasswordRequest 重置密码请求
+message ResetPasswordRequest{
+  string token = 1 ;
+}
+
+// ResetPasswordResponse 重置密码相应
+message ResetPasswordResponse{
+  bool resetSuccess = 1;
+  string newPassword = 2;
+}
+
+...
+</code></pre><h4 id="生成代码">生成代码</h4>
+<pre tabindex="0"><code>make proto
+</code></pre><h2 id="编写密码重置业务代码">编写密码重置业务代码</h2>
+<h4 id="编写一个生成随机字符串方法用于生成用户新密码">编写一个生成随机字符串方法，用于生成用户新密码</h4>
+<p>打开<code>common</code>项目</p>
+<pre tabindex="0"><code>mkdir pkg/string
+touch pkg/string/string.go
+</code></pre><pre tabindex="0"><code>package string
+
+import (
+	&#34;math/rand&#34;
+	&#34;time&#34;
+)
+
+// RandString 生成随机字符串
+func RandString(len int) string {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	bytes := make([]byte, len)
+	for i := 0; i &lt; len; i++ {
+		b := r.Intn(26) + 65
+		bytes[i] = byte(b)
+	}
+	return string(bytes)
+}
+</code></pre><h4 id="使用事务进行密码重置">使用事务进行密码重置</h4>
+<pre tabindex="0"><code>touch service/password.go
+</code></pre><pre tabindex="0"><code>package service
+
+import (
+	&#34;errors&#34;
+	&#34;github.com/869413421/micro-service/common/pkg/db&#34;
+	string2 &#34;github.com/869413421/micro-service/common/pkg/string&#34;
+	&#34;github.com/869413421/micro-service/user/pkg/repo&#34;
+	&#34;gorm.io/gorm&#34;
+	&#34;time&#34;
+)
+
+// PasswordResetServiceInterface 重置密码业务接口
+type PasswordResetServiceInterface interface {
+	Reset(token string) (string, error)
+}
+
+// PasswordResetService 重置密码业务
+type PasswordResetService struct {
+	UserRepo          repo.UserRepositoryInterface
+	PasswordResetRepo repo.PasswordRestRepositoryInterface
+}
+
+// NewPasswordResetService 创建业务层
+func NewPasswordResetService() PasswordResetServiceInterface {
+	return &amp;PasswordResetService{
+		UserRepo:          repo.NewUserRepository(),
+		PasswordResetRepo: repo.NewPasswordResetRepository(),
+	}
+}
+
+// Reset 重置密码,返回新的密码
+func (srv *PasswordResetService) Reset(token string) (string, error) {
+	//1.根据token获取密码重置记录
+	passwordReset, err := srv.PasswordResetRepo.GetByToken(token)
+	if err != nil {
+		return &#34;&#34;, err
+	}
+
+	//2.比较时间，查看邮件是否已经超时或已验证
+	if passwordReset.Verify == 1 {
+		return &#34;&#34;, errors.New(&#34;the record has been verified&#34;)
+	}
+	d, _ := time.ParseDuration(&#34;+5m&#34;)
+	expTime := passwordReset.CreatedAt.Add(d)
+	if time.Now().After(expTime) {
+		return &#34;&#34;, errors.New(&#34;verify that the message has expired&#34;)
+	}
+
+	//3.获取用户更新密码(使用事務)
+	newPassword := string2.RandString(8)
+	db := db.GetDB()
+	err = db.Transaction(func(tx *gorm.DB) error {
+		user, err := srv.UserRepo.GetByEmail(passwordReset.Email)
+		if err != nil {
+			return err
+		}
+		user.Password = newPassword
+		result := tx.Debug().Save(&amp;user)
+		err = result.Error
+		if err != nil {
+			return err
+		}
+		rowsAffected := result.RowsAffected
+		if rowsAffected == 0 {
+			return errors.New(&#34;update password fail&#34;)
+		}
+
+		//4.更新重置记录
+		passwordReset.Verify = 1
+		result = tx.Debug().Save(&amp;passwordReset)
+		err = result.Error
+		if err != nil {
+			return err
+		}
+		rowsAffected = result.RowsAffected
+		if rowsAffected == 0 {
+			return errors.New(&#34;update password fail&#34;)
+		}
+		return nil
+	})
+	if err != nil {
+		return &#34;&#34;, err
+	}
+
+	return newPassword, nil
+}
+</code></pre><h2 id="编写服务处理器代码">编写服务处理器代码</h2>
+<h3 id="修改初始化依赖">修改初始化依赖</h3>
+<pre tabindex="0"><code>...
+
+//UserServiceHandler 用户服务处理器
+type UserServiceHandler struct {
+	UserRepo        repo.UserRepositoryInterface
+	TokenService    service.Authble
+	PasswordService service.PasswordResetServiceInterface
+}
+
+// NewUserServiceHandler 用户服务初始化
+func NewUserServiceHandler() *UserServiceHandler {
+	return &amp;UserServiceHandler{
+		UserRepo:        repo.NewUserRepository(),
+		TokenService:    service.NewTokenService(),
+		PasswordService: service.NewPasswordResetService(),
+	}
+}
+
+...
+</code></pre><h3 id="增加创建重置记录重置方法">增加创建重置记录，重置方法</h3>
+<pre tabindex="0"><code>...
+
+// CreatePasswordReset 创建密码重置记录
+func (srv *UserServiceHandler) CreatePasswordReset(ctx context.Context, req *pb.CreatePasswordResetRequest, rsp *pb.PasswordReset) error {
+	//1.获取提交邮箱,检查用户是否存在
+	_, err := srv.UserRepo.GetByEmail(req.Email)
+	if err != nil {
+		return errors.NotFound(&#34;User.CreatePasswordReset.GetByEmail.Error&#34;, &#34;user not found ,check you email&#34;)
+	}
+
+	passwordReset := &amp;model.PasswordReset{}
+	types.Fill(passwordReset, req)
+
+	//2.生成md5保存到数据库
+	passwordReset.Token = password.Md5Str(req.Email + time.Now().String())
+	err = passwordReset.Store()
+	if err != nil {
+		return err
+	}
+
+	//3.返回响应信息
+	types.Fill(rsp, passwordReset)
+	return nil
+}
+
+// ResetPassword 重置密码
+func (srv *UserServiceHandler) ResetPassword(ctx context.Context, req *pb.ResetPasswordRequest, rsp *pb.ResetPasswordResponse) error {
+	//1.执行重置逻辑
+	newPassword, err := srv.PasswordService.Reset(req.Token)
+	if err != nil {
+		return err
+	}
+
+	//2.返回新密码
+	rsp.ResetSuccess = true
+	rsp.NewPassword = newPassword
+	return nil
+}
+
+...
+</code></pre><h2 id="接入borker编写订阅发布业务代码">接入borker,编写订阅发布业务代码</h2>
+<p>上面的代码已经完成了创建密码重置记录以及密码重置等功能，但中间基于异步通信的发布消息，订阅消费（<code>发送邮件</code>）代码还没有实现。</p>
+<h3 id="使用rabbitmq作为go-microborker组件">使用rabbitmq作为go-microborker组件</h3>
+<h4 id="修改docker-composeyaml-1">修改docker-compose.yaml</h4>
+<p>通过环境变量为go-micro指定borker</p>
+<pre tabindex="0"><code>...
+
+  micro-user-service:
+    depends_on: # 启动依赖，需要等etcd集群启动后才启动当前容器
+      - etcd1
+      - etcd2
+      - etcd3
+      - micro-user-db
+    build: ./user # dockerfile所在目录
+    environment:
+      TZ: ${TZ}
+      MICRO_SERVER_ADDRESS: &#34;:9091&#34; # 服务端口
+      MICRO_REGISTRY: &#34;etcd&#34; # 注册中心类型
+      MICRO_REGISTRY_ADDRESS: &#34;etcd1:2379,etcd2:2379,etcd3:2379&#34; # 注册中心集群地址
+      DB_HOST: &#34;micro-user-db:3306&#34;
+      DB_DATABASE: ${USER_DB_DATABASE}
+      DB_USER: ${USER_DB_USER}
+      DB_PASSWORD: ${USER_DB_PASSWORD}
+      DB_MAX_CONNECTIONS: ${USER_DB_MAX_CONNECTIONS}
+      DB_MAX_IDE_CONNECTIONS: ${USER_DB_MAX_IDE_CONNECTIONS}
+      DB_CONNECTIONS_MAX_LIFE_TIME: ${USER_DB_CONNECTIONS_MAX_LIFE_TIME}
+      MICRO_BROKER: &#34;rabbitmq&#34;
+      MICRO_BROKER_ADDRESS: &#34;amqp://${RABBITMQ_USER}:${RABBTIMQ_PASSWORD}@micro-rabbitmq:5672&#34;
+    restart: always
+    ports:
+      - 9092:9091
+    volumes:
+      - ./user:/app
+    networks:
+      - micro-network
+      
+  ...
+</code></pre><h4 id="获取rabbitmq插件包">获取rabbitmq插件包</h4>
+<pre tabindex="0"><code>go get -u github.com/micro/go-plugins/broker/rabbitmq/v2
+</code></pre><h4 id="修改plugingo">修改plugin.go</h4>
+<pre tabindex="0"><code>package main
+
+import (
+	// rabbitmq broker
+	_ &#34;github.com/micro/go-plugins/broker/rabbitmq/v2&#34;
+)
+</code></pre><p>修改makefile</p>
+<pre tabindex="0"><code>...
+
+.PHONY: build
+build: proto
+
+	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags &#39;-w&#39; -i -o micro-user-service ./main.go ./plugin.go
+
+...
+</code></pre><p>通过上述步骤，基于插件机制使rabbitmq成为go-micro<code>borker</code>组件的默认驱动。</p>
+<h3 id="封装containerjson包">封装container，Json包</h3>
+<p>考虑到整个程序的生命周期中，我们有许多对象需要全局使用，我们定义一个容器包将对象存储到当中，在需要时再从容器中取出使用。<!-- raw HTML omitted -->打开<code>common</code>项目</p>
+<pre tabindex="0"><code>mkdir pkg/container
+touch pkg/container/service.go
+</code></pre><pre tabindex="0"><code>package container
+
+import (
+	&#34;github.com/micro/go-micro/v2&#34;
+	&#34;github.com/micro/go-micro/v2/broker&#34;
+)
+
+var service micro.Service
+
+// SetService 设置服务实例
+func SetService(srv micro.Service) {
+	service = srv
+}
+
+// GetService 返回服务实例
+func GetService() micro.Service {
+	return service
+}
+
+// GetServiceBroker 返回服务Broker实例
+func GetServiceBroker() broker.Broker {
+	return service.Options().Broker
+}
+</code></pre><pre tabindex="0"><code>mkdir pkg/encoder
+touch pkg/encoder/encoder.go
+</code></pre><pre tabindex="0"><code>package encoder
+
+import jsoniter &#34;github.com/json-iterator/go&#34;
+
+var JsonHandler jsoniter.API
+
+func init() {
+	JsonHandler = jsoniter.ConfigCompatibleWithStandardLibrary
+}
+</code></pre><p>下载相关依赖<code>go mod tidy</code></p>
+<h3 id="基于事件编写发布代码">基于事件编写发布代码</h3>
+<pre tabindex="0"><code>touch pkg/model/password_hooks.go
+</code></pre><pre tabindex="0"><code>package model
+
+import (
+	&#34;fmt&#34;
+	&#34;github.com/869413421/micro-service/common/pkg/container&#34;
+	&#34;github.com/869413421/micro-service/common/pkg/encoder&#34;
+	&#34;github.com/micro/go-micro/v2/broker&#34;
+	&#34;gorm.io/gorm&#34;
+)
+
+var createTopic = &#34;create.password.reset&#34;
+
+// AfterCreate 创建成功后
+func (model *PasswordReset) AfterCreate(tx *gorm.DB) (err error) {
+	if model.Email != &#34;&#34; {
+		err := pushCreateEvent(model)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// pushCreateEvent 推送创建消息
+func pushCreateEvent(model *PasswordReset) error {
+	//1.获取发布连接
+	publisher := container.GetServiceBroker()
+
+	//2.构建broker消息
+	body, err := encoder.JsonHandler.Marshal(model)
+	if err != nil {
+		return err
+	}
+	msg := &amp;broker.Message{
+		Header: map[string]string{
+			&#34;email&#34;: model.Email,
+		},
+		Body: body,
+	}
+
+	//3.发送消息到mq
+	err = publisher.Publish(createTopic, msg)
+	if err != nil {
+		return err
+	} else {
+		fmt.Println(&#34;[pub] pubbed message:&#34;, string(msg.Body))
+	}
+	return nil
+}
+</code></pre><p>在创建密码重置记录成功后出发了模型事件，这时候将消息推送到rabbitmq，完成消息发布流程</p>
+<h3 id="编写订阅代码">编写订阅代码</h3>
+<pre tabindex="0"><code>touch subscriber/password.go
+</code></pre><pre tabindex="0"><code>package subscriber
+
+import (
+	&#34;fmt&#34;
+	&#34;github.com/micro/go-micro/v2/broker&#34;
+)
+
+// 重置密码事件
+const createPasswordResetTopic = &#34;create.password.reset&#34;
+
+// EventSubscriberInterface 事件订阅者启动器接口
+type EventSubscriberInterface interface {
+	Subscriber() error
+}
+
+// EventSubscriber 事件订阅者启动器
+type EventSubscriber struct {
+	Broker broker.Broker
+}
+
+// NewEventSubscriber 创建事件订阅启动器
+func NewEventSubscriber(brk broker.Broker) EventSubscriberInterface {
+	return &amp;EventSubscriber{Broker: brk}
+}
+
+// Subscriber 启动订阅
+func (subscriber EventSubscriber) Subscriber() error {
+	//1.重置密码事件订阅
+	_, err := subscriber.Broker.Subscribe(createPasswordResetTopic, func(event broker.Event) error {
+		// TODO 发送邮件
+		fmt.Println(&#34;[sub] received message:&#34;, string(event.Message().Body), &#34;header&#34;, event.Message().Header)
+		return nil
+	}, broker.Queue(createPasswordResetTopic), broker.DisableAutoAck())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+</code></pre><h3 id="修改maingo启动订阅">修改main.go启动订阅</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;github.com/869413421/micro-service/common/pkg/container&#34;
+	&#34;github.com/869413421/micro-service/common/pkg/db&#34;
+	&#34;github.com/869413421/micro-service/user/handler&#34;
+	&#34;github.com/869413421/micro-service/user/pkg/model&#34;
+	&#34;github.com/869413421/micro-service/user/subscriber&#34;
+	&#34;github.com/micro/go-micro/v2&#34;
+	log &#34;github.com/micro/go-micro/v2/logger&#34;
+
+	proto &#34;github.com/869413421/micro-service/user/proto/user&#34;
+)
+
+func main() {
+
+	// 1.准备数据库连接，并且执行数据库迁移
+	db := db.GetDB()
+	db.AutoMigrate(&amp;model.User{})
+	db.AutoMigrate(&amp;model.PasswordReset{})
+
+	// 2.创建服务
+	service := micro.NewService(
+		micro.Name(&#34;micro.service.user&#34;),
+		micro.Version(&#34;v1&#34;),
+	)
+
+	// 3.初始化服务,全局化service对象
+	service.Init()
+	container.SetService(service)
+
+	// 4.初始化borker
+	brk := service.Options().Broker
+	defer brk.Disconnect()
+	err := brk.Init()
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+	err = brk.Connect()
+	if err != nil {
+		log.Fatal(&#34;connection broker error:&#34;, err)
+		return
+	}
+
+	// 5.订阅事件
+	eventSubscriber := subscriber.NewEventSubscriber(brk)
+	err = eventSubscriber.Subscriber()
+	if err != nil {
+		log.Fatal(&#34;subscriber broker error:&#34;, err)
+		return
+	}
+
+	// 6.注册服务处理器
+	proto.RegisterUserServiceHandler(service.Server(), handler.NewUserServiceHandler())
+
+	// 7.运行服务
+	if err := service.Run(); err != nil {
+		log.Fatal(err)
+	}
+}
+</code></pre><p>至此，发布订阅代码完成</p>
+<h2 id="测试重置密码相关接口">测试重置密码相关接口</h2>
+<h3 id="编译代码然后重启容器">编译代码，然后重启容器</h3>
+<pre tabindex="0"><code>make build
+docker-compose up -d  micro-user-service
+</code></pre><p>调用了创建重置密码的记录后我们可以看到发布订阅代码中打印的相关信息都显示了<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651660612628-66b78b79-307b-4e94-ad88-4c281c97b8c2.png#clientId=u62d2d31b-9fad-4&amp;from=paste&amp;height=655&amp;id=u00d36d7e&amp;name=image.png&amp;originHeight=720&amp;originWidth=1270&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=65017&amp;status=done&amp;style=none&amp;taskId=uc4f9bbe6-fdb3-4c1f-9c01-50f4b453d9f&amp;title=&amp;width=1154.5454295213563" alt="image.png"><!-- raw HTML omitted -->拿到日志中的token调用重置接口<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651660710066-6c9e2d76-dcbe-41a4-a8af-d51f649bbc46.png#clientId=u62d2d31b-9fad-4&amp;from=paste&amp;height=845&amp;id=u7c87396e&amp;name=image.png&amp;originHeight=929&amp;originWidth=1920&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=38692&amp;status=done&amp;style=none&amp;taskId=u85b25e61-db79-4590-a4fe-d09c1878d8e&amp;title=&amp;width=1745.4545076228378" alt="image.png"><!-- raw HTML omitted -->接口返回新生成的密码。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5"
+      >go-micro开发运维实践</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%B0%81%E8%A3%85gin%E7%BC%96%E5%86%99api%E6%8E%A5%E5%8F%A3/"
+      ><span class="mr-1.5">←</span><span>go-micro开发运维实践(封装gin编写api接口)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E6%B3%A8%E5%86%8C%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BE%AE%E6%9C%8D%E5%8A%A1/"
+      ><span>go-micro开发运维实践(注册第一个微服务)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

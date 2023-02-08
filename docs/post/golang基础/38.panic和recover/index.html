@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(38.panic和recover) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="GO语言通过error接口进行统一的错误处理，这些都是我们在编写代码时就可以预见并且返回的。但是面对一些我们不可知的，比如数组越界、除数为0、空指针引用，这些 Go 语言是怎么处理的呢？
+panic Go 语言没有像 PHP 那样引入异常的概念，也没有提供 try&hellip;catch 这样的语法对运行时异常进行捕获和处理，当代码运行时出错，而又没有在编码时显式返回错误时，Go 语言会抛出 panic，中文译作「运行时恐慌」，我们也可以将其看作 Go 语言版的异常。除了 Go 语言底层抛出 panic，我们还可以在代码中显式抛出 panic，以便对错误和异常信息进行自定义，仍然以上篇教程除数为0的示例代码为例，我们可以这样显式返回 panic 中断代码执行：
+package mainimport &#34;fmt&#34;func main() {defer func() {fmt.Println(&#34;代码清理逻辑&#34;)}()var i = 1var j = 0if j == 0 {panic(&#34;除数不能为0！&#34;)}k := i / jfmt.Printf(&#34;%d / %d = %d&#34;, i, j, k)} 这样，当我们执行这段代码时，就会抛出 panic：panic 函数支持的参数类型是 interface{}：
+func panic(v interface{}) 所以可以传入任意类型的参数：" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(38.panic和recover)" />
+<meta property="og:description" content="golang基础(38.panic和recover)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/38.panic%E5%92%8Crecover/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(38.panic和recover)">
+<meta itemprop="description" content="golang基础(38.panic和recover)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="194">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(38.panic和recover)"/>
+<meta name="twitter:description" content="golang基础(38.panic和recover)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(38.panic和recover)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>GO语言通过<code>error接口</code>进行统一的错误处理，这些都是我们在编写代码时就可以预见并且返回的。但是面对一些我们不可知的，比如数组越界、除数为0、空指针引用，这些 Go 语言是怎么处理的呢？</p>
+<h2 id="panic">panic</h2>
+<p>Go 语言没有像 PHP 那样引入异常的概念，也没有提供 try&hellip;catch 这样的语法对运行时异常进行捕获和处理，当代码运行时出错，而又没有在编码时显式返回错误时，Go 语言会抛出 panic，中文译作「运行时恐慌」，我们也可以将其看作 Go 语言版的异常。<!-- raw HTML omitted -->除了 Go 语言底层抛出 panic，我们还可以在代码中显式抛出 panic，以便对错误和异常信息进行自定义，仍然以上篇教程除数为0的示例代码为例，我们可以这样显式返回 panic 中断代码执行：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+    defer func() {
+        fmt.Println(&#34;代码清理逻辑&#34;)
+    }()
+    
+    var i = 1
+    var j = 0
+    if j == 0 {
+        panic(&#34;除数不能为0！&#34;)
+    }
+    k := i / j
+    fmt.Printf(&#34;%d / %d = %d
+&#34;, i, j, k)
+}
+</code></pre><p>这样，当我们执行这段代码时，就会抛出 panic：<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1655546921175-2bdde8c1-61b2-458b-916a-ed6115047667.png#clientId=ue6471beb-eaca-4&amp;from=paste&amp;height=186&amp;id=u05d990fa&amp;name=image.png&amp;originHeight=186&amp;originWidth=751&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=30991&amp;status=done&amp;style=none&amp;taskId=u90caf9cb-ca24-4eaf-a601-d8ab996320c&amp;title=&amp;width=751" alt="image.png"><!-- raw HTML omitted -->panic 函数支持的参数类型是<code> interface{}</code>：</p>
+<pre tabindex="0"><code>func panic(v interface{})
+</code></pre><p>所以可以传入任意类型的参数：</p>
+<pre tabindex="0"><code>panic(500)   // 传入数字
+panic(errors.New(&#34;除数不能为0&#34;))  // 传入 error 类型
+</code></pre><p>无论是 Go 语言底层抛出 panic，还是我们在代码中显式抛出 panic，处理机制都是一样的：当遇到 panic 时，Go 语言<code>会中断当前协程</code>中（main 函数）后续代码的执行，然后执行在中断代码之前定义的 defer 语句（按照先入后出的顺序），最后程序退出并输出 panic 错误信息，以及出现错误的堆栈跟踪信息，在这里就是：</p>
+<pre tabindex="0"><code>goroutine 1 [running]:
+main.main()
+        /Users/sunqiang/Devlopment/golang/src/panic.go:13 +0x55
+exit status 2
+</code></pre><p>第一行表示出<code>问题的协程</code>，第二行是问题代码所在的<code>包和函数</code>，第三行是问题代码的具体位置，最后一行则是程序的<code>退出状态</code>。</p>
+<h2 id="recover">recover</h2>
+<p>此外，我们还可以通过 recover() 函数对 panic 进行捕获和处理，从而避免程序崩溃然后直接退出，实现类似 PHP 中 try&hellip;catch&hellip;finally 的功能，由于执行到抛出 panic 的问题代码时，会中断后续其他代码的执行，所以，显然这个 panic 的捕获和其他代码的恢复执行需要放到 defer 语句中完成。</p>
+<pre tabindex="0"><code>package main
+
+import (
+    &#34;fmt&#34;
+)
+
+func divide() {
+    defer func() {
+        if err := recover(); err != nil {
+            fmt.Printf(&#34;Runtime panic caught: %v
+&#34;, err)
+        }
+    }()
+
+    var i = 1
+    var j = 0
+    k := i / j
+    fmt.Printf(&#34;%d / %d = %d
+&#34;, i, j, k)
+}
+
+func main() {
+    divide()
+    fmt.Println(&#34;divide方法调用完毕，回到main函数&#34;)
+}
+</code></pre><p>如果没有通过 recover() 函数捕获 panic 的话，程序会直接崩溃退出，并打印错误和堆栈信息：<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1655547542558-6428d950-9d3f-4cb1-9cc6-8ab67ed55e42.png#clientId=ue6471beb-eaca-4&amp;from=paste&amp;height=210&amp;id=uda6026e0&amp;name=image.png&amp;originHeight=210&amp;originWidth=643&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=21306&amp;status=done&amp;style=none&amp;taskId=uf07e18e2-45cb-4758-b5fc-56619057dcd&amp;title=&amp;width=643" alt="image.png"><!-- raw HTML omitted -->而现在我们在 divide() 方法的 defer 语句中通过 recover() 函数捕获了 panic，并打印捕获到的错误信息，这个时候，程序会退出 divide() 方法而不是整个应用，继续执行 main() 函数中的后续代码，即恢复后续其他代码的执行：<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1655547581154-f5f9e72e-1645-4862-a68c-599c55672387.png#clientId=ue6471beb-eaca-4&amp;from=paste&amp;height=69&amp;id=u885b83d5&amp;name=image.png&amp;originHeight=69&amp;originWidth=333&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=3524&amp;status=done&amp;style=none&amp;taskId=u4381049d-9b39-4c02-86af-39e36239f3a&amp;title=&amp;width=333" alt="image.png"><!-- raw HTML omitted -->这样一来，当程序运行过程中抛出 panic 时我们可以通过 recover() 函数对其进行捕获和处理，如果没有抛出则什么也不做，从而确保了代码的健壮性。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/37.defer-%E8%AF%AD%E5%8F%A5%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B/"
+      ><span class="mr-1.5">←</span><span>golang基础(37.defer 语句及使用示例)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/39.%E5%A4%9A%E8%BF%9B%E7%A8%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%90%BA%E7%A8%8B/"
+      ><span>golang基础(39.多进程，多线程，携程)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

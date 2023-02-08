@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(39.多进程，多线程，携程) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="为什么需要并发编程 在PHP中并不存在并发的概念，PHP中所有的操作都是串行执行，同步阻塞的。这就是很多人诟病PHP性能低下的原因。但串行执行虽然性能上存在问题，但是相对的也有它的好处。
+保证了PHP的简单性，不需要考虑并发引入的线程安全问题 不需要考虑加锁来保证某个操作的原子性 不存在线程间的通讯问题 与并发相对的是串行，即按照代码顺序一步一步往下执行，当遇到某个IO操作时，比如发送邮件，读取文件，查询数据库。CPU会进行等待，等到IO操作完成后才会继续执行代码。这种情况在某些要求高并发高性能的业务场景显然是不合适的，从操作系统上来讲，多个任务是可以同时执行的，因为CPU本身就是多核的，能同时执行多任务的计算。哪怕是单核CPU，也可利用时间分片的方式在多个进程和线程之间来回切换执行。比如说当某个任务执行时遇到了IO操作，这个时候CPU不会一直傻傻等待，而是挂起这个任务，让出CPU时间片给到其他任务。然后等这个IO操作完成后，通知CPU恢复后续代码的执行。实际上CPU大部分时间都在做这种调度，并发编程就是最大程度的压榨CPU，从而提高程序的性能和效率 。
+并发编程的常见实现 多进程。多进程是基于操作系统层面的并发基本模式，同时也是开销最大的模式。在linux上很多工具都采用这种模式在工作，比如PHP-FPM,他有专门的主进程监听端口以及管理连接，还有多个工作进程对具体请求进行处理。这种方式好处是在于简单，进程间互相不影响，不同进程间数据相互隔离。缺点是系统开销大，每个进程都是由内核管理的。 多线程。多线层是基于系统层面的并发模式，它是基于进程内的，也是使用较多也相对有效的方式。线程比进程开销更小，线程间会共享数据，线程切换和调度会加锁会造成额外的性能开销。线程比进程轻量，但在高并发的情况下效率依然有影响，例如C10K问题，即支持一万个并发需要一万个线程，这样对系统资源有较高的要求，而且CPU管理这些线程带来巨大负担 携程。一种用户态线程，可以交由程序员调度的，你可以将其看作是轻量级别的线程，不许要操作系统来进行抢占式调度，系统开销极小，携程内有自己独立的堆栈调度间没有线程的加锁开销。 基于回调的非阻塞IO/异步IO。为了解决C10K的问题，在很多高并发的开发实践中，都会通过事件驱动的方式来使用异步IO,在这种模式下，一个线程维护多个Socket连接，从而降低了系统的开销。 传统并发模式的缺陷 在串行化模式下执行的程序，所有的事务都具备确定性的，比如程序预设了123个步骤，代码会严格按照顺序执行下去，即使在某哥步骤中阻塞了，也会一直等待代码执行结束才会进行下一步。多线程的并发模式下，就彻底打破了这种缺定性。比如我们原先的123，第2步是一个耗时操作，这时候我们启动了一个新的线程对其进行处理，这时候我们无法确定的是，主线程拉起2的子线程后继续往下执行代码，我们无法确定是主线程先执行完毕退出程序，还是2的线程先完成。如果是主线程完成退出会导致2的子线程操作中断。或者我们在第3步的时候依赖第2步的某个返回结果，我们不知道啥时候能够返回这个结果，如果第2、3步有相互依赖的变量，甚至可能出现死锁，以及我们如何在主线程中获取新线程的异常和错误信息并进行相应的处理，等等，这种不确定性给程序的行为带来了意外和危害，也让程序变得不可控。不同的线程好比平行时空，我们需要通过线程间通信来告知不同线程目前各自运行的状态和结果，以便使程序可控，线程之间通信可以通过共享内存的方式（参考 Swoole 中的 Swoole Table），即在不同线程中操作的是同一个内存地址上存储的值。为了保证共享内存的有效性，需要采取很多措施，比如加锁来避免死锁或资源竞争，还是以上面的主线程和新线程为例，如果我们在第1步获取了一个中间结果，第2步和第3步都要对这个中间结果进行操作，如果不加锁保证操作的原子性，很有可能产生脏数据。诸如此类的问题在生产环境极有可能造成重大故障甚至事故，而且不易察觉和调试。我们可以将线程加共享内存的方式称为「共享内存系统」。为了解决共享内存系统存在的问题，计算机科学家们又提出了「消息传递系统」。「消息传递系统」指的是将线程间共享状态的各种操作都封装在线程之间传递的消息中，这通常要求发送消息时对状态进行复制，并且在消息传递的边界上交出这个状态的所有权。从表明上来看，这个操作与「共享内存系统」中执行的通过加锁实现原子更新操作相同，但从底层实现上来看则不同：一个对同一个内存地址持有的值进行操作，一个是从消息通道读取数据并处理。由于需要执行状态复制操作，所以大多数消息传递的实现在性能上并不优越，但线程中的状态管理工作则会变得更加简单，这就有点像我们在开篇讲 PHP 不支持并发编程提到的那样，如果想让编码简单，性能就要做牺牲，如果想追求性能，代码编写起来就比较费劲，这也是我们为什么通常不会直接通过事件驱动的异步 IO 来实现并发编程一样，因为这涉及到直接调用操作系统底层的库函数（select、epoll、libevent 等）来实现，非常复杂。
+Go 语言协程支持 与传统的系统级线程和进程相比，协程的最大优势在于轻量级（可以看作用户态的轻量级线程），我们可以轻松创建上百万个协程而不会导致系统资源衰竭，而线程和进程通常最多也不能超过 1 万个（C10K问题）。多数语言在语法层面并不直接支持协程，而是通过库的方式支持，比如 PHP 的 Swoole 扩展库，但用库的方式支持的功能通常并不完整，比如仅仅提供轻量级线程的创建、销毁与切换等能力。如果在这样的轻量级线程中调用一个同步 IO 操作，比如网络通信、本地文件读写，都会阻塞其他的并发执行轻量级线程，从而无法真正达到轻量级线程本身期望达到的目标。Go 语言在语言级别支持协程，称之为 goroutine。Go 语言标准库提供的所有系统调用操作（当然也包括所有同步 IO 操作），都有协程的身影。协程间的切换管理不依赖于系统的线程和进程，也不依赖于 CPU 的核心数量，这让我们在 Go 语言中通过协程实现并发编程变得非常简单。" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(39.多进程，多线程，携程)" />
+<meta property="og:description" content="golang基础(39.多进程，多线程，携程)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/39.%E5%A4%9A%E8%BF%9B%E7%A8%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%90%BA%E7%A8%8B/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(39.多进程，多线程，携程)">
+<meta itemprop="description" content="golang基础(39.多进程，多线程，携程)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="43">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(39.多进程，多线程，携程)"/>
+<meta name="twitter:description" content="golang基础(39.多进程，多线程，携程)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(39.多进程，多线程，携程)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="为什么需要并发编程">为什么需要并发编程</h2>
+<p>在PHP中并不存在并发的概念，PHP中所有的操作都是串行执行，同步阻塞的。这就是很多人诟病PHP性能低下的原因。但串行执行虽然性能上存在问题，但是相对的也有它的好处。</p>
+<ul>
+<li>保证了PHP的简单性，不需要考虑并发引入的线程安全问题</li>
+<li>不需要考虑加锁来保证某个操作的原子性</li>
+<li>不存在线程间的通讯问题</li>
+</ul>
+<p>与并发相对的是<code>串行</code>，即按照代码顺序一步一步往下执行，当遇到某个IO操作时，比如发送邮件，读取文件，查询数据库。CPU会进行等待，等到IO操作完成后才会继续执行代码。这种情况在某些要求高并发高性能的业务场景显然是不合适的，从操作系统上来讲，多个任务是可以同时执行的，因为CPU本身就是多核的，能同时执行多任务的计算。哪怕是单核CPU，也可利用时间分片的方式在多个进程和线程之间来回切换执行。比如说当某个任务执行时遇到了IO操作，这个时候CPU不会一直傻傻等待，而是挂起这个任务，让出CPU时间片给到其他任务。然后等这个IO操作完成后，通知CPU恢复后续代码的执行。实际上CPU大部分时间都在做这种调度，<code>并发编程就是最大程度的压榨CPU，从而提高程序的性能和效率 </code>。</p>
+<h2 id="并发编程的常见实现">并发编程的常见实现</h2>
+<ul>
+<li><code>多进程</code>。多进程是基于操作系统层面的并发基本模式，同时也是开销最大的模式。在linux上很多工具都采用这种模式在工作，比如PHP-FPM,他有专门的主进程监听端口以及管理连接，还有多个工作进程对具体请求进行处理。这种方式好处是在于简单，进程间互相不影响，不同进程间数据相互隔离。缺点是系统开销大，每个进程都是由内核管理的。</li>
+<li><code>多线程</code>。多线层是基于系统层面的并发模式，它是基于进程内的，也是使用较多也相对有效的方式。线程比进程开销更小，线程间会共享数据，线程切换和调度会加锁会造成额外的性能开销。线程比进程轻量，但在高并发的情况下效率依然有影响，例如C10K问题，即支持一万个并发需要一万个线程，这样对系统资源有较高的要求，而且CPU管理这些线程带来巨大负担</li>
+<li><code>携程</code>。一种用户态线程，可以交由程序员调度的，你可以将其看作是轻量级别的线程，不许要操作系统来进行抢占式调度，系统开销极小，携程内有自己独立的堆栈调度间没有线程的加锁开销。</li>
+<li><code>基于回调的非阻塞IO/异步IO</code>。为了解决C10K的问题，在很多高并发的开发实践中，都会通过事件驱动的方式来使用异步IO,在这种模式下，一个线程维护多个Socket连接，从而降低了系统的开销。</li>
+</ul>
+<h2 id="传统并发模式的缺陷">传统并发模式的缺陷</h2>
+<p>在串行化模式下执行的程序，所有的事务都具备确定性的，比如程序预设了123个步骤，代码会严格按照顺序执行下去，即使在某哥步骤中阻塞了，也会一直等待代码执行结束才会进行下一步。<!-- raw HTML omitted -->多线程的并发模式下，就彻底打破了这种缺定性。比如我们原先的123，第2步是一个耗时操作，这时候我们启动了一个新的线程对其进行处理，这时候我们无法确定的是，主线程拉起2的子线程后继续往下执行代码，我们无法确定是主线程先执行完毕退出程序，还是2的线程先完成。如果是主线程完成退出会导致2的子线程操作中断。或者我们在第3步的时候依赖第2步的某个返回结果，我们不知道啥时候能够返回这个结果，如果第2、3步有相互依赖的变量，甚至可能出现死锁，以及我们如何在主线程中获取新线程的异常和错误信息并进行相应的处理，等等，这种不确定性给程序的行为带来了意外和危害，也让程序变得不可控。<!-- raw HTML omitted -->不同的线程好比平行时空，我们需要通过线程间通信来告知不同线程目前各自运行的状态和结果，以便使程序可控，线程之间通信可以通过共享内存的方式（参考 Swoole 中的 <a href="https://laravelacademy.org/post/19771.html">Swoole Table</a>），即在不同线程中操作的是同一个内存地址上存储的值。为了保证共享内存的有效性，需要采取很多措施，比如加锁来避免死锁或资源竞争，还是以上面的主线程和新线程为例，如果我们在第1步获取了一个中间结果，第2步和第3步都要对这个中间结果进行操作，如果不加锁保证操作的原子性，很有可能产生脏数据。诸如此类的问题在生产环境极有可能造成重大故障甚至事故，而且不易察觉和调试。<!-- raw HTML omitted -->我们可以将<code>线程加共享内存</code>的方式称为「共享内存系统」。为了解决共享内存系统存在的问题，计算机科学家们又提出了「消息传递系统」。<!-- raw HTML omitted -->「消息传递系统」指的是将线程间共享状态的各种操作都封装在线程之间传递的消息中，这通常要求发送消息时对状态进行复制，并且在消息传递的边界上交出这个状态的所有权。从表明上来看，这个操作与「共享内存系统」中执行的通过加锁实现原子更新操作相同，但从底层实现上来看则不同：一个对同一个内存地址持有的值进行操作，一个是从消息通道读取数据并处理。由于需要执行状态复制操作，所以大多数消息传递的实现在性能上并不优越，但线程中的状态管理工作则会变得更加简单，这就有点像我们在开篇讲 PHP 不支持并发编程提到的那样，如果想让编码简单，性能就要做牺牲，如果想追求性能，代码编写起来就比较费劲，这也是我们为什么通常不会直接通过事件驱动的异步 IO 来实现并发编程一样，因为这涉及到直接调用操作系统底层的库函数（select、epoll、libevent 等）来实现，非常复杂。</p>
+<h2 id="go-语言协程支持">Go 语言协程支持</h2>
+<p>与传统的系统级线程和进程相比，协程的最大优势在于轻量级（可以看作用户态的轻量级线程），我们可以轻松创建上百万个协程而不会导致系统资源衰竭，而线程和进程通常最多也不能超过 1 万个（C10K问题）。多数语言在语法层面并不直接支持协程，而是通过库的方式支持，比如 PHP 的 Swoole 扩展库，但用库的方式支持的功能通常并不完整，比如仅仅提供轻量级线程的创建、销毁与切换等能力。如果在这样的轻量级线程中调用一个同步 IO 操作，比如网络通信、本地文件读写，都会阻塞其他的并发执行轻量级线程，从而无法真正达到轻量级线程本身期望达到的目标。<!-- raw HTML omitted -->Go 语言在语言级别支持协程，称之为 goroutine。Go 语言标准库提供的所有系统调用操作（当然也包括所有同步 IO 操作），都有协程的身影。协程间的切换管理不依赖于系统的线程和进程，也不依赖于 CPU 的核心数量，这让我们在 Go 语言中通过协程实现并发编程变得非常简单。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/38.panic%E5%92%8Crecover/"
+      ><span class="mr-1.5">←</span><span>golang基础(38.panic和recover)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/4.%E4%BB%A3%E7%A0%81%E5%8C%85/"
+      ><span>golang基础(4.代码包)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

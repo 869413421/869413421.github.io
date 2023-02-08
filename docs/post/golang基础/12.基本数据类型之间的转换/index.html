@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(12.基本数据类型之间的转换) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="我们已经陆续介绍完了 Go 语言中的基本数据类型，分别是布尔类型、整型、浮点型、复数类型、字符串和字符类型，和 PHP 一样，Go 语言也支持这些基本数据类型之间的转化，但是不是像 PHP 那种可以自动转化，比如下面这些语句在 PHP 中都是合法的：
+$a = 1;$b = 1.1;$c = &#34;test&#34;;$d = true;$sum = $a &#43; $b; // 将 $a 和 $b 相加，会自动将 $a 转化为浮点型，结果是 2.1$sum = $a &#43; $d; // 将 $a 和 $d 相加，会自动将 $d 转化为整型，结果是 2$str = $c . $b; // 将 $b 和 $c 相连接，$b 会被转化为字符串，结果是「test1.1」 数值类型之间的转换 关于数值类型之间的转化，我们前面在介绍运算符的时候已经提到过，在进行类型转化时只需要调用要转化的数据类型对应的函数即可：
+v1:= uint(16) // 初始化 v1 类型为 unitv2 := int8(v1) // 将 v1 转化为 int8 类型并赋值给 v2v3 := uint16(v2) // 将 v2 转化为 uint16 类型并赋值给 v3 不过需要注意，在有符号与无符号以及高位数字向低位数字转化时，需要注意数字的溢出和截断，比如我们看这个例子：" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(12.基本数据类型之间的转换)" />
+<meta property="og:description" content="golang基础(12.基本数据类型之间的转换)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/12.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B9%8B%E9%97%B4%E7%9A%84%E8%BD%AC%E6%8D%A2/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(12.基本数据类型之间的转换)">
+<meta itemprop="description" content="golang基础(12.基本数据类型之间的转换)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="308">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(12.基本数据类型之间的转换)"/>
+<meta name="twitter:description" content="golang基础(12.基本数据类型之间的转换)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(12.基本数据类型之间的转换)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>我们已经陆续介绍完了 Go 语言中的基本数据类型，分别是<a href="https://laravelacademy.org/post/19728.html#toc-1">布尔类型</a>、<a href="https://laravelacademy.org/post/19732.html#toc-0">整型</a>、<a href="https://laravelacademy.org/post/19735.html#toc-0">浮点型</a>、<a href="https://laravelacademy.org/post/19735.html#toc-4">复数类型</a>、<a href="https://laravelacademy.org/post/19739.html#toc-0">字符串</a>和<a href="https://laravelacademy.org/post/19739.html#toc-6">字符类型</a>，和 PHP 一样，Go 语言也支持这些基本数据类型之间的转化，但是不是像 PHP 那种可以自动转化，比如下面这些语句在 PHP 中都是合法的：</p>
+<pre tabindex="0"><code>$a = 1;
+$b = 1.1;
+$c = &#34;test&#34;;
+$d = true;
+
+$sum = $a + $b;  // 将 $a 和 $b 相加，会自动将 $a 转化为浮点型，结果是 2.1
+$sum = $a + $d;  // 将 $a 和 $d 相加，会自动将 $d 转化为整型，结果是 2
+$str = $c . $b;  // 将 $b 和 $c 相连接，$b 会被转化为字符串，结果是「test1.1」
+</code></pre><h2 id="数值类型之间的转换">数值类型之间的转换</h2>
+<p>关于数值类型之间的转化，我们前面在介绍<a href="https://laravelacademy.org/post/19732.html#toc-1">运算符</a>的时候已经提到过，在进行类型转化时只需要调用要转化的数据类型对应的函数即可：</p>
+<pre tabindex="0"><code>v1:= uint(16) // 初始化 v1 类型为 unit
+v2 := int8(v1)   // 将 v1 转化为 int8 类型并赋值给 v2
+v3 := uint16(v2) // 将 v2 转化为 uint16 类型并赋值给 v3
+</code></pre><p>不过需要注意，在有符号与无符号以及高位数字向低位数字转化时，需要注意数字的溢出和截断，比如我们看这个例子：</p>
+<pre tabindex="0"><code>v1 := uint(-255)
+</code></pre><p>由于 uint 是无符号整型，所以上述转化编译时会报错：</p>
+<pre tabindex="0"><code>constant -255 overflows uint
+</code></pre><p>我们将上述代码改造如下：</p>
+<pre tabindex="0"><code>v1 := uint(255)
+v2 := int8(v1)  // v2 = -1
+</code></pre><p>由于 int8 能够表示的范围是 -128~127，255 超出其表示范围，所以，会截取后8位，v1 是一个无符号整型，后八位都是 1，int8 是一个有符号的整型，所以最高位作为符号位，因此转化后的数字 v2 是负数，11111111 是这个负数的补码，它的原码是 10000001（原码=补码的补码，正数的补码是自身，负数的补码是反码+1，具体可参考计算机基础理论中原码、反码、补码的概念），所以 v2 最终转化后的结果是 -1。然后，我们再来看下整型和浮点型之间的转化，浮点型转化为整型时，小数位被丢弃：</p>
+<pre tabindex="0"><code>v1 := 99.99
+v2 := int(v1)  // v2 = 99
+</code></pre><p>将整型转化为浮点型时，比较简单，直接调用对应的函数即可：</p>
+<pre tabindex="0"><code>v1 := 99
+v2 := float64(v2)
+</code></pre><h2 id="数值和布尔类型之间的转化">数值和布尔类型之间的转化</h2>
+<p>目前 Go 语言不支持将数值类型转化为布尔型，你需要自己根据需求去实现类似的转化。</p>
+<h2 id="字符串和其他基本类型之间的转化">字符串和其他基本类型之间的转化</h2>
+<p>整型数据可以通过对应的 UTF-8 编码转化为对应的字符串：</p>
+<pre tabindex="0"><code>v1 := 65
+v2 := string(v1)  // v2 = A
+
+v3 := 30028
+v4 := string(v3)  // v4 = 界
+</code></pre><p>此外还可以将字节数组或者 rune（Unicode 编码字符）数组转化为字符串：</p>
+<pre tabindex="0"><code>v1 := []byte{&#39;h&#39;, &#39;e&#39;, &#39;l&#39;, &#39;l&#39;, &#39;o&#39;}
+v2 := string(v1)  // v2 = hello
+
+v3 := []rune{0x5b66, 0x9662, 0x541b}
+v4 := string(v3)  // v4 = 学院君
+</code></pre><h2 id="strconv-包">strconv 包</h2>
+<p>要实现类似 PHP 中字符串与其他基本数据类型之间的转化，可以通过 <a href="https://golang.org/pkg/strconv/">strconv</a> 这个包提供的函数来实现：</p>
+<pre tabindex="0"><code>v1 := &#34;100&#34;
+v2, err := strconv.Atoi(v1)  // 将字符串转化为整型，v2 = 100
+
+v3 := 100
+v4 := strconv.Itoa(v3)   // 将整型转化为字符串, v4 = &#34;100&#34;
+
+v5 := &#34;true&#34;
+v6, err := strconv.ParseBool(v5)  // 将字符串转化为布尔型
+v5 = strconv.FormatBool(v6)  // 将布尔值转化为字符串
+
+v7 := &#34;100&#34;
+v8, err := strconv.ParseInt(v7, 10, 64)   // 将字符串转化为整型，第二个参数表示几进制，第三个参数表示最大位数
+v7 = strconv.FormatInt(v8, 10)   // 将整型转化为字符串，第二个参数表示几进制
+
+v9, err := strconv.ParseUint(v7, 10, 64)   // 将字符串转化为无符号整型，参数含义同 ParseInt
+v7 = strconv.FormatUint(v9, 10)  // 将字符串转化为无符号整型，参数含义同 FormatInt
+
+v10 := &#34;99.99&#34;
+v11, err := strconv.ParseFloat(v10, 64)   // 将字符串转化为浮点型，第二个参数表示精度
+v10 = strconv.FormatFloat(v11, &#39;E&#39;, -1, 64)
+
+q := strconv.Quote(&#34;Hello, 世界&#34;)    // 为字符串加引号
+q = strconv.QuoteToASCII(&#34;Hello, 世界&#34;)  // 将字符串转化为 ASCII 编码
+</code></pre></section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/11.%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%92%8C%E5%AD%97%E7%AC%A6%E7%B1%BB%E5%9E%8B/"
+      ><span class="mr-1.5">←</span><span>golang基础(11.字符串和字符类型)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/13.%E6%95%B0%E7%BB%84%E5%8F%8A%E5%85%B6%E4%BD%BF%E7%94%A8/"
+      ><span>golang基础(13.数组及其使用)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

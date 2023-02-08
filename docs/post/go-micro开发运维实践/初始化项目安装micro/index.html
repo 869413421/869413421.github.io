@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>go-micro开发运维实践(初始化项目，安装micro) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="初始化git项目 进入工作目录，按照go规范，我们定义一个工作目录应，这是我在windows环境中的定义的路径D:\go\src\github.com\869413421，在工作磁盘下的go/src中创建，后续加上仓库类型如github.com,gitee等，最后加上该站点账号。
+创建项目文件夹 mkdir micro-service 关联github仓库 cd micro-servicegit initgit remote add origin https://github.com/869413421/micro-service.gitgit pull origin main 安装micro 在安装前，我们首先明确了解go-micro和micro具体是什么东西。避免后续因为这两项有关联的技术产生一些混淆。
+go-micro:一款微服务开发框架，它是所有开发的核心，开发者可以利用它编码快速开发出服务。 micro:一个基于go-micro实现的微服务命令行工具包，它对于微服务开发是非必要的。但是能给开发提供很多便利，例如生成模板项目，提供web仪表盘，提供API网关，查看服务状态，调用服务等等。 拉取micro镜像 docker pull micro/micro:v2.9.3 生成micro生成项目模板 windows :::warning 在windows下执行命令要使用CMD执行 :::
+docker run --rm -v D:\go\src\github.com\869413421\micro-service:/www -w /www micro/micro:v2.9.3 new --namespace=micro --type=service user linux
+docker run --rm -v $(pwd):/www -w /www micro/micro:v2.9.3 new --namespace=micro --type=service user 安装protobuf 在执行生成模板命令后，我们可以等如下提示
+Creating service micro.service.user in user.├── main.go├── generate.go├── plugin." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="go-micro开发运维实践(初始化项目，安装micro)" />
+<meta property="og:description" content="go-micro开发运维实践(初始化项目，安装micro)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%88%9D%E5%A7%8B%E5%8C%96%E9%A1%B9%E7%9B%AE%E5%AE%89%E8%A3%85micro/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="go-micro开发运维实践(初始化项目，安装micro)">
+<meta itemprop="description" content="go-micro开发运维实践(初始化项目，安装micro)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="160">
+<meta itemprop="keywords" content="go-micro开发运维实践," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="go-micro开发运维实践(初始化项目，安装micro)"/>
+<meta name="twitter:description" content="go-micro开发运维实践(初始化项目，安装micro)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">go-micro开发运维实践(初始化项目，安装micro)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="初始化git项目">初始化git项目</h2>
+<p>进入工作目录，按照go规范，我们定义一个工作目录应，这是我在windows环境中的定义的路径D:\go\src\github.com\869413421，在工作磁盘下的go/src中创建，后续加上仓库类型如github.com,gitee等，最后加上该站点账号。</p>
+<h3 id="创建项目文件夹">创建项目文件夹</h3>
+<pre tabindex="0"><code>mkdir micro-service
+</code></pre><h3 id="关联github仓库">关联github仓库</h3>
+<pre tabindex="0"><code>cd micro-service
+git init
+git remote add origin https://github.com/869413421/micro-service.git
+git pull origin main
+</code></pre><h2 id="安装micro">安装micro</h2>
+<p>在安装前，我们首先明确了解go-micro和micro具体是什么东西。避免后续因为这两项有关联的技术产生一些混淆。</p>
+<ul>
+<li>go-micro:一款微服务开发框架，它是所有开发的核心，开发者可以利用它编码快速开发出服务。</li>
+<li>micro:一个基于go-micro实现的微服务命令行工具包，它对于微服务开发是非必要的。但是能给开发提供很多便利，例如生成模板项目，提供web仪表盘，提供API网关，查看服务状态，调用服务等等。</li>
+</ul>
+<h3 id="拉取micro镜像">拉取micro镜像</h3>
+<pre tabindex="0"><code>docker pull micro/micro:v2.9.3
+</code></pre><h2 id="生成micro生成项目模板">生成micro生成项目模板</h2>
+<p>windows
+:::warning
+在windows下执行命令要使用CMD执行
+:::</p>
+<pre tabindex="0"><code>docker run --rm -v D:\go\src\github.com\869413421\micro-service:/www -w /www micro/micro:v2.9.3 new --namespace=micro --type=service user
+</code></pre><p>linux</p>
+<pre tabindex="0"><code>docker run --rm -v $(pwd):/www -w /www micro/micro:v2.9.3 new --namespace=micro --type=service user
+</code></pre><h3 id="安装protobuf">安装protobuf</h3>
+<p>在执行生成模板命令后，我们可以等如下提示</p>
+<pre tabindex="0"><code>Creating service micro.service.user in user
+
+.
+├── main.go
+├── generate.go
+├── plugin.go
+├── handler
+│   └── user.go
+├── subscriber
+│   └── user.go
+├── proto
+│   └── user
+│       └── user.proto
+├── Dockerfile
+├── Makefile
+├── README.md
+├── .gitignore
+└── go.mod
+
+
+download protoc zip packages (protoc-$VERSION-$PLATFORM.zip) and install:
+
+visit https://github.com/protocolbuffers/protobuf/releases
+
+download protobuf for micro:
+
+go get -u github.com/golang/protobuf/proto
+go get -u github.com/golang/protobuf/protoc-gen-go
+go get github.com/micro/micro/v2/cmd/protoc-gen-micro
+
+compile the proto file user.proto:
+
+cd user
+make proto
+</code></pre><p>上图中我们可以得知，我们首先需要安装<code>protoc</code>提示中已经有链接，下载好后设置好环境变量，执行命令<code>protoc --version</code>，如果不知道如何安装，可以去网上搜索相关文章，这里不多赘述了。<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1650775668398-8840ba76-71f3-45e4-8091-e6ce897282a1.png#clientId=u36a90bae-b267-4&amp;from=ui&amp;height=463&amp;id=udf9de48e&amp;name=%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_20220424124732.png&amp;originHeight=369&amp;originWidth=580&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=10175&amp;status=done&amp;style=none&amp;taskId=ud59ea459-23b9-407e-b2be-7eaa625ae4c&amp;title=&amp;width=727" alt="微信截图_20220424124732.png"><!-- raw HTML omitted -->安装项目依赖相关包</p>
+<pre tabindex="0"><code>go get -u github.com/golang/protobuf/proto
+go get -u github.com/golang/protobuf/protoc-gen-go
+go get github.com/micro/micro/v2/cmd/protoc-gen-micro
+</code></pre><h2 id="调整项目结构生成protobuf代码">调整项目结构，生成protobuf代码</h2>
+<p>:::warning
+Windows中没有make，但是可以通过安装<a href="https://so.csdn.net/so/search?q=MinGW&amp;spm=1001.2101.3001.7020">MinGW</a>或者MinGW-w64，得到make。<!-- raw HTML omitted --><a href="https://blog.csdn.net/test1280/article/details/118186361">Windows安装make</a>
+:::</p>
+<pre tabindex="0"><code>cd user
+</code></pre><p>修改<code>proto/user/user.proto</code>文件<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1650777321171-680321aa-3e0c-4037-b52d-9e520a4feee8.png#clientId=u36a90bae-b267-4&amp;from=ui&amp;id=ue2ad0798&amp;name=%E4%BF%AE%E6%94%B9proto.png&amp;originHeight=463&amp;originWidth=1060&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=57207&amp;status=done&amp;style=none&amp;taskId=u4e36f178-b589-434a-9465-13e8b626b33&amp;title=" alt="修改proto.png"><!-- raw HTML omitted -->加上<code> option go_package = &quot;proto/user&quot;;</code>指定编译的包路径<!-- raw HTML omitted -->执行<code>make proto</code>,执行成功后可以看到<code>protoc</code>为我们生成的代码<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1650777512708-4c09de16-fe04-4423-9e76-f9d593d6c9c1.png#clientId=u36a90bae-b267-4&amp;from=ui&amp;id=ua86b19b9&amp;name=3.png&amp;originHeight=429&amp;originWidth=952&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=54234&amp;status=done&amp;style=none&amp;taskId=u0d2d08fd-ab68-4c1b-8bf5-e258de01104&amp;title=" alt="3.png"><!-- raw HTML omitted -->修改<code>go.mod</code>文件<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1650777692366-a6aaef3c-ab4d-4fec-a024-ae6d7580ebf9.png#clientId=u36a90bae-b267-4&amp;from=paste&amp;height=489&amp;id=uc677352d&amp;name=image.png&amp;originHeight=538&amp;originWidth=1066&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=59121&amp;status=done&amp;style=none&amp;taskId=uaec00359-6971-4690-83b0-d69f03d6293&amp;title=&amp;width=969.0908880864298" alt="image.png"><!-- raw HTML omitted --><code>module github.com/{your_name}/micro-service/user</code><!-- raw HTML omitted -->将账户替换你的github账号，方便后续管理<!-- raw HTML omitted -->执行<code>go mod tidy</code>下载生成生成代码依赖的包<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1650778270840-92e31985-5b49-412b-a99f-86b27fb4c5cc.png#clientId=u36a90bae-b267-4&amp;from=paste&amp;height=411&amp;id=uc5d4548e&amp;name=image.png&amp;originHeight=452&amp;originWidth=1005&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=70586&amp;status=done&amp;style=none&amp;taskId=u3cf18b05-e4e6-45ec-96d9-6f9f50b035b&amp;title=&amp;width=913.6363438338292" alt="image.png"><!-- raw HTML omitted -->看到相关包不再飘红，至此编写代码的初始化工作已经完成，后续中我们需要通过<code>docker-compose</code>安装微服务所需要的基础设施。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5"
+      >go-micro开发运维实践</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%88%9D%E5%A7%8B%E5%8C%96%E7%94%A8%E6%88%B7api%E9%A1%B9%E7%9B%AE/"
+      ><span class="mr-1.5">←</span><span>go-micro开发运维实践(初始化用户API项目)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%9F%BA%E4%BA%8Ejwt%E5%AE%9E%E7%8E%B0%E7%99%BB%E5%BD%95%E9%AA%8C%E8%AF%81%E6%8E%A5%E5%8F%A3/"
+      ><span>go-micro开发运维实践(基于jwt实现登录验证接口)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>go-micro开发运维实践(安装etcd集群，部署注册中心) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="etcd集群安装 在微服务架构中，注册中心作为基础设施，承担着服务注册以及服务发现的重要功能。etcd作为一个分布式一致性的KV存储系统，按照etcd官网给出的性能测试, 在2CPU，1.8G内存，SSD磁盘这样的配置下，单节点的写性能可以达到16K QPS, 而先写后读也能达到12K QPS，这个性能相当可观。而在go-micro中etcd作为注册中心默认驱动，得益于其灵活的拓展机制，要在go-micro中使用etcd相对简单，下面我们使用docker-compose部署一个etcd集群。
+编写docker-compose 创建yaml和配置文件 touch docker-compose.yamltouch .env 为etcd持久化提供挂载目录 mkdir -p data/etcd1mkdir -p data/etcd2mkdir -p data/etcd3 .env添加通用参数 # 设置时区TZ=Asia/Shanghai# 设置etcd镜像版本ETCD_VERSION=3.5# 设置e3w镜像版本E3W_VERSION=latest 编写docker-compose.yaml :::info 这里我们主要通过 environment 配置项设置 etcd启动参数来定义集群配置，在启动过程中需要确保三个 etcd节点可以相互连接并通信。 :::
+# docker-compose.ymlversion: &#39;3.3&#39;services:etcd1:image: bitnami/etcd:${ETCD_VERSION}environment:TZ: ${TZ}ALLOW_NONE_AUTHENTICATION: &#34;yes&#34;ETCD_NAME: &#34;etcd1&#34;ETCD_INITIAL_ADVERTISE_PEER_URLS: &#34;http://etcd1:2380&#34;ETCD_LISTEN_PEER_URLS: &#34;http://0.0.0.0:2380&#34;ETCD_LISTEN_CLIENT_URLS: &#34;http://0.0.0.0:2379&#34;ETCD_ADVERTISE_CLIENT_URLS: &#34;http://etcd1:2379&#34;ETCD_INITIAL_CLUSTER_TOKEN: &#34;etcd-cluster&#34;ETCD_INITIAL_CLUSTER: &#34;etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380&#34;ETCD_INITIAL_CLUSTER_STATE: &#34;new&#34;volumes:- ." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="go-micro开发运维实践(安装etcd集群，部署注册中心)" />
+<meta property="og:description" content="go-micro开发运维实践(安装etcd集群，部署注册中心)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%AE%89%E8%A3%85etcd%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="go-micro开发运维实践(安装etcd集群，部署注册中心)">
+<meta itemprop="description" content="go-micro开发运维实践(安装etcd集群，部署注册中心)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="269">
+<meta itemprop="keywords" content="go-micro开发运维实践," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="go-micro开发运维实践(安装etcd集群，部署注册中心)"/>
+<meta name="twitter:description" content="go-micro开发运维实践(安装etcd集群，部署注册中心)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">go-micro开发运维实践(安装etcd集群，部署注册中心)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="etcd集群安装">etcd集群安装</h2>
+<p>在微服务架构中，注册中心作为基础设施，承担着服务注册以及服务发现的重要功能。<code>etcd</code>作为一个分布式一致性的<code>KV存储系统</code>，按照<code>etcd</code>官网给出的性能测试, 在2CPU，1.8G内存，SSD磁盘这样的配置下，单节点的写性能可以达到16K QPS, 而先写后读也能达到12K QPS，这个性能相当可观。而在go-micro中<code>etcd</code>作为注册中心默认驱动，得益于其灵活的拓展机制，要在go-micro中使用etcd相对简单，下面我们使用<code>docker-compose</code>部署一个etcd集群。</p>
+<h3 id="编写docker-compose">编写docker-compose</h3>
+<h4 id="创建yaml和配置文件">创建yaml和配置文件</h4>
+<pre tabindex="0"><code>touch docker-compose.yaml
+touch .env
+</code></pre><h4 id="为etcd持久化提供挂载目录">为etcd持久化提供挂载目录</h4>
+<pre tabindex="0"><code>mkdir -p data/etcd1
+mkdir -p data/etcd2
+mkdir -p data/etcd3
+</code></pre><h4 id="env添加通用参数">.env添加通用参数</h4>
+<pre tabindex="0"><code># 设置时区
+TZ=Asia/Shanghai
+
+# 设置etcd镜像版本
+ETCD_VERSION=3.5
+
+# 设置e3w镜像版本
+E3W_VERSION=latest
+</code></pre><h4 id="编写docker-composeyaml">编写docker-compose.yaml</h4>
+<p>:::info
+这里我们主要通过 environment 配置项设置 etcd启动参数来定义集群配置，在启动过程中需要确保三个 etcd节点可以相互连接并通信。
+:::</p>
+<pre tabindex="0"><code># docker-compose.yml
+version: &#39;3.3&#39;
+
+services:
+  etcd1:
+    image: bitnami/etcd:${ETCD_VERSION}
+    environment:
+      TZ: ${TZ}
+      ALLOW_NONE_AUTHENTICATION: &#34;yes&#34;
+      ETCD_NAME: &#34;etcd1&#34;
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: &#34;http://etcd1:2380&#34;
+      ETCD_LISTEN_PEER_URLS: &#34;http://0.0.0.0:2380&#34;
+      ETCD_LISTEN_CLIENT_URLS: &#34;http://0.0.0.0:2379&#34;
+      ETCD_ADVERTISE_CLIENT_URLS: &#34;http://etcd1:2379&#34;
+      ETCD_INITIAL_CLUSTER_TOKEN: &#34;etcd-cluster&#34;
+      ETCD_INITIAL_CLUSTER: &#34;etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380&#34;
+      ETCD_INITIAL_CLUSTER_STATE: &#34;new&#34;
+    volumes:
+      - ./data/etcd1:/bitnami/etcd
+    ports:
+      - 23791:2379
+      - 23801:2380
+    networks:
+      - micro-network
+
+  etcd2:
+    image: bitnami/etcd:${ETCD_VERSION}
+    environment:
+      TZ: ${TZ}
+      ALLOW_NONE_AUTHENTICATION: &#34;yes&#34;
+      ETCD_NAME: &#34;etcd2&#34;
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: &#34;http://etcd2:2380&#34;
+      ETCD_LISTEN_PEER_URLS: &#34;http://0.0.0.0:2380&#34;
+      ETCD_LISTEN_CLIENT_URLS: &#34;http://0.0.0.0:2379&#34;
+      ETCD_ADVERTISE_CLIENT_URLS: &#34;http://etcd2:2379&#34;
+      ETCD_INITIAL_CLUSTER_TOKEN: &#34;etcd-cluster&#34;
+      ETCD_INITIAL_CLUSTER: &#34;etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380&#34;
+      ETCD_INITIAL_CLUSTER_STATE: &#34;new&#34;
+    volumes:
+      - ./data/etcd2:/bitnami/etcd
+    ports:
+      - 23792:2379
+      - 23802:2380
+    networks:
+      - micro-network
+
+  etcd3:
+    image: bitnami/etcd:${ETCD_VERSION}
+    environment:
+      TZ: ${TZ}
+      ALLOW_NONE_AUTHENTICATION: &#34;yes&#34;
+      ETCD_NAME: &#34;etcd3&#34;
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: &#34;http://etcd3:2380&#34;
+      ETCD_LISTEN_PEER_URLS: &#34;http://0.0.0.0:2380&#34;
+      ETCD_LISTEN_CLIENT_URLS: &#34;http://0.0.0.0:2379&#34;
+      ETCD_ADVERTISE_CLIENT_URLS: &#34;http://etcd3:2379&#34;
+      ETCD_INITIAL_CLUSTER_TOKEN: &#34;etcd-cluster&#34;
+      ETCD_INITIAL_CLUSTER: &#34;etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380&#34;
+      ETCD_INITIAL_CLUSTER_STATE: &#34;new&#34;
+    volumes:
+      - ./data/etcd3:/bitnami/etcd
+    ports:
+      - 23793:2379
+      - 23803:2380
+    networks:
+      - micro-network
+
+networks:
+  micro-network:
+    external: true
+</code></pre><h4 id="创建内部通信网络">创建内部通信网络</h4>
+<pre tabindex="0"><code>docker network create micro-network
+</code></pre><p>Docker默认状态下的三个network对象，上述命令默认是bridge：</p>
+<ul>
+<li>none： 只有一个回环网卡，没有任何的网络通信能力</li>
+<li>host： 与宿主机共用一块网卡</li>
+<li>bridge： 利用虚拟路由器进行网络通信</li>
+</ul>
+<h4 id="启动etcd集群">启动etcd集群</h4>
+<pre tabindex="0"><code>docker-compose up -d
+</code></pre><p><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1650804348895-359a7bf6-82bd-4295-b7af-f20839173ef8.png#clientId=u306a74a4-4fe0-4&amp;from=paste&amp;height=655&amp;id=uda07b62d&amp;name=image.png&amp;originHeight=720&amp;originWidth=1270&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=81656&amp;status=done&amp;style=none&amp;taskId=ud3451e19-915d-4fdd-9015-bf42b5d6661&amp;title=&amp;width=1154.5454295213563" alt="image.png"><!-- raw HTML omitted -->查看docker-desktop中etcd集群已成功启动
+:::warning
+如果重启docker后etcd集群容器无法启动，请删除挂载目录下的data文件夹，或选择不持久化数据<!-- raw HTML omitted -->rm -rf data/etcd1/data<!-- raw HTML omitted -->rm -rf data/etcd2/data<!-- raw HTML omitted -->rm -rf data/etcd3/data
+:::</p>
+<h2 id="安装etcdweb管理工具">安装etcdWeb管理工具</h2>
+<p>etcd并没有像 Consul 的 Web 管理界面，导致我们不能直观地观看集群节点状态和管理数据。所以我们安装一个<a href="https://github.com/soyking/e3w">e3w</a>对集群进行管理。</p>
+<h4 id="创建配置文件">创建配置文件</h4>
+<pre tabindex="0"><code>mkdir -p conf/e3w
+touch conf/e3w/config.ini
+</code></pre><pre tabindex="0"><code>[app]
+# 端口号
+port=8080
+# 是否需要登录认证
+auth=false
+
+[etcd]
+# 根key
+root_key=micro-service
+# 根文件夹
+dir_value=
+# 集群地址
+addr=etcd1:2379,etcd2:2379,etcd3:2379
+# 用户名
+username=
+# 密码
+password=
+cert_file=
+key_file=
+ca_file=
+</code></pre><h4 id="docker-compose安装e3w">docker-compose安装e3w</h4>
+<p>修改docker-compose.yaml，然后执行<code>docker-compose up -d e3w</code></p>
+<pre tabindex="0"><code>...
+
+  e3w:
+    image: soyking/e3w:${E3W_VERSION}
+    environment:
+      TZ: ${TZ}
+    ports:
+      - &#34;8088:8080&#34;
+    volumes:
+      - ./conf/e3w/config.ini:/app/conf/config.default.ini
+    networks:
+      - micro-network
+...
+</code></pre><p>访问<a href="http://127.0.0.1:8088/">http://127.0.0.1:8088</a><!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1650806554128-ef589acd-23b0-4c55-9cb9-57cc267280d9.png#clientId=u730c8cb0-5acf-4&amp;from=paste&amp;height=845&amp;id=u5c4982b0&amp;name=image.png&amp;originHeight=929&amp;originWidth=1920&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=57395&amp;status=done&amp;style=none&amp;taskId=u741ba6ed-9d14-486a-9884-d1fd5c25d76&amp;title=&amp;width=1745.4545076228378" alt="image.png"></p>
+<h2 id="安装micro-web">安装micro-web</h2>
+<p>micro-web是由micro工具包提供的微服务web管理界面，可以用来查看、管理、测试所有服务接口。能为我们后续开发工作提供很多便利。</p>
+<h4 id="docker-compose安装micro-web">docker-compose安装micro-web</h4>
+<p>修改docker-compose.yaml，然后执行<code>docker-compose up -d micro-web</code></p>
+<pre tabindex="0"><code>  ...
+  
+  micro-web:
+    container_name: micro-web
+    image: micro/micro:v2.9.3
+    ports:
+      - 8082:8082
+    environment:
+      MICRO_REGISTRY: &#34;etcd&#34;
+      MICRO_REGISTRY_ADDRESS: &#34;etcd1:2379,etcd2:2379,etcd3:2379&#34;
+    command: web
+    networks:
+      - micro-network
+      
+  ...
+</code></pre><p>访问<a href="http://127.0.0.1:8082/">http://127.0.0.1:8082</a><!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1650807431270-8cf038c8-d473-4f63-904c-c7740d7c29c2.png#clientId=u98d1fb23-4b26-4&amp;from=paste&amp;height=845&amp;id=ubc9e86ad&amp;name=image.png&amp;originHeight=929&amp;originWidth=1920&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=17733&amp;status=done&amp;style=none&amp;taskId=ubb5cac8a-bc9c-4c60-a2df-e45f9b4c08d&amp;title=&amp;width=1745.4545076228378" alt="image.png"></p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5"
+      >go-micro开发运维实践</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%9F%BA%E4%BA%8Ejwt%E5%AE%9E%E7%8E%B0%E7%99%BB%E5%BD%95%E9%AA%8C%E8%AF%81%E6%8E%A5%E5%8F%A3/"
+      ><span class="mr-1.5">←</span><span>go-micro开发运维实践(基于jwt实现登录验证接口)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%AE%9E%E7%8E%B0%E7%94%A8%E6%88%B7curd%E6%9C%8D%E5%8A%A1/"
+      ><span>go-micro开发运维实践(实现用户CURD服务)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

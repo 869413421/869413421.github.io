@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(9.整形以及运算符) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="go支持的整形 类型 长度（单位：字节） 说明 值范围 默认值 int8 1 带符号8位整型 -128~127 0 uint8 1 无符号8位整型，与 byte 类型等价 0~255 0 int16 2 带符号16位整型 -32768~32767 0 uint16 2 无符号16位整型 0~65535 0 int32 4 带符号32位整型，与 rune 类型等价 -2147483648~2147483647 0 uint32 4 无符号32位整型 0~4294967295 0 int64 8 带符号64位整型 -9223372036854775808~9223372036854775807 0 uint64 8 无符号64位整型 0~18446744073709551615 0 int 32位或64位 与具体平台相关 与具体平台相关 0 uint 32位或64位 与具体平台相关 与具体平台相关 0 uintptr 与对应指针相同 无符号整型，足以存储指针值的未解释位 32位平台下为4字节，64位平台下为8字节 0 在PHP中只有一种int类型且不区分符号，最大存储数量基于运行平台决定。在 32 位平台下其最大值为 20 亿左右（等同于 Go 语言中的 int32），64 位平台下的最大值通常是大约 9E18（等同于 Go 语言中的 int64），并且 PHP 中的整型不支持无符号类型，你可以通过 PHP_INT_MAX 常量在 PHP 中获取当前平台的最大整型值。在go中不同类型的int不支持类型自动转换，需要转换类型后才能进行运算" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(9.整形以及运算符)" />
+<meta property="og:description" content="golang基础(9.整形以及运算符)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/9.%E6%95%B4%E5%BD%A2%E4%BB%A5%E5%8F%8A%E8%BF%90%E7%AE%97%E7%AC%A6/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(9.整形以及运算符)">
+<meta itemprop="description" content="golang基础(9.整形以及运算符)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="374">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(9.整形以及运算符)"/>
+<meta name="twitter:description" content="golang基础(9.整形以及运算符)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(9.整形以及运算符)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="go支持的整形">go支持的整形</h2>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>长度（单位：字节）</th>
+<th>说明</th>
+<th>值范围</th>
+<th>默认值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>int8</td>
+<td>1</td>
+<td>带符号8位整型</td>
+<td>-128~127</td>
+<td>0</td>
+</tr>
+<tr>
+<td>uint8</td>
+<td>1</td>
+<td>无符号8位整型，与 byte 类型等价</td>
+<td>0~255</td>
+<td>0</td>
+</tr>
+<tr>
+<td>int16</td>
+<td>2</td>
+<td>带符号16位整型</td>
+<td>-32768~32767</td>
+<td>0</td>
+</tr>
+<tr>
+<td>uint16</td>
+<td>2</td>
+<td>无符号16位整型</td>
+<td>0~65535</td>
+<td>0</td>
+</tr>
+<tr>
+<td>int32</td>
+<td>4</td>
+<td>带符号32位整型，与 rune 类型等价</td>
+<td>-2147483648~2147483647</td>
+<td>0</td>
+</tr>
+<tr>
+<td>uint32</td>
+<td>4</td>
+<td>无符号32位整型</td>
+<td>0~4294967295</td>
+<td>0</td>
+</tr>
+<tr>
+<td>int64</td>
+<td>8</td>
+<td>带符号64位整型</td>
+<td>-9223372036854775808~9223372036854775807</td>
+<td>0</td>
+</tr>
+<tr>
+<td>uint64</td>
+<td>8</td>
+<td>无符号64位整型</td>
+<td>0~18446744073709551615</td>
+<td>0</td>
+</tr>
+<tr>
+<td>int</td>
+<td>32位或64位</td>
+<td>与具体平台相关</td>
+<td>与具体平台相关</td>
+<td>0</td>
+</tr>
+<tr>
+<td>uint</td>
+<td>32位或64位</td>
+<td>与具体平台相关</td>
+<td>与具体平台相关</td>
+<td>0</td>
+</tr>
+<tr>
+<td>uintptr</td>
+<td>与对应指针相同</td>
+<td>无符号整型，足以存储指针值的未解释位</td>
+<td>32位平台下为4字节，64位平台下为8字节</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>在PHP中只有一种int类型且不区分符号，最大存储数量基于运行平台决定。在 32 位平台下其最大值为 20 亿左右（等同于 Go 语言中的 int32），64 位平台下的最大值通常是大约 9E18（等同于 Go 语言中的 int64），并且 PHP 中的整型不支持无符号类型，你可以通过 PHP_INT_MAX 常量在 PHP 中获取当前平台的最大整型值。<!-- raw HTML omitted -->在go中不同类型的int不支持<code>类型自动转换</code>，需要转换类型后才能进行运算</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	var num1 int32 = 10
+	num2 := 8                       // 自动推导为int
+	var num3 int = int(num1) + num2 // 需要对类型进行转换才可以运算
+	fmt.Println(num3)
+}
+</code></pre><p>:::success
+此外，可以通过增加前缀 0 来表示八进制数（如：077），增加前缀 0x 来表示十六进制数（如：0xFF），以及使用 E 来表示 10 的连乘（如：1E3 = 1000）。
+:::</p>
+<h2 id="运算符">运算符</h2>
+<h3 id="算数运算符">算数运算符</h3>
+<p>和 PHP 类似，Go 语言支持所有常规的整数四则运算：+、-、*、/ 和 %（<code>取余运算只能用于整数</code>），不过由于强类型的关系，在 Go 语言中，不同类型的整型值不能直接进行算术运算。比如</p>
+<pre tabindex="0"><code>	var a int   = 8
+	var b int32 = 10
+	a+b
+</code></pre><p>go也支持类似 PHP 或其他语言中的自增/自减运算符，即 ++/&ndash;，但是只能作为语句，不能作为表达式，且只能用作后缀，<code>不能放到变量前面</code>。</p>
+<pre tabindex="0"><code>int_value_1++  // 有效，int_value_1 的值变成 9
+int_value_1 = int_value_1++ // 无效，编译报错
+--int_value_1  // 无效，编译报错
+</code></pre><p>也支持 +=、-=、*=、/=、%= 这种快捷写法</p>
+<pre tabindex="0"><code>int_value_1 += int_value_1 // 18
+int_value_1 -= int_value_1 // 0
+int_value_1 *= int_value_1 // 81
+int_value_1 /= int_value_1 // 1
+int_value_1 %= int_value_1 // 0
+</code></pre><h3 id="比较运算符">比较运算符</h3>
+<p>和 PHP 类似，Go 语言支持以下几种常见的比较运算符： &gt;、&lt;、==、&gt;=、&lt;= 和 !=，比较运算符运行的结果是布尔值。<!-- raw HTML omitted --><code>不同类型的值不能放在一起比较</code>，否则会报编译错处,如下</p>
+<pre tabindex="0"><code>var a int  = 1
+var b int8 = 2
+a &gt; b
+</code></pre><pre><code>不过，各种类型的整型变量都可以直接与字面常量进行比较
+</code></pre>
+<pre tabindex="0"><code>if a == 1 {
+  fmt.Println(&#34;a = 1&#34;)
+}
+</code></pre><h3 id="位运算符">位运算符</h3>
+<p>位运算符以二进制的方式对数值进行运算（效率更高），和 PHP 类似，Go 语言支持以下这几种位运算符：</p>
+<table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>含义</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>x &amp; y</td>
+<td>按位与</td>
+<td>把 x 和 y 都为 1 的位设为 1</td>
+</tr>
+<tr>
+<td>x | y</td>
+<td>按位或</td>
+<td>把 x 或 y 为 1 的位设为 1</td>
+</tr>
+<tr>
+<td>x ^ y</td>
+<td>按位异或</td>
+<td>把 x 和 y 一个为 1 一个为 0 的位设为 1</td>
+</tr>
+<tr>
+<td>^x</td>
+<td>按位取反</td>
+<td>把 x 中为 0 的位设为 1，为 1 的位设为 0，PHP 中对应的位运算符是 ~，与 C 语言一致</td>
+</tr>
+<tr>
+<td>x &laquo; y</td>
+<td>左移</td>
+<td>把 x 中的位向左移动 y 次，每次移动相当于乘以 2</td>
+</tr>
+<tr>
+<td>x &raquo; y</td>
+<td>右移</td>
+<td>把 x 中的位向右移动 y 次，每次移动相当于除以 2</td>
+</tr>
+</tbody>
+</table>
+<h3 id="逻辑运算符">逻辑运算符</h3>
+<p>与 PHP 类似，Go 语言也支持以下逻辑运算符：</p>
+<table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>含义</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>x &amp;&amp; y</td>
+<td>逻辑与运算符（AND）</td>
+<td>如果 x 和 y 都是 true，则结果为 true，否则结果为 false</td>
+</tr>
+<tr>
+<td>x || y</td>
+<td>逻辑或运算符（OR）</td>
+<td>如果 x 或 y 是 true，则结果为 true，否则结果为 false</td>
+</tr>
+<tr>
+<td>!x</td>
+<td>逻辑非运算符（NOT）</td>
+<td>如果 x 为 true，则结果为 false，否则结果为 true</td>
+</tr>
+</tbody>
+</table>
+<h3 id="运算符优先级">运算符优先级</h3>
+<p>上面介绍的 Go 语言运算符优先级如下所示（由上到下表示优先级从高到低，或者数字越大，优先级越高）：</p>
+<pre tabindex="0"><code>6      ^（按位取反） !
+5      *  /  %  &lt;&lt;  &gt;&gt;  &amp;  &amp;^
+4      +  -  |  ^（按位异或）
+3      ==  !=  &lt;  &lt;=  &gt;  &gt;=
+2      &amp;&amp;
+1      ||
+</code></pre><!-- raw HTML omitted -->
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/8.%E5%B8%83%E5%B0%94%E7%B1%BB%E5%9E%8B/"
+      ><span class="mr-1.5">←</span><span>golang基础(8.布尔类型)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go%E6%A0%B8%E5%BF%83/%E8%B0%83%E8%AF%95go%E6%BA%90%E4%BB%A3%E7%A0%81/"
+      ><span>Go核心(调试Go源代码)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

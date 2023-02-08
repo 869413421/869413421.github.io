@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(11.字符串和字符类型) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="字符串 在go中字符串作为一个基本类型，默认使用utf8编码。当字符为ASCII码时占用一个字节，其他字符串需要2-4个自己，中文占用3个字节。
+声明和初始化 var str string str = &#34;test&#34;str2 := &#34;test2&#34; 获取单个字符 获取单个字符可以使用数组下标的方式
+str := &#34;test&#34;ch := str[0]print(ch) // 输出t 格式化输出 还可以通过 Go 语言内置的 len() 函数获取指定字符串的长度，以及通过 fmt 包提供的 Printf 进行字符串格式化输出（用法和 PHP 中的 printf 类似）
+fmt.Printf(&#34;The length of \&#34;%s\&#34; is %d &#34;, str, len(str)) fmt.Printf(&#34;The first character of \&#34;%s\&#34; is %c.&#34;, str, ch) 转义字符 与PHP不同，go只允许使用双引号来定义字符串字面值。如果要对特定字符进行转义，可以通过 \ 实现，就像我们上面在字符串中转义双引号和换行符那样，常见的需要转义的字符如下所示：
+：换行符
+\r ：回车符 \t ：tab 键 \u 或 \U ：Unicode 字符 \ ：反斜杠自身 所以，上述打印代码输出结果为：" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(11.字符串和字符类型)" />
+<meta property="og:description" content="golang基础(11.字符串和字符类型)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/11.%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%92%8C%E5%AD%97%E7%AC%A6%E7%B1%BB%E5%9E%8B/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(11.字符串和字符类型)">
+<meta itemprop="description" content="golang基础(11.字符串和字符类型)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="303">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(11.字符串和字符类型)"/>
+<meta name="twitter:description" content="golang基础(11.字符串和字符类型)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(11.字符串和字符类型)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="字符串">字符串</h2>
+<p>在go中字符串作为一个基本类型，默认使用utf8编码。当字符为ASCII码时占用一个字节，其他字符串需要2-4个自己，中文占用3个字节。</p>
+<h2 id="声明和初始化">声明和初始化</h2>
+<pre tabindex="0"><code>var str string 
+str = &#34;test&#34;
+str2 := &#34;test2&#34;
+</code></pre><h2 id="获取单个字符">获取单个字符</h2>
+<p>获取单个字符可以使用数组下标的方式</p>
+<pre tabindex="0"><code>str := &#34;test&#34;
+ch := str[0]
+print(ch) // 输出t
+</code></pre><h2 id="格式化输出">格式化输出</h2>
+<p>还可以通过 Go 语言内置的 len() 函数获取指定字符串的长度，以及通过 <a href="https://golang.google.cn/pkg/fmt/">fmt</a> 包提供的 Printf 进行字符串格式化输出（用法和 PHP 中的 <a href="https://www.php.net/manual/zh/function.printf.php">printf</a> 类似）</p>
+<pre tabindex="0"><code>fmt.Printf(&#34;The length of \&#34;%s\&#34; is %d 
+&#34;, str, len(str)) 
+fmt.Printf(&#34;The first character of \&#34;%s\&#34; is %c.
+&#34;, str, ch)
+</code></pre><h2 id="转义字符">转义字符</h2>
+<p>与PHP不同，go只允许使用双引号来定义字符串字面值。如果要对特定字符进行转义，可以通过 \ 实现，就像我们上面在字符串中转义双引号和换行符那样，常见的需要转义的字符如下所示：</p>
+<ul>
+<li></li>
+</ul>
+<p>：换行符</p>
+<ul>
+<li>\r ：回车符</li>
+<li>\t ：tab 键</li>
+<li>\u 或 \U ：Unicode 字符</li>
+<li>\ ：反斜杠自身</li>
+</ul>
+<p>所以，上述打印代码输出结果为：</p>
+<pre tabindex="0"><code>The length of &#34;Hello world&#34; is 11 
+The first character of &#34;Hello world&#34; is H.
+</code></pre><h2 id="不可变值类型">不可变值类型</h2>
+<p>在go中虽然可以通过下标的方式访问字符，但是在go中字符串作为一种不可变类型，是无法通过下标对值进行修改的。</p>
+<pre tabindex="0"><code>str := &#34;test&#34;
+str[0] = &#34;x&#34; //编译错误
+</code></pre><h2 id="字符编码">字符编码</h2>
+<p>Go 语言中字符串默认是 UTF-8 编码的 Unicode 字符序列，所以可以包含非 ANSI 字符，比如「Hello, 学院君」可以出现在 Go 代码中。但需要注意的是，如果你的 Go 代码需要包含非 ANSI 字符，保存源文件时请注意编码格式必须选择 UTF-8。特别是在 Windows 下一般编辑器都默认存为本地编码，比如中国地区可能是 GBK 编码而不是 UTF-8，如果没注意这点在编译和运行时就会出现一些意料之外的情况。<!-- raw HTML omitted -->字符串的编码转换是处理文本文档（比如 TXT、XML、HTML 等）时非常常见的需求，不过 Go 语言默认仅支持 UTF-8 和 Unicode 编码，对于其他编码，Go 语言标准库并没有内置的编码转换支持。不过，所幸的是我们可以很容易基于 iconv 库包装一个。这里有一个开源项目可供参考：<a href="https://github.com/qiniu/iconv">https://github.com/qiniu/iconv</a>。</p>
+<h2 id="字符串操作">字符串操作</h2>
+<h3 id="字符串连接">字符串连接</h3>
+<p>PHP 默认提供了丰富的<a href="https://www.php.net/manual/zh/ref.strings.php">字符串函数</a>对字符串进行操作，Go 也不例外，常见的操作包含连接、获取长度和指定字符，获取长度和指定字符前面已经介绍过，字符串连接只需要通过「+」即可（PHP 里面使用的是「.」）：</p>
+<pre tabindex="0"><code>str := &#34;test&#34;
+str += &#34;,test&#34;
+</code></pre><p>另外，还有一点需要注意的是如果字符串长度较长，需要换行，则「+」必须出现在上一行的末尾，否则会报错：</p>
+<pre tabindex="0"><code>str := &#34;test&#34;+
+&#34;test2&#34;
+</code></pre><h2 id="字符串切片">字符串切片</h2>
+<p>在 PHP 中我们可以通过 <a href="https://www.php.net/manual/zh/function.substr.php">substr</a> 函数获取字符串的子串，在 Go 语言中，可以通过字符串切片功能实现类似的操作，相比 substr 函数，使用起来更加方便：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	str := &#34;hello,world&#34;
+	str1 := str[:5]  //取下标五之前的数据
+	str2 := str[7:]  // 取下标7后的数据
+	str3 := str[1:4] // 去下标1到4前的数据
+
+	fmt.Println(str1)
+	fmt.Println(str2)
+	fmt.Println(str3)
+}
+</code></pre><p>字符串切片和 PHP 的 substr 函数使用方式有所差异，通过「:」对字符串进行切片，冒号之前的数字代表起始点（为空表示从0开始），之后的数字代表结束点（为空表示到字符串最后），而不是子串的长度。<!-- raw HTML omitted -->此外 Go 字符串也支持字符串比较、是否包含指定字符/子串、获取指定子串索引位置、字符串替换、大小写转换、trim 等操作，更多操作 API，请参考标准库 <a href="https://golang.org/pkg/strings/">strings</a> 包。</p>
+<h2 id="字符串遍历">字符串遍历</h2>
+<p>Go 语言支持两种方式遍历字符串</p>
+<ul>
+<li>一种是以字节数组进行遍历</li>
+</ul>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	str := &#34;hello,world!我&#34;
+	n := len(str)
+
+	for i := 0; i &lt; n; i++ {
+		ch := str[i]
+		fmt.Println(i, string(ch)) // 根据下标取字符串中的字符，类型为byte
+	}
+}
+</code></pre><p>可以看出，这个字符串长度为 14，尽管从直观上来说，这个字符串应该只有 10个字符。这是因为每个中文字符在 UTF-8 中占 3 个字节，而不是 1 个字节。</p>
+<ul>
+<li>另一种是以Unicode字符串遍历</li>
+</ul>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	str := &#34;hello,世界&#34;
+	for i, ch := range str {
+		fmt.Println(i, string(ch)) // ch 的类型为 rune
+	}
+}
+</code></pre><h2 id="字符类型">字符类型</h2>
+<p>和 PHP 不同，Go 语言对单个字符进行了单独的类型支持，在 Go 语言中支持两个字符类型，一个是 byte（实际上是 uint8 的别名），代表 UTF-8 字符串的单个字节的值；另一个是 rune，代表单个 Unicode 字符。 关于 rune 相关的操作，可查阅 Go 标准库的 <a href="https://golang.org/pkg/unicode/">unicode</a> 包。 另外 <a href="https://golang.org/pkg/unicode/utf8/">unicode/utf8</a> 包也提供了 UTF-8 和 Unicode 之间的转换。出于简化语言的考虑，Go 语言的多数 API 都假设字符串为 UTF-8 编码。尽管 Unicode 字符在标准库中有支持，但实际上较少使用。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/10.%E6%B5%AE%E7%82%B9%E5%9E%8B%E4%B8%8E%E5%A4%8D%E6%95%B0%E7%B1%BB%E5%9E%8B/"
+      ><span class="mr-1.5">←</span><span>golang基础(10.浮点型与复数类型)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/12.%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B9%8B%E9%97%B4%E7%9A%84%E8%BD%AC%E6%8D%A2/"
+      ><span>golang基础(12.基本数据类型之间的转换)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

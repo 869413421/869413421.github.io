@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(1.GOPATH和工作区) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="官方命令文档 设置gopath的意义是什么？ gopath是系统的环境变量，它是由一个或者多个文件目录路径组成。每一个文件路径是一个GO语言的工作区（workspace）。这些工作区用于存放go项目的源代码文件（sourcefile），安装（go install）以后的归档文件，编译后的可执行文件(go build)。
+go语言的源码的组织方式 在go语言中，包作为go语言的基本单位，这些包的名称和文件系统中目录名称一一对应，一个目录下可以有多个子目录，相对应的一个包下可以有多个子包 一个包下可以包含多个.go文件，这些源代码必须被声明为在同一包下。代码包的名称一般与源码所在的目录同名，如果不同名，那么在安装过程中会一代码文件中的包声明为准 每个包拥有自己的导入路径，在工作区中一个包的导入路径实际上就是从src子目录到该包存储位置的相对路径 了解源码安装后的后果 源码文件会被放到某个工作区的src目录下 如果安装后产生了归档文件，则会被放进该工作区的pkg子目录下 如果安装后产生了可执行文件，则会被放进该工作区的bin子目录下 理解构建和安装go程序的过程 构建命令使用go build,安装命令使用go install,构建和安装都会进行打包编译等操作，并且将这些操作生成的文件放到某个临时目录当中 如果构建的是库源码文件，这些文件只会被保存在临时目录当中，这里构建的意义在于检查和验证。 如果构建的是命令源码文件，那么操作的结果文件会被搬运到那个源码文件所在的目录中。 安装操作会先构建，然后把文件转运到指定的目录下。如果安装的是库源码文件，那么结果文件会被搬运到它所在工作区的 pkg 目录下的某个子目录 。 如果安装的是命令源码文件，那么结果文件会被搬运到它所在工作区的 bin 目录中，或者环境变量GOBIN指向的目录中。 go build 命令的一些可选项的用途和用法 在运行go build的时候，默认是不会编译目标代码所依赖的那些代码包。如果依赖代码包的归档文件不存在，或者源码发生了变化，那么它还是会被编译。如果要强制编译她们，可以在执行命令时加上选项 -a,此时目标代码包以及所依赖的代码包都会被编译，哪怕是标准库中的代码包也是如此。另外，如果不但要编译依赖的代码包，还要安装它们的归档文件，那么可以加入标记-i（新版本已抛弃）。如何确认那些包被编译了？
+运行go build时候加上-x,加上-n参数可以只看具体操作不执行他们 运行go build的时候加上-v,这样可以看到编译代码包的名称。 go get命令常用选项 go get 命令会自动帮我们从主流的公用代码仓库下载代码，并且将他们安装到环境变量gopath包含的第一工作区对应的目录中。
+-u : 下载并安装代码，不论工作区中是否已经存在 -d: 只下载代码包，不安装代码包 -fix: 在下载代码包后先运行一个用于根据当前版本GO语言的修正工具，然后再安装代码包 -t: 同时下载测试所需的代码包 -insecure：允许通过非安全的网络协议下载和安装代码包。HTTP 就是这样的协议。 " />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(1.GOPATH和工作区)" />
+<meta property="og:description" content="golang基础(1.GOPATH和工作区)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/1.gopath%E5%92%8C%E5%B7%A5%E4%BD%9C%E5%8C%BA/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(1.GOPATH和工作区)">
+<meta itemprop="description" content="golang基础(1.GOPATH和工作区)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="52">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(1.GOPATH和工作区)"/>
+<meta name="twitter:description" content="golang基础(1.GOPATH和工作区)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(1.GOPATH和工作区)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="官方命令文档httpsgolanggooglecncmdgo"><a href="https://golang.google.cn/cmd/go">官方命令文档</a></h2>
+<h2 id="设置gopath的意义是什么">设置gopath的意义是什么？</h2>
+<p>gopath是系统的<code>环境变量</code>，它是由一个或者多个文件<code>目录路径</code>组成。每一个文件路径是一个GO语言的<code>工作区</code>（workspace）。这些工作区用于存放go项目的<code>源代码文件</code>（sourcefile），安装（go install）以后的<code>归档文件</code>，编译后的<code>可执行文件</code>(go build)。</p>
+<h2 id="go语言的源码的组织方式">go语言的源码的组织方式</h2>
+<ul>
+<li>在go语言中，包作为go语言的基本单位，这些包的名称和文件系统中目录名称一一对应，一个目录下可以有多个子目录，相对应的一个包下可以有多个子包</li>
+<li>一个包下可以包含多个.go文件，这些源代码必须被声明为在同一包下。代码包的名称一般与源码所在的目录同名，如果不同名，那么在安装过程中会一代码文件中的包声明为准</li>
+<li>每个包拥有自己的导入路径，在工作区中一个包的导入路径实际上就是从src子目录到该包存储位置的相对路径</li>
+</ul>
+<h2 id="了解源码安装后的后果">了解源码安装后的后果</h2>
+<ul>
+<li>源码文件会被放到某个工作区的src目录下</li>
+<li>如果安装后产生了归档文件，则会被放进该工作区的pkg子目录下</li>
+<li>如果安装后产生了可执行文件，则会被放进该工作区的bin子目录下</li>
+</ul>
+<h2 id="理解构建和安装go程序的过程">理解构建和安装go程序的过程</h2>
+<ul>
+<li>构建命令使用<code>go build</code>,安装命令使用<code>go install</code>,构建和安装都会进行打包编译等操作，并且将这些操作生成的文件放到某个临时目录当中</li>
+<li>如果构建的是<code>库源码文件</code>，这些文件只会被保存在临时目录当中，这里构建的意义在于检查和验证。</li>
+<li>如果构建的是<code>命令源码文件</code>，那么操作的结果文件会被搬运到那个源码文件所在的目录中。</li>
+<li>安装操作会<code>先构建</code>，然后把文件转运到指定的目录下。如果安装的是库源码文件，那么结果文件会被搬运到它所在工作区的 pkg 目录下的某个子目录 。</li>
+<li>如果安装的是<code>命令源码文件</code>，那么结果文件会被搬运到它所在工作区的 bin 目录中，或者环境变量GOBIN指向的目录中。</li>
+</ul>
+<h2 id="go-build-命令的一些可选项的用途和用法">go build 命令的一些可选项的用途和用法</h2>
+<p>在运行<code>go build</code>的时候，默认是不会编译目标代码所依赖的那些代码包。如果依赖代码包的<code>归档文件不存在</code>，或者<code>源码发生了变化</code>，那么它还是会被编译。如果要强制编译她们，可以在执行命令时加上选项 <code>-a</code>,此时目<code>标代码包以及所依赖的代码包</code>都会被编译，哪怕是标准库中的代码包也是如此。另外，如果不但要编译依赖的代码包，还要安装它们的归档文件，那么可以加入标记<code>-i</code>（<code>新版本已抛弃</code>）。<!-- raw HTML omitted -->如何确认那些包被编译了？</p>
+<ul>
+<li>运行<code>go build</code>时候加上<code>-x</code>,加上<code>-n</code>参数可以只看具体操作不执行他们</li>
+<li>运行go build的时候加上<code>-v</code>,这样可以看到编译代码包的名称。</li>
+</ul>
+<h2 id="go-get命令常用选项">go get命令常用选项</h2>
+<p><code>go get </code>命令会自动帮我们从主流的公用代码仓库下载代码，并且将他们安装到环境变量<code>gopath</code>包含的第一工作区对应的目录中。</p>
+<ul>
+<li>-u : 下载并安装代码，不论工作区中是否已经存在</li>
+<li>-d:  只下载代码包，不安装代码包</li>
+<li>-fix: 在下载代码包后先运行一个用于根据当前版本GO语言的修正工具，然后再安装代码包</li>
+<li>-t: 同时下载测试所需的代码包</li>
+<li>-insecure：允许通过非安全的网络协议下载和安装代码包。HTTP 就是这样的协议。</li>
+</ul>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E9%83%A8%E7%BD%B2%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE%E5%BA%93%E5%B0%81%E8%A3%85gorm/"
+      ><span class="mr-1.5">←</span><span>go-micro开发运维实践(部署用户数据库，封装gorm)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/10.%E6%B5%AE%E7%82%B9%E5%9E%8B%E4%B8%8E%E5%A4%8D%E6%95%B0%E7%B1%BB%E5%9E%8B/"
+      ><span>golang基础(10.浮点型与复数类型)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

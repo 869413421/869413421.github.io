@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(5.变量声明，初始化，赋值，作用域) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="变量相当于计算机中一块存储区域的命名，通过定义变量能像系统申请到一块存储空间。通过使用变量名，能对这块存储空间进行操作。
+定义变量 在go中，可以使用var关键字来定义变量，且要将值类型放置到变量定义后面。
+var i int 可以同时定义多个同类型变量
+var i1,i2 int 可以分组定义
+var (a,a1 intb stringc bool) 需要注意的是定义变量后，系统会将变量初始化为该类型的初始值，入`i`会为`0`，`b`是`空字符串`，`c`是`flase`package mainimport &#34;fmt&#34;// 定义一个var i int// 定义多个同类型var i1, i2 int// 分组定义var (a, a1 intb string)func main() {fmt.Printf(&#34;i is %d &#34;, i)fmt.Printf(&#34;i1 is %d &#34;, i1)fmt.Printf(&#34;i2 is %d &#34;, i2)fmt.Printf(&#34;a is %d &#34;, a)fmt.Printf(&#34;a1 is %d &#34;, a1)fmt." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(5.变量声明，初始化，赋值，作用域)" />
+<meta property="og:description" content="golang基础(5.变量声明，初始化，赋值，作用域)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/5.%E5%8F%98%E9%87%8F%E5%A3%B0%E6%98%8E%E5%88%9D%E5%A7%8B%E5%8C%96%E8%B5%8B%E5%80%BC%E4%BD%9C%E7%94%A8%E5%9F%9F/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(5.变量声明，初始化，赋值，作用域)">
+<meta itemprop="description" content="golang基础(5.变量声明，初始化，赋值，作用域)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="337">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(5.变量声明，初始化，赋值，作用域)"/>
+<meta name="twitter:description" content="golang基础(5.变量声明，初始化，赋值，作用域)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(5.变量声明，初始化，赋值，作用域)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>变量相当于计算机中一块存储区域的命名，通过定义变量能像系统申请到一块存储空间。通过使用变量名，能对这块存储空间进行操作。</p>
+<h2 id="定义变量">定义变量</h2>
+<p>在go中，可以使用<code>var</code>关键字来定义变量，且要将值类型放置到变量定义后面。</p>
+<pre tabindex="0"><code>var i int
+</code></pre><p>可以同时定义多个同类型变量</p>
+<pre tabindex="0"><code>var i1,i2 int
+</code></pre><p>可以分组定义</p>
+<pre tabindex="0"><code>var (
+	a,a1 int
+	b string
+  c bool
+)
+</code></pre><pre><code>需要注意的是定义变量后，系统会将变量初始化为该类型的初始值，入`i`会为`0`，`b`是`空字符串`，`c`是`flase`
+</code></pre>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+// 定义一个
+var i int
+
+// 定义多个同类型
+var i1, i2 int
+
+// 分组定义
+var (
+	a, a1 int
+	b     string
+)
+
+func main() {
+	fmt.Printf(&#34;i is %d 
+&#34;, i)
+	fmt.Printf(&#34;i1 is %d 
+&#34;, i1)
+	fmt.Printf(&#34;i2 is %d 
+&#34;, i2)
+	fmt.Printf(&#34;a is %d 
+&#34;, a)
+	fmt.Printf(&#34;a1 is %d 
+&#34;, a1)
+	fmt.Printf(&#34;b is %s 
+&#34;, b)
+}
+</code></pre><h2 id="变量初始化">变量初始化</h2>
+<p>如果需要在定义变量同时对变量进行初始化，可以选择一下三种方式</p>
+<ul>
+<li>常规赋值</li>
+</ul>
+<pre tabindex="0"><code>var c int = 10
+</code></pre><ul>
+<li>自动推导类型，如果定义时不指定类型，在编译期间，编译器会自动推导</li>
+</ul>
+<pre tabindex="0"><code>var c1 = 10
+</code></pre><ul>
+<li>可以忽略var 关键字使用:,在编译期间，编译器也会自动推导。需要注意使用：初始化的变量名称必须是不存在的，否则会编译报错</li>
+</ul>
+<pre tabindex="0"><code>c2 := 10
+</code></pre><pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	var c int = 10
+	var c1 = 10
+	c2 := 10
+
+	fmt.Printf(&#34;c is %d 
+&#34;, c)
+	fmt.Printf(&#34;c1 is %d 
+&#34;, c1)
+	fmt.Printf(&#34;c2 is %d 
+&#34;, c2)
+}
+</code></pre><h2 id="变量赋值多重赋值">变量赋值，多重赋值</h2>
+<p>在go中变量初始化，变量赋值是两种概念。如果使用上面一行代码定义变量，内部会先执行初始化，然后再赋值，变量初始化，只会<code>执行一次</code>，变量赋值会<code>执行多次</code>。</p>
+<pre tabindex="0"><code>var d int
+fmt.Printf(&#34;d is %d 
+&#34;, d) // 输出0
+d = 100
+fmt.Printf(&#34;d is %d 
+&#34;, d) // 输出100
+d = 200
+fmt.Printf(&#34;d is %d 
+&#34;, d) // 输出200
+</code></pre><p>在go中还支持变量多重赋值，交换变量值非常方便。</p>
+<pre tabindex="0"><code>	d1 := 1
+	d2 := 2
+	fmt.Printf(&#34;d1 is %d 
+&#34;, d1)
+	fmt.Printf(&#34;d2 is %d 
+&#34;, d2)
+	d1, d2 = d2, d1
+	fmt.Printf(&#34;d1 is %d 
+&#34;, d1)
+	fmt.Printf(&#34;d2 is %d 
+&#34;, d2)
+</code></pre><pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	var d int
+	fmt.Printf(&#34;d is %d 
+&#34;, d) // 输出0
+	d = 100
+	fmt.Printf(&#34;d is %d 
+&#34;, d) // 输出100
+	d = 200
+	fmt.Printf(&#34;d is %d 
+&#34;, d) // 输出200
+
+	d1 := 1
+	d2 := 2
+	fmt.Printf(&#34;d1 is %d 
+&#34;, d1)
+	fmt.Printf(&#34;d2 is %d 
+&#34;, d2)
+	d1, d2 = d2, d1
+	fmt.Printf(&#34;d1 is %d 
+&#34;, d1)
+	fmt.Printf(&#34;d2 is %d 
+&#34;, d2)
+}
+</code></pre><h2 id="匿名变量">匿名变量</h2>
+<p>假设我们有一个方法，这个方法有多个返回值，这时候我们需要定义多个变量来对返回值进行接收，导致我们定义了很多无用的变量。这个时候我们可以使用<code>_</code>定义一个匿名变量来对返回值进行接收，任何赋予它的值都会被丢弃回收。</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func GetName() (name, nickName string) {
+	name = &#34;test&#34;
+	nickName = &#34;测试&#34;
+  
+	return name, nickName
+}
+
+func main() {
+	_, nickName := GetName()
+	fmt.Printf(&#34;nickName is %s 
+&#34;, nickName)
+}
+</code></pre><h2 id="变量的作用域">变量的作用域</h2>
+<p>每个定义的变量在程序中都有一定的作用范围，这个我们称之为变量作用域，go中分为<code>全局变量</code>以及<code>局部变量</code>。</p>
+<ul>
+<li>全局变量：定义在函数体外的变量，我们称之为全局变量。可以在整个包，甚至外部包使用（如果以大写开头），不管你是在那个源文件下调用。</li>
+<li>局部变量：在函数体内定义的变量，我们称之为局部变量，局部变量只能在定义的函数体内使用，函数中的参数以及返回值也是局部变量</li>
+</ul>
+<p>但你可以在某个代码块的内层代码块中使用相同名称的变量，则此时外部的同名变量将会暂时隐藏（结束内部代码块的执行后隐藏的外部同名变量又会出现，而内部同名变量则被释放），你任何的操作都只会影响内部代码块的局部变量。比如定义了一个全局变量d2,在函数体中再定义一个局部变量d2,修改局部变量d2不会对全局变量有任何影响。</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+var d2 = 10
+
+func Test() {
+	var d2 = 20
+	fmt.Printf(&#34;局部变量d2 is %d 
+&#34;, d2)
+}
+
+func main() {
+	Test()
+	fmt.Printf(&#34;全局变量d2 is %d 
+&#34;, d2)
+}
+</code></pre></section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/49.sync-%E5%8C%85%E6%9D%A1%E4%BB%B6%E5%8F%98%E9%87%8F-sync.cond/"
+      ><span class="mr-1.5">←</span><span>golang基础(49.sync 包：条件变量 sync.Cond)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/50.sync-%E5%8C%85%E5%8E%9F%E5%AD%90%E6%93%8D%E4%BD%9C/"
+      ><span>golang基础(50.sync 包：原子操作)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

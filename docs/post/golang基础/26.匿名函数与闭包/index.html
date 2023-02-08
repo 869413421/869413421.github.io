@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(26.匿名函数与闭包) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="匿名函数 匿名函数是一种不需要定义函数名称的声明方式，Go 语言中也提供了对匿名函数的支持，并且形式上和 PHP 类似，无非是要声明参数类型和返回值类型而已：
+package mainimport &#34;fmt&#34;func main() {add := func(a, b int) int {return a &#43; b}fmt.Println(add(1, 2)) // 赋值变量调用匿名函数 addc := func(a, b int) int {return a &#43; b}(1, 2)fmt.Println(c) // 直接调用} 闭包 Go 语言的匿名函数是一个闭包（Closure），下面我们先来了解一下闭包的概念、价值和应用场景。
+闭包的概念和价值 所谓闭包是指引用了自由变量的函数，被引用的自由变量将和这个函数一同存在，即使离开了创造它的上下文环境也不会被释放掉。或者通俗点说，「闭」的意思是「封闭外部状态」，即使外部状态已经失效，闭包内部依然保留了一份从外部引用的变量。闭包的价值在于可以作为函数对象或者匿名函数，对于类型系统而言，这意味着不仅要表示数据还要表示代码。支持闭包的多数语言都将函数作为第一类对象（firt-class object，有的地方也译作第一级对象，第一类公民等），就是说这些函数可以存储到变量中作为参数传递给其他函数，能够被函数动态创建和返回。 :::success 注：所谓第一类对象指的是运行期可以被创建并作为参数传递给其他函数或赋值给变量的实体，在绝大多数语言中，数值和基本类型都是第一类对象，在支持闭包的编程语言中（比如 Go、PHP、JavaScript、Python 等），函数也是第一类对象，而像 C、C&#43;&#43; 等不支持闭包的语言中，函数不能在运行期创建，所以在这些语言中，函数不是不是第一类对象。 :::
+Go 语言中闭包的应用场景 Go 语言中的闭包同样也会引用函数外定义的变量，只要闭包还在被使用，那么被闭包引用的变量会一直存在。保证局部变量的安全性闭包内部声明的局部变量无法从外部修改，从而确保了安全性（类似类的私有属性）：
+package mainimport &#34;fmt&#34;func main() {var j = 1f := func() {var i intfmt." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(26.匿名函数与闭包)" />
+<meta property="og:description" content="golang基础(26.匿名函数与闭包)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/26.%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0%E4%B8%8E%E9%97%AD%E5%8C%85/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(26.匿名函数与闭包)">
+<meta itemprop="description" content="golang基础(26.匿名函数与闭包)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="196">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(26.匿名函数与闭包)"/>
+<meta name="twitter:description" content="golang基础(26.匿名函数与闭包)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(26.匿名函数与闭包)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="匿名函数">匿名函数</h2>
+<p>匿名函数是一种不需要定义函数名称的声明方式，Go 语言中也提供了对匿名函数的支持，并且形式上和 PHP 类似，无非是要声明参数类型和返回值类型而已：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	add := func(a, b int) int {
+		return a + b
+	}
+
+	fmt.Println(add(1, 2)) // 赋值变量调用匿名函数 add
+
+	c := func(a, b int) int {
+		return a + b
+	}(1, 2)
+	fmt.Println(c) // 直接调用
+}
+</code></pre><h2 id="闭包">闭包</h2>
+<p>Go 语言的匿名函数是一个闭包（Closure），下面我们先来了解一下闭包的概念、价值和应用场景。</p>
+<h3 id="闭包的概念和价值">闭包的概念和价值</h3>
+<p>所谓闭包是指引用了自由变量的函数，被引用的自由变量将和这个函数一同存在，即使离开了创造它的上下文环境也不会被释放掉。或者通俗点说，「闭」的意思是「封闭外部状态」，即使外部状态已经失效，闭包内部依然保留了一份从外部引用的变量。<!-- raw HTML omitted -->闭包的价值在于可以作为函数对象或者匿名函数，对于类型系统而言，这意味着不仅要表示数据还要表示代码。支持闭包的多数语言都将函数作为第一类对象（firt-class object，有的地方也译作第一级对象，第一类公民等），就是说这些函数可以存储到变量中作为参数传递给其他函数，能够被函数动态创建和返回。
+:::success
+注：所谓第一类对象指的是运行期可以被创建并作为参数传递给其他函数或赋值给变量的实体，在绝大多数语言中，数值和基本类型都是第一类对象，在支持闭包的编程语言中（比如 Go、PHP、JavaScript、Python 等），函数也是第一类对象，而像 C、C++ 等不支持闭包的语言中，函数不能在运行期创建，所以在这些语言中，函数不是不是第一类对象。
+:::</p>
+<h3 id="go-语言中闭包的应用场景">Go 语言中闭包的应用场景</h3>
+<p>Go 语言中的闭包同样也会引用函数外定义的变量，只要闭包还在被使用，那么被闭包引用的变量会一直存在。<!-- raw HTML omitted --><strong>保证局部变量的安全性</strong><!-- raw HTML omitted -->闭包内部声明的局部变量无法从外部修改，从而确保了安全性（类似类的私有属性）：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	var j = 1
+	f := func() {
+		var i int
+		fmt.Printf(&#34;i, j: %d, %d
+&#34;, i, j)
+	}
+
+	f()
+	j += 2
+	f()
+}
+</code></pre><p>上述代码输出结果如下：</p>
+<pre tabindex="0"><code>i, j: 1, 1
+i, j: 1, 3
+</code></pre><pre><code>在上面的示例中，变量 f 指向的闭包引用了局部变量 i 和 j，i 在闭包内部定义，其值被隔离，不能从外部修改，而变量 j 在闭包外部定义，所以可以从外部修改，闭包持有的只是其引用。
+</code></pre>
+<h3 id="将匿名函数作为参数">将匿名函数作为参数</h3>
+<p>我们可以先声明一个外部函数的参数为函数类型，然后定义一个闭包并赋值给指定变量，再将这个变量传递到外部函数中：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func callBack(f func()) {
+	f()
+}
+
+func main() {
+	var j = 1
+	f := func() {
+		var i int
+		j += 1
+		fmt.Printf(&#34;i, j: %d, %d
+&#34;, i, j)
+	}
+
+	f()
+	j += 2
+	f()
+	callBack(f)
+	fmt.Println(j)
+}
+</code></pre><h3 id="将匿名函数作为返回值">将匿名函数作为返回值</h3>
+<p>最后，我们来演示下闭包作为函数返回值的示例：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func addFunc(a int) func(b int) int {
+	return func(b int) int {
+		b++
+		return b
+	}
+}
+
+func main() {
+	f := addFunc(1)
+	fmt.Println(f(1))
+}
+</code></pre><p>我们声明 addfunc 函数的返回值是一个函数，并且在 return 时返回一个闭包，这个闭包可以访问外部函数的参数和变量，并持有这些变量，只要闭包存在，这些变量就一直存在，即使脱离了 addfunc 函数的作用域，依然可以访问它们。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/25.%E5%8F%98%E9%95%BF%E5%87%BD%E6%95%B0/"
+      ><span class="mr-1.5">←</span><span>golang基础(25.变长函数)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/27.%E7%B1%BB%E5%9E%8B%E7%B3%BB%E7%BB%9F/"
+      ><span>golang基础(27.类型系统)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

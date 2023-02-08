@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(42.基于消息的携程通信) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="通道 Go 语言推荐使用消息传递实现并发通信，这种消息通信机制被称为 channel，中文译作「通道」，可理解为传递消息的通道。通道是 Go 语言在语言级别提供的协程通信方式，它是一种数据类型，本身是并发安全的，我们可以使用它在多个 goroutine 之间传递消息，而不必担心通道中的值被污染。通道是一种数据类型，和数组/切片类型类似，一个通道只能传递一种类型的值，这个类型需要在声明 通道时指定。在使用通道时，需要通过 make 进行声明，通道对应的类型关键字是 chan：
+ch := make(chan int) 我们可以把通道看作是一个先进先出（FIFO）的队列，通道中的元素会严格按照发送顺序排列，继而按照排列顺序被接收，通道元素的发送和接收都可以通过 &lt;- 操作符来实现，发送时元素值在右，通道变量在左：
+ch &lt;- 1 // 表示把元素 1 发送到通道 ch 接收时通道变量在右，可以通过指定变量接收元素值：
+element := &lt;-ch 也可以留空表示忽略：
+&lt;-ch package mainimport (&#34;fmt&#34;&#34;time&#34;)func channelAdd(a, b int, ch chan int) {c := a &#43; bfmt.Printf(&#34;%d&#43;%d = %d &#34;, a, b, c)ch &lt;- c}func main() {start := time.Now()chs := make([]chan int, 10)for i := 0; i &lt; 10; i&#43;&#43; {chs[i] = make(chan int)go channelAdd(1, i, chs[i])}for _, ch := range chs {&lt;- ch}end := time." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(42.基于消息的携程通信)" />
+<meta property="og:description" content="golang基础(42.基于消息的携程通信)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/42.%E5%9F%BA%E4%BA%8E%E6%B6%88%E6%81%AF%E7%9A%84%E6%90%BA%E7%A8%8B%E9%80%9A%E4%BF%A1/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(42.基于消息的携程通信)">
+<meta itemprop="description" content="golang基础(42.基于消息的携程通信)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="128">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(42.基于消息的携程通信)"/>
+<meta name="twitter:description" content="golang基础(42.基于消息的携程通信)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(42.基于消息的携程通信)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="通道">通道</h2>
+<p>Go 语言推荐使用消息传递实现并发通信，这种消息通信机制被称为 channel，中文译作「通道」，可理解为传递消息的通道。<!-- raw HTML omitted -->通道是 Go 语言在语言级别提供的协程通信方式，它是一种<a href="https://laravelacademy.org/post/19728.html">数据类型</a>，本身是并发安全的，我们可以使用它在多个 goroutine 之间传递消息，而不必担心通道中的值被污染。<!-- raw HTML omitted -->通道是一种数据类型，和数组/切片类型类似，一个通道只能传递一种类型的值，这个类型需要在声明 通道时指定。在使用通道时，需要通过 make 进行声明，通道对应的类型关键字是 chan：</p>
+<pre tabindex="0"><code>ch := make(chan int)
+</code></pre><p>我们可以把通道看作是一个<code>先进先出</code>（FIFO）的队列，通道中的元素会严格按照发送顺序排列，继而按照排列顺序被接收，通道元素的发送和接收都可以通过 &lt;- 操作符来实现，发送时元素值在右，通道变量在左：</p>
+<pre tabindex="0"><code>ch &lt;- 1  // 表示把元素 1 发送到通道 ch
+</code></pre><p>接收时通道变量在右，可以通过指定变量接收元素值：</p>
+<pre tabindex="0"><code>element := &lt;-ch
+</code></pre><p>也可以留空表示忽略：</p>
+<pre tabindex="0"><code>&lt;-ch
+</code></pre><pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;time&#34;
+)
+
+func channelAdd(a, b int, ch chan int) {
+	c := a + b
+	fmt.Printf(&#34;%d+%d = %d 
+&#34;, a, b, c)
+	ch &lt;- c
+}
+
+func main() {
+	start := time.Now()
+	chs := make([]chan int, 10)
+
+	for i := 0; i &lt; 10; i++ {
+		chs[i] = make(chan int)
+		go channelAdd(1, i, chs[i])
+	}
+
+	for _, ch := range chs {
+		&lt;- ch
+	}
+
+	end := time.Now()
+	consume := string(end.Sub(start).String())
+	fmt.Printf(&#34;coumse %s s&#34;, consume)
+
+}
+</code></pre><p>我们首先定义了一个包含 10 个通道类型的切片 chs，并把切片中的每个通道<code>分配给 10 个不同的协程</code>。在每个协程的 add函数业务逻辑完成后，我们通过 ch&lt;- 1 语句向对应的通道中发送一个数据。在所有的协程启动完成后，我们再通过 &lt;-ch 语句从通道切片 chs 中依次接收数据（不对结果做任何处理，相当于写入通道的数据只是个标识而已，表示这个通道所属的协程逻辑执行完毕），直到所有通道数据接收完毕，然后打印主程序耗时并退出。<!-- raw HTML omitted -->之所以上述这段代码可以实现和「共享内存+锁」一样的效果，<code>是因为往通道写入数据和从通道接收数据都是原子操作</code>，或者说是同步阻塞的，当我们向某个通道写入数据时，就相当于该通道被加锁，直到写入操作完成才能执行从该通道读取数据的操作，反过来，当我们从某个通道读取数据时，其他协程也不能操作该通道，直到读取完成，如果通道中没有数据，则会阻塞在这里，直到通道被写入数据。因此，可以看到通道的发送和接收操作是互斥的，<code>同一时间同一个进程内的所有协程对某个通道只能执行发送或接收操作，两者不可能同时进行，这样就保证了并发的安全性，数据不可能被污染</code>。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/41.%E5%9F%BA%E4%BA%8E%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98%E7%9A%84%E6%90%BA%E7%A8%8B%E9%80%9A%E4%BF%A1/"
+      ><span class="mr-1.5">←</span><span>golang基础(41.基于共享内存的携程通信)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/43.%E9%80%9A%E9%81%93%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95%E5%92%8C%E7%BC%93%E5%86%B2%E9%80%9A%E9%81%93/"
+      ><span>golang基础(43.通道基本语法和缓冲通道)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(36.error 接口及其使用) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="PHP错误处理以及异常处理一直比较混乱，在 PHP 5 中是通过 error_reporting 函数设置错误报告级别，然后通过 set_error_handler 函数注册全局的错误处理器。PHP中抛弃了错误的报告方式，转而通过抛出将错误当做异常抛出，可以通过try catch语句进行捕获，还可以通过 set_exception_handler 注册全局异常处理器，将应用中未处理的异常统一兜底。
+GO语言错误处理机制 GO语言的错误处理机制相对来说比较简洁，它提供了一个标准的error接口。
+type error interface { Error() string } 其中`error`接口值只有一个标准方法，`Error()`,用于返回错误信息。在大多数函数中一般将一个`error`作为一个返回值，交由上级调用来进行判断。func Foo(param int) (n int, err error) { // ...} 然后在调用返回错误信息的函数/方法时，按照如下「卫述语句」模板编写处理代码即可：
+n, err := Foo(0)if err != nil { // 错误处理 } else {// 使用返回值 n } 错误消息返回及处理 我们可以使用errors.new()方法返回我们需要自定的错误信息。
+func add(a, b *int) (c int, err error) {if (*a &lt; 0 || *b &lt; 0) {err = errors." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(36.error 接口及其使用)" />
+<meta property="og:description" content="golang基础(36.error 接口及其使用)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/36.error-%E6%8E%A5%E5%8F%A3%E5%8F%8A%E5%85%B6%E4%BD%BF%E7%94%A8/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(36.error 接口及其使用)">
+<meta itemprop="description" content="golang基础(36.error 接口及其使用)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="257">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(36.error 接口及其使用)"/>
+<meta name="twitter:description" content="golang基础(36.error 接口及其使用)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(36.error 接口及其使用)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>PHP错误处理以及异常处理一直比较混乱，在 PHP 5 中是通过 <a href="https://www.php.net/manual/zh/function.error-reporting.php">error_reporting</a> 函数设置错误报告级别，然后通过 <a href="https://www.php.net/manual/zh/function.set-error-handler.php">set_error_handler</a> 函数注册全局的错误处理器。PHP中抛弃了错误的报告方式，转而通过抛出将错误当做异常抛出，可以通过try catch语句进行捕获，还可以通过 <a href="https://www.php.net/manual/zh/function.set-exception-handler.php">set_exception_handler</a> 注册全局异常处理器，将应用中未处理的异常统一兜底。</p>
+<h2 id="go语言错误处理机制">GO语言错误处理机制</h2>
+<p>GO语言的错误处理机制相对来说比较简洁，它提供了一个标准的<code>error</code>接口。</p>
+<pre tabindex="0"><code>type error interface { 
+    Error() string 
+}
+</code></pre><pre><code>其中`error`接口值只有一个标准方法，`Error()`,用于返回错误信息。在大多数函数中一般将一个`error`作为一个返回值，交由上级调用来进行判断。
+</code></pre>
+<pre tabindex="0"><code>func Foo(param int) (n int, err error) { 
+    // ...
+}
+</code></pre><p>然后在调用返回错误信息的函数/方法时，按照如下「卫述语句」模板编写处理代码即可：</p>
+<pre tabindex="0"><code>n, err := Foo(0)
+
+if err != nil { 
+    // 错误处理 
+} else {
+    // 使用返回值 n 
+}
+</code></pre><h2 id="错误消息返回及处理">错误消息返回及处理</h2>
+<p>我们可以使用errors.new()方法返回我们需要自定的错误信息。</p>
+<pre tabindex="0"><code>func add(a, b *int) (c int, err error) {
+    if (*a &lt; 0 || *b &lt; 0) {
+        err = errors.New(&#34;只支持非负整数相加&#34;)
+        return
+    }
+    *a *= 2
+    *b *= 3
+    c = *a + *b
+    return
+}
+</code></pre><p>调用这个函数并处理错误的代码如下所示：</p>
+<pre tabindex="0"><code>x, y := 1, 2
+z, err := add(&amp;x, &amp;y)
+if err != nil {
+    fmt.Println(err)
+} else {
+    fmt.Printf(&#34;add(%d, %d) = %d
+&#34;, x, y, z)
+}
+</code></pre><p>注意到我们在打印错误信息时，直接传入了 err 对象实例，因为 Go 底层会自动调用 err 实例上的 Error() 方法返回错误信息并将其打印出来，就像普通类的 String() 方法一样。<!-- raw HTML omitted -->以上这种错误处理已经能够满足我们日常编写 Go 代码时大部分错误处理的需求了，事实上，Go 底层很多包进行错误处理时就是这样做的，此外我们还可以通过 fmt.Errorf() 格式化方法返回 error 类型错误，其底层调用的其实也是 errors.New 方法：</p>
+<pre tabindex="0"><code>func Errorf(format string, a ...interface{}) error {
+    return errors.New(Sprintf(format, a...))
+}
+</code></pre><h2 id="内置错误类型">内置错误类型</h2>
+<p>除了上面这种最基本的使用 errors.New 方法返回错误信息之外，Go 语言内置的很多包还封装了很多更复杂的错误类型，以 <a href="https://golang.org/pkg/os">os</a> 包为例，这个包主要与操作平台的文件系统打交道，所以提供了 LinkError、PathError、SyscallError 这些实现了 error 接口的错误类型，以 PathError 为例，其底层类型结构如下：</p>
+<pre tabindex="0"><code>type PathError struct {
+    Op   string
+    Path string
+    Err  error
+}
+</code></pre><p>该错误类型除了组合 error 接口实现 Error() 方法外，还提供了额外的操作类型字段 Op 和文件路径字段 Path 以丰富错误信息，该类型的 Error() 方法实现如下：</p>
+<pre tabindex="0"><code>func (e *PathError) Error() string { 
+    return e.Op + &#34; &#34; + e.Path + &#34;: &#34; + e.Err.Error() 
+}
+</code></pre><p>我们可以在调用 os 包方法出错时通过 switch 分支语句判定具体的错误类型进行处理：</p>
+<pre tabindex="0"><code>fi, err := os.Stat(&#34;test.txt&#34;)
+if err != nil {
+    switch err := err.(type) {
+    case *os.PathError:
+        // do something
+    case *os.LinkError:
+        // dome something
+    case *os.SyscallError:
+        // dome something
+    case *exec.Error:
+        // dome something
+    }
+} else {
+    // ...
+}
+</code></pre><h2 id="自定义错误类型">自定义错误类型</h2>
+<p>当然，我们也可以仿照 PathError 的实现自定义一些复杂的错误类型，只需要组合 error 接口实现 Error() 方法即可，然后按照自己的需要为自定义类型添加一些属性字段，很简单，这里就不展开介绍了。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/35.%E9%80%9A%E8%BF%87%E9%AB%98%E9%98%B6%E5%87%BD%E6%95%B0%E6%9D%A5%E5%AE%9E%E7%8E%B0%E8%A3%85%E9%A5%B0%E5%99%A8%E6%A8%A1%E5%BC%8F/"
+      ><span class="mr-1.5">←</span><span>golang基础(35.通过高阶函数来实现装饰器模式)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/37.defer-%E8%AF%AD%E5%8F%A5%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B/"
+      ><span>golang基础(37.defer 语句及使用示例)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>go-micro开发运维实践(实现用户CURD服务) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="定义protobuf,生成代码 修改proto/user/user.proto syntax = &#34;proto3&#34;;package micro.service.user;option go_package = &#34;proto/user&#34;;service UserService {rpc Pagination(PaginationRequest) returns(PaginationResponse){}rpc Get(GetRequest) returns(UserResponse){}rpc Create(CreateRequest) returns(UserResponse){}rpc Update(UpdateRequest) returns(UserResponse){}rpc Delete(DeleteRequest) returns(UserResponse){}}message User{uint64 id = 1;string name = 3;string email = 4;string real_name = 6;string avatar = 7;string create_at = 9;string update_at = 10;}//UserResponse 单个用户响应message UserResponse{User user = 1;}//PaginationResponse 用户分页数据响应message PaginationResponse{repeated User users = 1;uint64 total = 2;}//PaginationRequest 用户分页请求message PaginationRequest{uint64 page = 1;uint32 perPage = 2;}//GetRequest 获取单个用户请求message GetRequest{uint64 id = 1;}//CreateRequest 创建用户请求message CreateRequest{string name = 1;string password = 2;string email = 3;string real_name = 4;string avatar = 5;}//UpdateRequest 更新用户请求message UpdateRequest{uint64 id = 1;string name = 2;string email = 3;string real_name = 4;string avatar = 6;}//DeleteRequest 删除用户请求message DeleteRequest{uint64 id = 1;} 执行生成命令 make命令能帮我们执行在makefile中预定义好的命令，在开发当中能给我们带来便利。" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="go-micro开发运维实践(实现用户CURD服务)" />
+<meta property="og:description" content="go-micro开发运维实践(实现用户CURD服务)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%AE%9E%E7%8E%B0%E7%94%A8%E6%88%B7curd%E6%9C%8D%E5%8A%A1/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="go-micro开发运维实践(实现用户CURD服务)">
+<meta itemprop="description" content="go-micro开发运维实践(实现用户CURD服务)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="1645">
+<meta itemprop="keywords" content="go-micro开发运维实践," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="go-micro开发运维实践(实现用户CURD服务)"/>
+<meta name="twitter:description" content="go-micro开发运维实践(实现用户CURD服务)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">go-micro开发运维实践(实现用户CURD服务)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="定义protobuf生成代码">定义protobuf,生成代码</h2>
+<h3 id="修改protouseruserproto">修改proto/user/user.proto</h3>
+<pre tabindex="0"><code>syntax = &#34;proto3&#34;;
+
+package micro.service.user;
+option go_package = &#34;proto/user&#34;;
+
+service UserService {
+  rpc Pagination(PaginationRequest) returns(PaginationResponse){}
+  rpc Get(GetRequest) returns(UserResponse){}
+  rpc Create(CreateRequest) returns(UserResponse){}
+  rpc Update(UpdateRequest) returns(UserResponse){}
+  rpc Delete(DeleteRequest) returns(UserResponse){}
+}
+
+message User{
+  uint64 id = 1;
+  string name = 3;
+  string email = 4;
+  string real_name = 6;
+  string avatar = 7;
+  string create_at = 9;
+  string update_at = 10;
+}
+
+//UserResponse 单个用户响应
+message UserResponse{
+  User user = 1;
+}
+
+//PaginationResponse 用户分页数据响应
+message PaginationResponse{
+  repeated User users = 1;
+  uint64 total = 2;
+}
+
+//PaginationRequest 用户分页请求
+message PaginationRequest{
+  uint64 page = 1;
+  uint32 perPage = 2;
+}
+
+//GetRequest 获取单个用户请求
+message GetRequest{
+  uint64 id = 1;
+}
+
+//CreateRequest 创建用户请求
+message CreateRequest{
+  string name = 1;
+  string password = 2;
+  string email = 3;
+  string real_name = 4;
+  string avatar = 5;
+}
+
+//UpdateRequest 更新用户请求
+message UpdateRequest{
+  uint64 id = 1;
+  string name = 2;
+  string email = 3;
+  string real_name = 4;
+  string avatar = 6;
+}
+
+//DeleteRequest 删除用户请求
+message DeleteRequest{
+  uint64 id = 1;
+}
+</code></pre><h3 id="执行生成命令">执行生成命令</h3>
+<p>make命令能帮我们执行在<code>makefile</code>中预定义好的命令，在开发当中能给我们带来便利。</p>
+<pre tabindex="0"><code>make proto
+</code></pre><p>没有make命令可以直接复制<code>makefile</code>中的proto命令执行</p>
+<pre tabindex="0"><code>protoc --proto_path=. --micro_out=${MODIFY}:. --go_out=${MODIFY}:. proto/user/user.proto
+</code></pre><h2 id="封装用户数据库交互层">封装用户数据库交互层</h2>
+<h3 id="封装分页工具">封装分页工具</h3>
+<p>我们日常开发中在页面上经常需要获取一些分页数据，在多个微服务中如果每个都要实现分页代码代码必定会造成大量的冗余，所以我们这里需要对分页代码进行一些封装。<!-- raw HTML omitted -->打开我们项目的<code>common</code>项目</p>
+<h4 id="创建分页工具包目录">创建分页工具包目录</h4>
+<pre tabindex="0"><code>mkdir -p pkg/pagination
+touch pkg/pagination/pagination.go
+</code></pre><h4 id="编写分页工具代码">编写分页工具代码</h4>
+<pre tabindex="0"><code>package pagination
+
+import (
+	&#34;gorm.io/gorm&#34;
+	&#34;math&#34;
+)
+
+// Page 单个分页元素
+type Page struct {
+	// 链接
+	URL string
+	// 页码
+	Number uint64
+}
+
+// ViewData 同视图渲染的数据
+type ViewData struct {
+	// 是否需要显示分页
+	HasPages bool
+
+	// 下一页
+	Next    Page
+	HasNext bool
+
+	// 上一页
+	Prev    Page
+	HasPrev bool
+
+	Current Page
+
+	// 数据库的内容总数量
+	TotalCount uint64
+	// 总页数
+	TotalPage uint64
+}
+
+// Pagination 分页对象
+type Pagination struct {
+	PerPage uint32
+	Page    uint64
+	Count   uint64
+	DB      *gorm.DB
+}
+
+// New 分页对象构建器
+// db —— GORM 查询句柄，用以查询数据集和获取数据总数
+// page —— page
+// perPage —— 每页条数，传参为小于或者等于 0 时为默认值  10
+func New(db *gorm.DB, page uint64, perPage uint32) *Pagination {
+	// 默认每页数量
+	if perPage &lt;= 0 {
+		perPage = 10
+	}
+
+	// 实例对象
+	p := &amp;Pagination{
+		DB:      db,
+		PerPage: perPage,
+		Page:    page,
+		Count:   0,
+	}
+
+	// 设置当前页码
+	p.SetPage(page)
+
+	return p
+}
+
+// Paging 返回渲染分页所需的数据
+func (p *Pagination) Paging() ViewData {
+
+	return ViewData{
+		HasPages: p.HasPages(),
+
+		Next:    p.NewPage(p.NextPage()),
+		HasNext: p.HasNext(),
+
+		Prev:    p.NewPage(p.PrevPage()),
+		HasPrev: p.HasPrev(),
+
+		Current:   p.NewPage(p.CurrentPage()),
+		TotalPage: p.TotalPage(),
+
+		TotalCount: p.Count,
+	}
+}
+
+// NewPage 设置当前页
+func (p Pagination) NewPage(page uint64) Page {
+	return Page{
+		Number: page,
+	}
+}
+
+// SetPage 设置当前页
+func (p *Pagination) SetPage(page uint64) {
+	if page &lt;= 0 {
+		page = 1
+	}
+
+	p.Page = page
+}
+
+// CurrentPage 返回当前页码
+func (p Pagination) CurrentPage() uint64 {
+	totalPage := p.TotalPage()
+	if totalPage == 0 {
+		return 0
+	}
+
+	if p.Page &gt; totalPage {
+		return totalPage
+	}
+
+	return p.Page
+}
+
+// Results 返回请求数据，请注意 data 参数必须为 GROM 模型的 Slice 对象
+func (p Pagination) Results(data interface{}) error {
+	var err error
+	var offset uint64
+	page := p.CurrentPage()
+	if page == 0 {
+		return err
+	}
+
+	if page &gt; 1 {
+		offset = (page - 1) * uint64(p.PerPage)
+	}
+
+	return p.DB.Debug().Limit(int(p.PerPage)).Offset(int(offset)).Find(data).Error
+}
+
+// TotalCount 返回的是数据库里的条数
+func (p *Pagination) TotalCount() uint64 {
+	if p.Count == 0 {
+		var count int64
+		if err := p.DB.Count(&amp;count).Error; err != nil {
+			return 0
+		}
+		p.Count = uint64(count)
+	}
+
+	return p.Count
+}
+
+// HasPages 总页数大于 1 时会返回 true
+func (p *Pagination) HasPages() bool {
+	n := p.TotalCount()
+	return n &gt; uint64(p.PerPage)
+}
+
+// HasNext returns true if current page is not the last page
+func (p Pagination) HasNext() bool {
+	totalPage := p.TotalPage()
+	if totalPage == 0 {
+		return false
+	}
+
+	page := p.CurrentPage()
+	if page == 0 {
+		return false
+	}
+
+	return page &lt; totalPage
+}
+
+// PrevPage 前一页码，0 意味着这就是第一页
+func (p Pagination) PrevPage() uint64 {
+	hasPrev := p.HasPrev()
+
+	if !hasPrev {
+		return 0
+	}
+
+	page := p.CurrentPage()
+	if page == 0 {
+		return 0
+	}
+
+	return page - 1
+}
+
+// NextPage 下一页码，0 的话就是最后一页
+func (p Pagination) NextPage() uint64 {
+	hasNext := p.HasNext()
+	if !hasNext {
+		return 0
+	}
+
+	page := p.CurrentPage()
+	if page == 0 {
+		return 0
+	}
+
+	return page + 1
+}
+
+// HasPrev 如果当前页不为第一页，就返回 true
+func (p Pagination) HasPrev() bool {
+	page := p.CurrentPage()
+	if page == 0 {
+		return false
+	}
+
+	return page &gt; 1
+}
+
+// TotalPage 返回总页数
+func (p Pagination) TotalPage() uint64 {
+	count := p.TotalCount()
+	if count == 0 {
+		return 0
+	}
+
+	nums := int64(math.Ceil(float64(count) / float64(p.PerPage)))
+	if nums == 0 {
+		nums = 1
+	}
+
+	return uint64(nums)
+}
+</code></pre><h3 id="编写用户仓库代码">编写用户仓库代码</h3>
+<h4 id="创建用户仓库代码目录">创建用户仓库代码目录</h4>
+<pre tabindex="0"><code>mkdir -p pkg/repo
+touch pkg/repo/user.go
+</code></pre><h4 id="编写仓库代码">编写仓库代码</h4>
+<pre tabindex="0"><code>package repo
+
+import (
+	baseDb &#34;github.com/869413421/micro-service/common/pkg/db&#34;
+	&#34;github.com/869413421/micro-service/common/pkg/pagination&#34;
+	&#34;github.com/869413421/micro-service/user/pkg/model&#34;
+	&#34;gorm.io/gorm&#34;
+)
+
+// UserRepositoryInterface 用户CURD仓库接口
+type UserRepositoryInterface interface {
+	GetFirst(where map[string]interface{}) (*model.User, error)
+	GetByID(uint642 uint64) (*model.User, error)
+	GetByEmail(email string) (*model.User, error)
+	Pagination(page uint64, perPage uint32) (users []model.User, viewData pagination.ViewData, err error)
+}
+
+// UserRepository 用户仓库
+type UserRepository struct {
+	Db *gorm.DB
+}
+
+// NewUserRepository 初始化仓库
+func NewUserRepository() UserRepositoryInterface {
+	db := baseDb.GetDB()
+	return &amp;UserRepository{Db: db}
+}
+
+// GetByID 根据ID获取用户
+func (repo UserRepository) GetByID(id uint64) (*model.User, error) {
+	user := &amp;model.User{}
+	err := repo.Db.First(&amp;user, id).Error
+	return user, err
+}
+
+// Pagination 获取分页数据
+func (repo UserRepository) Pagination(page uint64, perPage uint32) (users []model.User, viewData pagination.ViewData, err error) {
+	//1.初始化分页实例
+	DB := repo.Db.Model(model.User{}).Order(&#34;created_at desc&#34;)
+	_pager := pagination.New(DB, page, perPage)
+
+	// 2. 获取分页构建数据
+	viewData = _pager.Paging()
+
+	// 3. 获取数据
+	_pager.Results(&amp;users)
+
+	return users, viewData, nil
+}
+
+// GetByEmail 根据email获取用户
+func (repo UserRepository) GetByEmail(email string) (*model.User, error) {
+	user := &amp;model.User{}
+	err := repo.Db.Where(&#34;email = ?&#34;, email).First(&amp;user).Error
+	return user, err
+}
+
+// GetFirst 根据自定义条件获取用户
+func (repo UserRepository) GetFirst(where map[string]interface{}) (*model.User, error) {
+	user := &amp;model.User{}
+	for key, val := range where {
+		repo.Db.Where(key+&#34;=?&#34;, val)
+	}
+	err := repo.Db.First(&amp;user).Error
+	return user, err
+}
+</code></pre><p>根据<code>依赖倒置原则</code>，我们定义了一个用户抽象的接口，然后编写了接口的实现细节。这种方式能使我们上层模块（即调用用户仓库的类），不再依赖下层（即实现的代码<code>UserRepository</code>）。当后续我们的业务改动，只需要重新实现<code>UserRepositoryInterface</code>就可以直接对实现细节进行替换，在开发中我们应该遵循<code>抽象不应该依赖细节，细节应该依赖抽象</code>的方式来实现功能。</p>
+<h4 id="修改modelusergo">修改model/user.go</h4>
+<pre tabindex="0"><code>package model
+
+import (
+	db &#34;github.com/869413421/micro-service/common/pkg/db&#34;
+	pb &#34;github.com/869413421/micro-service/user/proto/user&#34;
+)
+
+// User 用户模型
+type User struct {
+	db.BaseModel
+	Name     string `gorm:&#34;column:name;type:varchar(255);not null;unique;default:&#39;&#39;&#34; valid:&#34;name&#34;`
+	Email    string `gorm:&#34;column:email;type:varchar(255) not null;unique;default:&#39;&#39;&#34; valid:&#34;email&#34;`
+	RealName string `gorm:&#34;column:real_name;type:varchar(255);not null;default:&#39;&#39;&#34; valid:&#34;realName&#34;`
+	Avatar   string `gorm:&#34;column:avatar;type:varchar(255);not null;default:&#39;&#39;&#34; valid:&#34;avatar&#34;`
+	Status   int    `gorm:&#34;column:status;type:tinyint(1);not null;default:0&#34; `
+	Password string `gorm:&#34;column:password;type:varchar(255) not null;;default:&#39;&#39;&#34; valid:&#34;password&#34;`
+}
+
+// ToORM protobuf转换为orm
+func ToORM(protoUser *pb.User) *User {
+	user := &amp;User{}
+	user.ID = protoUser.Id
+	user.Email = protoUser.Email
+	user.Name = protoUser.Name
+	user.Avatar = protoUser.Avatar
+	user.RealName = protoUser.RealName
+	return user
+}
+
+// ToProtobuf orm转换为protobuf
+func (model *User) ToProtobuf() *pb.User {
+	user := &amp;pb.User{}
+	user.Id = model.ID
+	user.Email = model.Email
+	user.Name = model.Name
+	user.Avatar = model.Avatar
+	user.CreateAt = model.CreatedAtDate()
+	user.UpdateAt = model.UpdatedAtDate()
+	user.RealName = model.RealName
+	return user
+}
+
+// Store 创建用户
+func (model *User) Store() (err error) {
+	result := db.GetDB().Create(&amp;model)
+	err = result.Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// Update 更新用户
+func (model *User) Update() (rowsAffected int64, err error) {
+	result := db.GetDB().Save(&amp;model)
+	err = result.Error
+	if err != nil {
+		return 0, err
+	}
+	rowsAffected = result.RowsAffected
+	return
+}
+
+// Delete 删除用户
+func (model User) Delete() (rowsAffected int64, err error) {
+	result := db.GetDB().Delete(&amp;model)
+	err = result.Error
+	if err != nil {
+		return
+	}
+	rowsAffected = result.RowsAffected
+	return
+}
+</code></pre><h4 id="添加模型事件加密用户密码">添加模型事件，加密用户密码</h4>
+<p>在储存用户到数据库时，我们的密码不应该以明文的方式进行存储，我们这里利用gorm提供的模型事件，在用户信息进入数据库之前，对密码进行一次加密再存储。</p>
+<p>打开<code>common</code>项目，封装一个加密工具包，把加密相关的工具方法放到这个目录下</p>
+<pre tabindex="0"><code>mkdir -p pkg/password
+touch pkg/password/password.go
+</code></pre><pre tabindex="0"><code>package password
+
+import (
+	&#34;crypto/md5&#34;
+	&#34;encoding/hex&#34;
+	&#34;golang.org/x/crypto/bcrypt&#34;
+)
+
+// Hash hash加密
+func Hash(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	if err != nil {
+		return &#34;&#34;, err
+	}
+
+	return string(bytes), nil
+}
+
+//CheckHash 检查密码是否与hash值匹配
+func CheckHash(password string, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
+
+// IsHashed 检查是否已经加密过
+func IsHashed(str string) bool {
+	return len(str) == 60
+}
+
+// Md5Str 获取一个md5加密字符串
+func Md5Str(str string) string {
+	h := md5.New()
+	h.Write([]byte(str))
+	return hex.EncodeToString(h.Sum(nil))
+}
+</code></pre><p>执行<code>go mod tidy</code>下载加密相关包<!-- raw HTML omitted -->返回<code>user</code>项目，编写模型事件代码</p>
+<pre tabindex="0"><code>touch pkg/model/user_hooks.go
+</code></pre><pre tabindex="0"><code>package model
+
+import (
+	&#34;github.com/869413421/micro-service/common/pkg/password&#34;
+	&#34;gorm.io/gorm&#34;
+)
+
+// BeforeSave 保存前模型事件
+func (model *User) BeforeSave(tx *gorm.DB) (err error) {
+	//1.如果密码没加密，进行一次加密
+	if !password.IsHashed(model.Password) {
+		model.Password, err = password.Hash(model.Password)
+		if err!=nil{
+			return err
+		}
+	}
+	return nil
+}
+</code></pre><h2 id="实现服务处理">实现服务处理</h2>
+<p>前面我们对rpc接口进行了定义并且生成了相对应的通讯代码。我们只是整个服务经行了声明，但并没有对服务进行实现。<!-- raw HTML omitted -->打开<code>user</code>项目</p>
+<h3 id="修改handlerusergo">修改handler/user.go</h3>
+<pre tabindex="0"><code>package handler
+
+import (
+	&#34;context&#34;
+	&#34;github.com/869413421/micro-service/common/pkg/types&#34;
+	&#34;github.com/869413421/micro-service/user/pkg/model&#34;
+	&#34;github.com/869413421/micro-service/user/pkg/repo&#34;
+	pb &#34;github.com/869413421/micro-service/user/proto/user&#34;
+	&#34;github.com/micro/go-micro/v2/errors&#34;
+	&#34;gorm.io/gorm&#34;
+)
+
+//UserServiceHandler 用户服务处理器
+type UserServiceHandler struct {
+	UserRepo repo.UserRepositoryInterface
+}
+
+// NewUserServiceHandler 用户服务初始化
+func NewUserServiceHandler() *UserServiceHandler {
+	return &amp;UserServiceHandler{
+		UserRepo: repo.NewUserRepository(),
+	}
+}
+
+// Pagination 分页
+func (srv *UserServiceHandler) Pagination(ctx context.Context, req *pb.PaginationRequest, rsp *pb.PaginationResponse) error {
+	// 1.查找分页数据
+	users, pagerData, err := srv.UserRepo.Pagination(req.Page, req.PerPage)
+	if err != nil {
+		return errors.InternalServerError(&#34;user.Pagination.Pagination.Error&#34;, err.Error())
+	}
+
+	// 2.构造用户列表
+	userItems := make([]*pb.User, len(users))
+	for index, user := range users {
+		userItem := user.ToProtobuf()
+		userItems[index] = userItem
+	}
+
+	// 3.返回用户信息
+	rsp.Users = userItems
+	rsp.Total = pagerData.TotalCount
+	return nil
+}
+
+// Get 根据ID获取数据
+func (srv *UserServiceHandler) Get(ctx context.Context, req *pb.GetRequest, rsp *pb.UserResponse) error {
+	// 1.查找用户
+	user, err := srv.UserRepo.GetByID(req.GetId())
+	if err != nil &amp;&amp; err != gorm.ErrRecordNotFound {
+		return err
+	}
+	if err == gorm.ErrRecordNotFound {
+		return errors.BadRequest(&#34;User.GetByID&#34;, &#34;user not found&#34;)
+	}
+
+	// 2.返回用户信息
+	rsp.User = user.ToProtobuf()
+	return nil
+}
+
+// Create 创建用户
+func (srv *UserServiceHandler) Create(ctx context.Context, req *pb.CreateRequest, rsp *pb.UserResponse) error {
+	// 1.填充提交信息
+	user := &amp;model.User{}
+	types.Fill(user, req)
+
+	// 2.创建用户
+	err := user.Store()
+	if err != nil {
+		return err
+	}
+
+	// 3.返回用户信息
+	rsp.User = user.ToProtobuf()
+	return nil
+}
+
+// Update 更新用户信息
+func (srv *UserServiceHandler) Update(ctx context.Context, req *pb.UpdateRequest, rsp *pb.UserResponse) error {
+	// 1.获取用户
+	id := req.Id
+	_user, err := srv.UserRepo.GetByID(id)
+	if err != nil &amp;&amp; err != gorm.ErrRecordNotFound {
+		return err
+	}
+	if err == gorm.ErrRecordNotFound {
+		return errors.NotFound(&#34;User.Update.GetUserByID.Error&#34;, &#34;user not found ,check you request id&#34;)
+	}
+
+	// 2.验证提交信息
+	types.Fill(_user, req)
+
+	// 3.更新用户
+	rowsAffected, err := _user.Update()
+	if rowsAffected == 0 || err != nil {
+		return errors.InternalServerError(&#34;User.Update.Update.Error&#34;, err.Error())
+	}
+
+	// 4.返回更新信息
+	rsp.User = _user.ToProtobuf()
+	return nil
+}
+
+// Delete 删除用户
+func (srv *UserServiceHandler) Delete(ctx context.Context, req *pb.DeleteRequest, rsp *pb.UserResponse) error {
+	// 1.获取用户
+	id := req.Id
+	_user, err := srv.UserRepo.GetByID(id)
+	if err != nil &amp;&amp; err != gorm.ErrRecordNotFound {
+		return err
+	}
+	if err == gorm.ErrRecordNotFound {
+		return errors.NotFound(&#34;User.Delete.GetUserByID.Error&#34;, &#34;user not found ,check you request id&#34;)
+	}
+
+	// 2.删除用户
+	rowsAffected, err := _user.Delete()
+	if err != nil {
+		return errors.InternalServerError(&#34;User.Delete.Delete.Error&#34;, err.Error())
+	}
+	if rowsAffected == 0 {
+		return errors.BadRequest(&#34;User.Delete.Delete.Fail&#34;, &#34;update fail&#34;)
+	}
+
+	// 3.返回更新信息
+	rsp.User = _user.ToProtobuf()
+	return nil
+}
+</code></pre><h3 id="修改maingo">修改main.go</h3>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;github.com/869413421/micro-service/common/pkg/db&#34;
+	&#34;github.com/869413421/micro-service/user/handler&#34;
+	&#34;github.com/869413421/micro-service/user/pkg/model&#34;
+	&#34;github.com/micro/go-micro/v2&#34;
+	log &#34;github.com/micro/go-micro/v2/logger&#34;
+
+	proto &#34;github.com/869413421/micro-service/user/proto/user&#34;
+)
+
+func main() {
+
+	// 1.准备数据库连接，并且执行数据库迁移
+	db := db.GetDB()
+	db.AutoMigrate(&amp;model.User{})
+
+	// 2.创建服务
+	service := micro.NewService(
+		micro.Name(&#34;micro.service.user&#34;),
+		micro.Version(&#34;v1&#34;),
+	)
+
+	// 3.初始化服务
+	service.Init()
+
+	// 4.注册服务处理器
+	proto.RegisterUserServiceHandler(service.Server(),handler.NewUserServiceHandler())
+
+	// 5.运行服务
+	if err := service.Run(); err != nil {
+		log.Fatal(err)
+	}
+}
+</code></pre><h4 id="编译服务">编译服务</h4>
+<pre tabindex="0"><code>go mod download
+make build
+</code></pre><h2 id="测试用户服务是否正常运行">测试用户服务是否正常运行</h2>
+<h3 id="重启服务">重启服务</h3>
+<pre tabindex="0"><code>docker-compose restart micro-user-service
+</code></pre><h4 id="检查注册的服务方法">检查注册的服务方法</h4>
+<p>打开<a href="http://127.0.0.1:8082/service/micro.service.user">http://127.0.0.1:8082/service/micro.service.user</a><!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651574619019-51b73b37-9931-4cf9-9249-343d7a6e67a8.png#clientId=ude921de3-de0e-4&amp;from=paste&amp;height=845&amp;id=u1ad0f958&amp;name=image.png&amp;originHeight=929&amp;originWidth=1920&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=51721&amp;status=done&amp;style=none&amp;taskId=ue3cee349-96b4-496b-b26e-59f77d4a2eb&amp;title=&amp;width=1745.4545076228378" alt="image.png"><!-- raw HTML omitted -->可以看到实现的rpc接口已经注册</p>
+<h4 id="测试接口">测试接口</h4>
+<p>点击client,选择相关服务以及方法，输入请求参数，对接口进行测试<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651575858750-967ab8ae-5114-4fb5-aa71-70085533a47f.png#clientId=ude921de3-de0e-4&amp;from=paste&amp;height=508&amp;id=uee9cddce&amp;name=image.png&amp;originHeight=559&amp;originWidth=1146&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=51629&amp;status=done&amp;style=none&amp;taskId=u273c3a92-1b0e-4886-8291-7ae9d2db6d3&amp;title=&amp;width=1041.8181592373815" alt="image.png"><!-- raw HTML omitted -->可以看到返回了正常信息，顺便检查数据库用户密码是否加密<!-- raw HTML omitted --><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1651575952490-ef234120-4b3b-45e4-907e-4291355a573a.png#clientId=ude921de3-de0e-4&amp;from=paste&amp;height=61&amp;id=u74bf1f21&amp;name=image.png&amp;originHeight=67&amp;originWidth=1133&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=8097&amp;status=done&amp;style=none&amp;taskId=u69d512a8-8d44-49ec-88c3-0515930174b&amp;title=&amp;width=1029.9999776753516" alt="image.png"><!-- raw HTML omitted -->依次对其他接口进行测试，保证编写的代码正常运行,提交代码到github</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5"
+      >go-micro开发运维实践</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%AE%89%E8%A3%85etcd%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83/"
+      ><span class="mr-1.5">←</span><span>go-micro开发运维实践(安装etcd集群，部署注册中心)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%B0%81%E8%A3%85gin%E7%BC%96%E5%86%99api%E6%8E%A5%E5%8F%A3/"
+      ><span>go-micro开发运维实践(封装gin编写api接口)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

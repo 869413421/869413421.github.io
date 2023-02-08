@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>go-micro开发运维实践 on 清水泥沙</title>
+    <link>https://869413421.github.io/categories/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/</link>
+    <description>Recent content in go-micro开发运维实践 on 清水泥沙</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-zh</language>
+    <lastBuildDate>Tue, 07 Feb 2023 15:52:40 +0800</lastBuildDate><atom:link href="https://869413421.github.io/categories/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>go-micro开发运维实践(业务架构)</title>
+      <link>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E4%B8%9A%E5%8A%A1%E6%9E%B6%E6%9E%84/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E4%B8%9A%E5%8A%A1%E6%9E%B6%E6%9E%84/</guid>
+      <description>业务准备 一个传统web系统，用户模块永远是不可或缺的一环，也作为一个系统的基石。下列的教程中将使用go-micro来编写一个用户服务，以此作为开发的基础。下面是一个用户服务中暴露的api以及内部调用rpc方法规划。
+api /user POST 注册 /user/:id GET 获取用户信息 /user/token POST 认证获取token /user GET 获取用户列表 /user/:id PUT 更新用户 /user/:id DELETE 删除用户 /user/password POST 发起密码重置 /user/password PUT 重置密码 rpc Get 根据ID获取用户信息 Pagination 获取分页数据 Create 创建用户 Update 更新用户 Delete 删除用户 Auth 认证获取token Validate 验证token CreatePasswordReset 创建密码重置记录 ResetPassword 密码重置 架构设计 技术选型 注册中心：etcd api网关：micro-api v2 api服务：gin 微服务：go-micro v2 数据库：mysql 服务追踪：opentracing/jaeger 服务监控：prometheus + grafana 消息队列：rabbit-mq 缓存系统：redis 搜索服务：elasticsearch 日志系统：ELK 上述中所有描述的组件，在单机阶段我们都使用docker-compose来进行实践。后续我完成编码以及单机部署后再基于k8s进行部署
+总结一下上图中用户请求到响应的整个流程，用户在前端发起请求，请求到达服务器后通过nginx或其他的负载均衡器中，通过反向代理把请求转发到micro-api统一网关。关于micro-api网关，你同样可以把他理解为一个分发路由，micro-api启动后会通过服务发现找到所有已经注册的api服务，然后解析路由规则将请求分发到到我们指定的api服务。而api服务会通过grpc向service请求，实际中api服务并不参与过多的密集计算或IO处理，最终处理压力交由service来承担。service处理完成将响应返回给api服务，api再返回响应给到接入层（nginx）,从而完成整个请求响应的闭环。至于上图中出现的服务治理，服务监控，链路追踪等细节，我们后续在执行到相关知识时再详细了解。</description>
+    </item>
+    
+    <item>
+      <title>go-micro开发运维实践(初始化用户API项目)</title>
+      <link>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%88%9D%E5%A7%8B%E5%8C%96%E7%94%A8%E6%88%B7api%E9%A1%B9%E7%9B%AE/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%88%9D%E5%A7%8B%E5%8C%96%E7%94%A8%E6%88%B7api%E9%A1%B9%E7%9B%AE/</guid>
+      <description>服务与API分离 在开篇前头，我们已经明确过，用户服务与用户API的用途与关系，用户服务是基于内网调用不对外暴露的，用户API是暴露到外网提供给外部访问的，用户API的实际用途可以归结为以下几点。
+作为用户服务的客户端，提供对外访问路由，提高系统安全性 作为中间层，对web客户端提交信息进行验证过滤。 作为中间层，基于限流熔断等机制，控制访问流量。 初始化项目 mkdir user-apicd user-apigo mod init github.com/869413421/micro-service/user-apigo get -u github.com/gin-gonic/gin 编写web服务注册代码 touch main.go package mainimport (&amp;#34;github.com/micro/go-micro/v2/web&amp;#34;&amp;#34;log&amp;#34;&amp;#34;time&amp;#34;)func main() {var serviceName = &amp;#34;micro.api.user&amp;#34;service := web.NewService(web.Name(serviceName),web.Address(&amp;#34;:81&amp;#34;),// 指定服务注册信息在注册中心的有效期。 默认为一分种web.RegisterTTL(time.Minute*2),// 指定服务主动向注册中心报告健康状态的时间间隔,默认为 30 秒。web.RegisterInterval(time.Minute*1),)err := service.Init()if err != nil {log.Fatal(&amp;#34;Init api error:&amp;#34;, err)}err = service.Run()if err != nil {log.</description>
+    </item>
+    
+    <item>
+      <title>go-micro开发运维实践(初始化项目，安装micro)</title>
+      <link>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%88%9D%E5%A7%8B%E5%8C%96%E9%A1%B9%E7%9B%AE%E5%AE%89%E8%A3%85micro/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%88%9D%E5%A7%8B%E5%8C%96%E9%A1%B9%E7%9B%AE%E5%AE%89%E8%A3%85micro/</guid>
+      <description>初始化git项目 进入工作目录，按照go规范，我们定义一个工作目录应，这是我在windows环境中的定义的路径D:\go\src\github.com\869413421，在工作磁盘下的go/src中创建，后续加上仓库类型如github.com,gitee等，最后加上该站点账号。
+创建项目文件夹 mkdir micro-service 关联github仓库 cd micro-servicegit initgit remote add origin https://github.com/869413421/micro-service.gitgit pull origin main 安装micro 在安装前，我们首先明确了解go-micro和micro具体是什么东西。避免后续因为这两项有关联的技术产生一些混淆。
+go-micro:一款微服务开发框架，它是所有开发的核心，开发者可以利用它编码快速开发出服务。 micro:一个基于go-micro实现的微服务命令行工具包，它对于微服务开发是非必要的。但是能给开发提供很多便利，例如生成模板项目，提供web仪表盘，提供API网关，查看服务状态，调用服务等等。 拉取micro镜像 docker pull micro/micro:v2.9.3 生成micro生成项目模板 windows :::warning 在windows下执行命令要使用CMD执行 :::
+docker run --rm -v D:\go\src\github.com\869413421\micro-service:/www -w /www micro/micro:v2.9.3 new --namespace=micro --type=service user linux
+docker run --rm -v $(pwd):/www -w /www micro/micro:v2.9.3 new --namespace=micro --type=service user 安装protobuf 在执行生成模板命令后，我们可以等如下提示
+Creating service micro.service.user in user.├── main.go├── generate.go├── plugin.</description>
+    </item>
+    
+    <item>
+      <title>go-micro开发运维实践(基于jwt实现登录验证接口)</title>
+      <link>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%9F%BA%E4%BA%8Ejwt%E5%AE%9E%E7%8E%B0%E7%99%BB%E5%BD%95%E9%AA%8C%E8%AF%81%E6%8E%A5%E5%8F%A3/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%9F%BA%E4%BA%8Ejwt%E5%AE%9E%E7%8E%B0%E7%99%BB%E5%BD%95%E9%AA%8C%E8%AF%81%E6%8E%A5%E5%8F%A3/</guid>
+      <description>定义登录验证protobuf 修改proto/user/user.proto syntax = &amp;#34;proto3&amp;#34;;package micro.service.user;option go_package = &amp;#34;proto/user&amp;#34;;service UserService {rpc Pagination(PaginationRequest) returns(PaginationResponse){}rpc Get(GetRequest) returns(UserResponse){}rpc Create(CreateRequest) returns(UserResponse){}rpc Update(UpdateRequest) returns(UserResponse){}rpc Delete(DeleteRequest) returns(UserResponse){}rpc Auth(AuthRequest) returns(TokenResponse){}rpc ValidateToken(TokenRequest) returns(TokenResponse){}}message User{uint64 id = 1;string name = 3;string email = 4;string real_name = 6;string avatar = 7;string create_at = 9;string update_at = 10;}//UserResponse 单个用户响应message UserResponse{User user = 1;}//PaginationResponse 用户分页数据响应message PaginationResponse{repeated User users = 1;uint64 total = 2;}//PaginationRequest 用户分页请求message PaginationRequest{uint64 page = 1;uint32 perPage = 2;}//GetRequest 获取单个用户请求message GetRequest{uint64 id = 1;}//CreateRequest 创建用户请求message CreateRequest{string name = 1;string password = 2;string email = 3;string real_name = 4;string avatar = 5;}//UpdateRequest 更新用户请求message UpdateRequest{uint64 id = 1;string name = 2;string email = 3;string real_name = 4;string avatar = 6;}//DeleteRequest 删除用户请求message DeleteRequest{uint64 id = 1;}//AuthRequest 登录请求message AuthRequest{string email = 1;string password = 2;}//TokenRequest token验证接口message TokenRequest{string token = 1;}//TokenResponse token响应接口message TokenResponse{string token = 1;bool valid = 2;} 生成protobuf代码 make proto 引用jwt编写获取token业务 获取jwt生成包 go get -u github.</description>
+    </item>
+    
+    <item>
+      <title>go-micro开发运维实践(安装etcd集群，部署注册中心)</title>
+      <link>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%AE%89%E8%A3%85etcd%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%AE%89%E8%A3%85etcd%E9%9B%86%E7%BE%A4%E9%83%A8%E7%BD%B2%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83/</guid>
+      <description>etcd集群安装 在微服务架构中，注册中心作为基础设施，承担着服务注册以及服务发现的重要功能。etcd作为一个分布式一致性的KV存储系统，按照etcd官网给出的性能测试, 在2CPU，1.8G内存，SSD磁盘这样的配置下，单节点的写性能可以达到16K QPS, 而先写后读也能达到12K QPS，这个性能相当可观。而在go-micro中etcd作为注册中心默认驱动，得益于其灵活的拓展机制，要在go-micro中使用etcd相对简单，下面我们使用docker-compose部署一个etcd集群。
+编写docker-compose 创建yaml和配置文件 touch docker-compose.yamltouch .env 为etcd持久化提供挂载目录 mkdir -p data/etcd1mkdir -p data/etcd2mkdir -p data/etcd3 .env添加通用参数 # 设置时区TZ=Asia/Shanghai# 设置etcd镜像版本ETCD_VERSION=3.5# 设置e3w镜像版本E3W_VERSION=latest 编写docker-compose.yaml :::info 这里我们主要通过 environment 配置项设置 etcd启动参数来定义集群配置，在启动过程中需要确保三个 etcd节点可以相互连接并通信。 :::
+# docker-compose.ymlversion: &amp;#39;3.3&amp;#39;services:etcd1:image: bitnami/etcd:${ETCD_VERSION}environment:TZ: ${TZ}ALLOW_NONE_AUTHENTICATION: &amp;#34;yes&amp;#34;ETCD_NAME: &amp;#34;etcd1&amp;#34;ETCD_INITIAL_ADVERTISE_PEER_URLS: &amp;#34;http://etcd1:2380&amp;#34;ETCD_LISTEN_PEER_URLS: &amp;#34;http://0.0.0.0:2380&amp;#34;ETCD_LISTEN_CLIENT_URLS: &amp;#34;http://0.0.0.0:2379&amp;#34;ETCD_ADVERTISE_CLIENT_URLS: &amp;#34;http://etcd1:2379&amp;#34;ETCD_INITIAL_CLUSTER_TOKEN: &amp;#34;etcd-cluster&amp;#34;ETCD_INITIAL_CLUSTER: &amp;#34;etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380&amp;#34;ETCD_INITIAL_CLUSTER_STATE: &amp;#34;new&amp;#34;volumes:- .</description>
+    </item>
+    
+    <item>
+      <title>go-micro开发运维实践(实现用户CURD服务)</title>
+      <link>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%AE%9E%E7%8E%B0%E7%94%A8%E6%88%B7curd%E6%9C%8D%E5%8A%A1/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%AE%9E%E7%8E%B0%E7%94%A8%E6%88%B7curd%E6%9C%8D%E5%8A%A1/</guid>
+      <description>定义protobuf,生成代码 修改proto/user/user.proto syntax = &amp;#34;proto3&amp;#34;;package micro.service.user;option go_package = &amp;#34;proto/user&amp;#34;;service UserService {rpc Pagination(PaginationRequest) returns(PaginationResponse){}rpc Get(GetRequest) returns(UserResponse){}rpc Create(CreateRequest) returns(UserResponse){}rpc Update(UpdateRequest) returns(UserResponse){}rpc Delete(DeleteRequest) returns(UserResponse){}}message User{uint64 id = 1;string name = 3;string email = 4;string real_name = 6;string avatar = 7;string create_at = 9;string update_at = 10;}//UserResponse 单个用户响应message UserResponse{User user = 1;}//PaginationResponse 用户分页数据响应message PaginationResponse{repeated User users = 1;uint64 total = 2;}//PaginationRequest 用户分页请求message PaginationRequest{uint64 page = 1;uint32 perPage = 2;}//GetRequest 获取单个用户请求message GetRequest{uint64 id = 1;}//CreateRequest 创建用户请求message CreateRequest{string name = 1;string password = 2;string email = 3;string real_name = 4;string avatar = 5;}//UpdateRequest 更新用户请求message UpdateRequest{uint64 id = 1;string name = 2;string email = 3;string real_name = 4;string avatar = 6;}//DeleteRequest 删除用户请求message DeleteRequest{uint64 id = 1;} 执行生成命令 make命令能帮我们执行在makefile中预定义好的命令，在开发当中能给我们带来便利。</description>
+    </item>
+    
+    <item>
+      <title>go-micro开发运维实践(封装gin编写api接口)</title>
+      <link>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%B0%81%E8%A3%85gin%E7%BC%96%E5%86%99api%E6%8E%A5%E5%8F%A3/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%B0%81%E8%A3%85gin%E7%BC%96%E5%86%99api%E6%8E%A5%E5%8F%A3/</guid>
+      <description>封装用户服务客户端 打开common项目修改pkg/container/service.go
+package containerimport (userPb &amp;#34;github.com/869413421/micro-service/user/proto/user&amp;#34;&amp;#34;github.com/micro/go-micro/v2&amp;#34;&amp;#34;github.com/micro/go-micro/v2/broker&amp;#34;)var service micro.Servicevar userServiceClient userPb.UserService// SetService 设置服务实例func SetService(srv micro.Service) {service = srv}// GetService 返回服务实例func GetService() micro.Service {return service}// GetServiceBroker 返回服务Broker实例func GetServiceBroker() broker.Broker {return service.Options().Broker}// SetUserServiceClient 设置客户端实例func SetUserServiceClient(userService userPb.UserService) {userServiceClient = userService}// GetUserServiceClient 获取客户端实例func GetUserServiceClient() userPb.UserService {return userServiceClient} 打开user-api</description>
+    </item>
+    
+    <item>
+      <title>go-micro开发运维实践(引入rabbitmq作为消息驱动)</title>
+      <link>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%BC%95%E5%85%A5rabbitmq%E4%BD%9C%E4%B8%BA%E6%B6%88%E6%81%AF%E9%A9%B1%E5%8A%A8/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%BC%95%E5%85%A5rabbitmq%E4%BD%9C%E4%B8%BA%E6%B6%88%E6%81%AF%E9%A9%B1%E5%8A%A8/</guid>
+      <description>为什么需要异步通信？ 在我们预设定的接口中，我们需要完成一个重置密码的功能。基本流程为，用户提交需要重置密码的邮箱，系统接收到后向邮箱发送一则消息，用户点击邮箱中带有加密信息的邮件再次向系统发起请求，系统通过验证后重置用户的密码。在这一个流程当中，发送邮件是一个耗时操作，如果采用同步的方式，一方面这会导致大量的请求浪费（因为要监听状态需要发起轮询请求），另一方面会导致接口数量不断增长变得臃肿，另外，对一些耗时操作同步请求会影响用户体验。基于上面的种种原因，我们有必要为系统接入基于事件异步通信，这样不仅为系统带来解耦，同时可以基于消息队列进行多个订阅处理，从而提高系统的运行效率。在go-micro中，我们可以通过broker组件来实现上述的异步通信。这里我们选择go-micro插件支持rabbitmq作为broker的驱动。
+docker-compose安装rabbitmq .env中添加配置信息 ...#设置rabbitmq镜像版本RABBITMQ_VERSION=3.8.3-management#rabbitmq默认用户名称RABBITMQ_USER=root#rabbitmq默认密码RABBTIMQ_PASSWORD=root... 修改docker-compose.yaml micro-rabbitmq:image: rabbitmq:${RABBITMQ_VERSION}restart: alwaysports:- 15672:15672- 5672:5672environment:- RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}- RABBITMQ_DEFAULT_PASS=${RABBTIMQ_PASSWORD}networks:- micro-network 检查rabbitmq是否正常运行 检查容器是否正常运行 访问rabbitmq可视化管理界面 打开http://127.0.0.1:15672输入配置的用户名密码
+编写重置密码服务 创建重置密码记录模型 touch pkg/model/password.go package modelimport (db &amp;#34;github.com/869413421/micro-service/common/pkg/db&amp;#34;)// PasswordReset 重置密码模型type PasswordReset struct {db.BaseModelToken string `gorm:&amp;#34;column:token;type:varchar(255) not null;index&amp;#34; `Email string `gorm:&amp;#34;column:email;type:varchar(255) not null;index&amp;#34; valid:&amp;#34;email&amp;#34;`Verify int8 `gorm:&amp;#34;column:verify;type:tinyint(1);not null;default:0&amp;#34;`}// Store 创建重置记录func (model *PasswordReset) Store() (err error) {result := db.</description>
+    </item>
+    
+    <item>
+      <title>go-micro开发运维实践(注册第一个微服务)</title>
+      <link>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E6%B3%A8%E5%86%8C%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BE%AE%E6%9C%8D%E5%8A%A1/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E6%B3%A8%E5%86%8C%E7%AC%AC%E4%B8%80%E4%B8%AA%E5%BE%AE%E6%9C%8D%E5%8A%A1/</guid>
+      <description>修改用户服务代码 前面我们已经安装好了微服务的一些基础设施，现在我们需要开始编写微服务代码，构建容器，启动服务并将其注册到注册中心中。
+更正引用错误 打开micro生成的用户服务代码模板的入口文件main.go,我们发现因为我们修改了go.mod文件所以导致一些引用失效，所以我们需要将这些文件的引用更正
+修改main.go package mainimport (&amp;#34;github.com/869413421/micro-service/user/handler&amp;#34;&amp;#34;github.com/869413421/micro-service/user/subscriber&amp;#34;&amp;#34;github.com/micro/go-micro/v2&amp;#34;log &amp;#34;github.com/micro/go-micro/v2/logger&amp;#34;proto &amp;#34;github.com/869413421/micro-service/user/proto/user&amp;#34;)func main() {// New Serviceservice := micro.NewService(micro.Name(&amp;#34;micro.service.user&amp;#34;),micro.Version(&amp;#34;latest&amp;#34;),)// Initialise serviceservice.Init()// Register Handlerproto.RegisterUserHandler(service.Server(), new(handler.User))// Register Struct as Subscribermicro.RegisterSubscriber(&amp;#34;micro.service.user&amp;#34;, service.Server(), new(subscriber.User))// Run serviceif err := service.Run(); err != nil {log.Fatal(err)}} package handlerimport (&amp;#34;context&amp;#34;&amp;#34;github.com/869413421/micro-service/user/proto/user&amp;#34;log &amp;#34;github.com/micro/go-micro/v2/logger&amp;#34;proto &amp;#34;github.com/869413421/micro-service/user/proto/user&amp;#34;)type User struct{}// Call is a single request handler called via client.</description>
+    </item>
+    
+    <item>
+      <title>go-micro开发运维实践(行文初衷)</title>
+      <link>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E8%A1%8C%E6%96%87%E5%88%9D%E8%A1%B7/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E8%A1%8C%E6%96%87%E5%88%9D%E8%A1%B7/</guid>
+      <description>写在前头 考虑到近期耗费了不少时间在微服务开发上，在拜读完学院君的《微服务从入门到实践》在趟了很多坑后获得了一些自己的理解和实践。为了巩固近期学习到的知识，以及为后来者作些许贡献，打算利用空闲时间来书写一写我这段时间内从零到一的实现方案。作为一名有实用原则的程序员，行文中我可能并不会对概念方面进行详细讲解。只希望能抛砖引玉让大家对整个方案的实现有所理解，点到点之间做好链接，从而达到摸清整个微服务的轮廓的目的。
+阅读本文所需知识 具备golang基础，了解grpc 对微服务概念有所理解，使用过go-micro，至少能完成go-micro入门案例 使用过docker，docker-compose,熟悉docker的基本操作 会使用linux 开发工具 以下是作者使用到的开发工具，可以根据自身实际情况进行调整
+win10 docker-desktop goland mysqlWorkbeanch vmware 项目案例 为了展示教学，我们展示不考虑编写过于复杂的业务。但为了对于知识点有所覆盖，我们选用比较经典的电商项目进行编码。主要划分为三个模块，用户服务，商品服务，订单服务 。方便我们展示在微服务中如何实现定时调度，分布式事务，链路追踪，服务治理，分布式日志，异步消息等方案。微服务框架选择 这里我们选择使用go-micro v2版本，至于为什么使用go-micro，因为它除了提供基本的RPC远程调用外，还提供了需要实现微服务的各种基础支持，包括注册中心、服务发现、负载均衡、API 网关、异步消息队列、多种通信协议和数据序列化格式等，不需要开发者额外编写代码。还可以基于go-micro的插件机制，对这些功能的驱动进行替换。如注册中心，可以基于热拔插机制替换成etcd,consul,k8s,异步消息驱动可以替换成市面上比较流行的各种中间件，如NATS,RabbitMq。相对来说go-micro是一款灵活拓展性高且功能完备的开发框架。
+为什么不是micro v3? 至作者行文当天，micro v3依然处于商业化探索阶段，大部分功能开发测试当中。且v3版本除了一些思想上的延续，与v2基本上不再相同。v2已经独立出一个仓库维护了，且[micro](https://micro.dev)官网大部分文档已经下架更新中，导致学习框架的成本更高。所以这里选择v2，因为v2的使用在[github](https://github.com/asim/go-micro)仓库中依然有大部分的使用案例。</description>
+    </item>
+    
+    <item>
+      <title>go-micro开发运维实践(部署用户数据库，封装gorm)</title>
+      <link>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E9%83%A8%E7%BD%B2%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE%E5%BA%93%E5%B0%81%E8%A3%85gorm/</link>
+      <pubDate>Tue, 07 Feb 2023 15:52:40 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E9%83%A8%E7%BD%B2%E7%94%A8%E6%88%B7%E6%95%B0%E6%8D%AE%E5%BA%93%E5%B0%81%E8%A3%85gorm/</guid>
+      <description>微服务数据库拆分原则 数据库拆分是微服务中的一个关键点，在进行拆分时需要遵循一些原则。
+每个微服务都拥有属于自己的数据库，且只允许当前服务调用。 微服务中，依赖数据（如主表依赖从表，用户与用户订单这种关系）应该通过服务进行调用。 共享数据（如国家，地区），可能需要被许多微服务进行访问，将其拆分后虽然起到了解耦的作用，如果通过服务来进行访问对性能会有损耗。这种情况下就需要斟酌处理了，其中一种方式是直接对数据异构解耦。比如一个地区表，用户服务需要直接对其join进行访问，订单服务也需要对其join进行访问。这时候我们在两个服务的数据库中都建立一个地区表，再通过binlog或者mq的方式让这两个表的数据进行同步。推荐一下chanl,阿里开源的一种binlog同步方案，支持多种语言客户端。 docker-compose安装用户数据库 修改.env ...#数据库版本MYSQL_VERSION=latest#用户数据库用户名USER_DB_USER=&amp;#34;micro_user&amp;#34;#用户数据库密码USER_DB_PASSWORD=&amp;#34;micro_user&amp;#34;#用户数据库初始dbUSER_DB_DATABASE=&amp;#34;micro_user&amp;#34;#用户数据库root密码USER_DB_ROOT_PASSWORD=&amp;#34;root&amp;#34;#用户数据库映射端口USER_DB_PORT=33061#用户数据库最大链接数USER_DB_MAX_CONNECTIONS=200#用户数据库最大空闲链接数USER_DB_MAX_IDE_CONNECTIONS=50#用户数据库空闲链接最大存活时间，分USER_DB_CONNECTIONS_MAX_LIFE_TIME=5... 创建持久化挂载目录 mkdir -p data/user-db 修改docker-compose.yaml ...micro-user-db:image: mysql:${MYSQL_VERSION}ports:- ${USER_DB_PORT}:3306volumes:- ./data/user-db:/var/lib/mysqlrestart: alwaysenvironment:TZ: ${TZ}MYSQL_USER: ${USER_DB_USER} # 设置用户名MYSQL_PASSWORD: ${USER_DB_PASSWORD} # 设置用户民吗MYSQL_DATABASE: ${USER_DB_DATABASE} # 初始数据库MYSQL_ROOT_PASSWORD: ${USER_DB_ROOT_PASSWORD} # root用户密码networks:- micro-network... 启动数据库 docker-compose up -d micro-user-db查看容器是否正常运行使用.</description>
+    </item>
+    
+  </channel>
+</rss>

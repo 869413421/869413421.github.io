@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>go-micro开发运维实践(封装gin编写api接口) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="封装用户服务客户端 打开common项目修改pkg/container/service.go
+package containerimport (userPb &#34;github.com/869413421/micro-service/user/proto/user&#34;&#34;github.com/micro/go-micro/v2&#34;&#34;github.com/micro/go-micro/v2/broker&#34;)var service micro.Servicevar userServiceClient userPb.UserService// SetService 设置服务实例func SetService(srv micro.Service) {service = srv}// GetService 返回服务实例func GetService() micro.Service {return service}// GetServiceBroker 返回服务Broker实例func GetServiceBroker() broker.Broker {return service.Options().Broker}// SetUserServiceClient 设置客户端实例func SetUserServiceClient(userService userPb.UserService) {userServiceClient = userService}// GetUserServiceClient 获取客户端实例func GetUserServiceClient() userPb.UserService {return userServiceClient} 打开user-api" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="go-micro开发运维实践(封装gin编写api接口)" />
+<meta property="og:description" content="go-micro开发运维实践(封装gin编写api接口)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%B0%81%E8%A3%85gin%E7%BC%96%E5%86%99api%E6%8E%A5%E5%8F%A3/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="go-micro开发运维实践(封装gin编写api接口)">
+<meta itemprop="description" content="go-micro开发运维实践(封装gin编写api接口)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="989">
+<meta itemprop="keywords" content="go-micro开发运维实践," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="go-micro开发运维实践(封装gin编写api接口)"/>
+<meta name="twitter:description" content="go-micro开发运维实践(封装gin编写api接口)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">go-micro开发运维实践(封装gin编写api接口)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="封装用户服务客户端">封装用户服务客户端</h2>
+<p>打开<code>common</code>项目<!-- raw HTML omitted -->修改<code>pkg/container/service.go</code></p>
+<pre tabindex="0"><code>package container
+
+import (
+	userPb &#34;github.com/869413421/micro-service/user/proto/user&#34;
+	&#34;github.com/micro/go-micro/v2&#34;
+	&#34;github.com/micro/go-micro/v2/broker&#34;
+)
+
+var service micro.Service
+var userServiceClient userPb.UserService
+
+// SetService 设置服务实例
+func SetService(srv micro.Service) {
+	service = srv
+}
+
+// GetService 返回服务实例
+func GetService() micro.Service {
+	return service
+}
+
+// GetServiceBroker 返回服务Broker实例
+func GetServiceBroker() broker.Broker {
+	return service.Options().Broker
+}
+
+// SetUserServiceClient 设置客户端实例
+func SetUserServiceClient(userService userPb.UserService) {
+	userServiceClient = userService
+}
+
+// GetUserServiceClient 获取客户端实例
+func GetUserServiceClient() userPb.UserService {
+	return userServiceClient
+}
+</code></pre><p>打开<code>user-api</code></p>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;github.com/869413421/micro-service/common/pkg/container&#34;
+	pb &#34;github.com/869413421/micro-service/user/proto/user&#34;
+	&#34;github.com/micro/go-micro/v2&#34;
+	&#34;github.com/micro/go-micro/v2/web&#34;
+	&#34;log&#34;
+	&#34;time&#34;
+)
+
+func main() {
+	// 1.初始化web客户端
+	var serviceName = &#34;micro.api.user&#34;
+	service := web.NewService(
+		web.Name(serviceName),
+		web.Address(&#34;:81&#34;),
+		// 指定服务注册信息在注册中心的有效期。 默认为一分种
+		web.RegisterTTL(time.Minute*2),
+		// 指定服务主动向注册中心报告健康状态的时间间隔,默认为 30 秒。
+		web.RegisterInterval(time.Minute*1),
+	)
+
+
+	// 2.初始化用户服务客户端
+	clientService := micro.NewService(
+		micro.Name(&#34;pg.api.user.cli&#34;),
+	)
+	client := pb.NewUserService(&#34;micro.service.user&#34;, clientService.Client())
+	container.SetUserServiceClient(client)
+
+	// 3.启动web客户端
+	err := service.Init()
+	if err != nil {
+		log.Fatal(&#34;Init api error:&#34;, err)
+	}
+	err = service.Run()
+	if err != nil {
+		log.Fatal(&#34;start api error:&#34;, err)
+		return
+	}
+}
+</code></pre><p>修改<code>common</code>和<code>user-api</code>的<code>go.mod</code>，锁定<code>grpc</code>版本</p>
+<pre tabindex="0"><code>replace google.golang.org/grpc =&gt; google.golang.org/grpc v1.26.0
+</code></pre><p>执行<code>go mod tidy</code> 下载依赖</p>
+<h2 id="封装basecontroller">封装BaseController</h2>
+<p>打开<code>common</code>项目</p>
+<pre tabindex="0"><code>mkdir -p api/http/controller
+touch api/http/controller/base_controller.go
+</code></pre><pre tabindex="0"><code>package controller
+
+import &#34;github.com/gin-gonic/gin&#34;
+
+// ResponseErrors 异常信息统一格式
+type ResponseErrors map[string]interface{}
+
+// ResponseData 统一响应格式
+type ResponseData struct {
+	Code     int         `json:&#34;code&#34;`
+	ErrorMsg string      `json:&#34;errorMsg&#34;`
+	Data     interface{} `json:&#34;data&#34;`
+}
+
+// Pagination 分页统一结构体
+type Pagination struct {
+	Page    uint64 `form:&#34;page&#34;`
+	PerPage uint32 `form:&#34;perPage&#34;`
+}
+
+// BaseController base
+type BaseController struct {
+}
+
+// NewBaseController 初始化控制器
+func NewBaseController() *BaseController {
+	return &amp;BaseController{}
+}
+
+// ResponseJson 响应json
+func (*BaseController) ResponseJson(ctx *gin.Context, code int, errorMsg string, data interface{}) {
+	responseData := ResponseData{
+		Code:     code,
+		ErrorMsg: errorMsg,
+		Data:     data,
+	}
+
+	ctx.JSON(code, responseData)
+	ctx.Abort()
+}
+</code></pre><p>执行<code>go mod tidy</code> 下载依赖</p>
+<h2 id="编写用户控制器">编写用户控制器</h2>
+<pre tabindex="0"><code>mkdir -p app/http/controllers
+touch app/http/controllers/user_controller.go
+</code></pre><pre tabindex="0"><code>package controllers
+
+import (
+	base &#34;github.com/869413421/micro-service/common/api/http/controller&#34;
+	&#34;github.com/869413421/micro-service/common/pkg/container&#34;
+	&#34;github.com/869413421/micro-service/common/pkg/types&#34;
+	pb &#34;github.com/869413421/micro-service/user/proto/user&#34;
+	&#34;github.com/gin-gonic/gin&#34;
+	&#34;net/http&#34;
+)
+
+// UserController 用户控制器
+type UserController struct {
+	base.BaseController
+}
+
+// NewUserController 初始化用户控制器
+func NewUserController() *UserController {
+	return &amp;UserController{}
+}
+
+// Index 用户分页
+func (controller *UserController) Index(context *gin.Context) {
+	// 1.构建发起请求参数
+	pagination := &amp;base.Pagination{}
+	err := context.BindQuery(pagination)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusForbidden, &#34;pagination params required&#34;, []string{})
+	}
+
+	// 2.请求用户服务
+	req := &amp;pb.PaginationRequest{
+		Page:    pagination.Page,
+		PerPage: pagination.PerPage,
+	}
+	client := container.GetUserServiceClient()
+	rsp, err := client.Pagination(context, req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusInternalServerError, err.Error(), []string{})
+		return
+	}
+
+	//3.响应用户信息
+	controller.ResponseJson(context, http.StatusOK, &#34;&#34;, rsp)
+}
+
+// Store 创建用户
+func (controller *UserController) Store(context *gin.Context) {
+	// 1.构建微服务请求体
+	req := &amp;pb.CreateRequest{}
+	client := container.GetUserServiceClient()
+	err := context.BindJSON(req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusForbidden, &#34;json params error&#34;, []string{})
+		return
+	}
+
+	// 2.发起创建请求
+	rsp, err := client.Create(context, req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusInternalServerError, err.Error(), []string{})
+		return
+	}
+
+	// 3.响应用户信息
+	controller.ResponseJson(context, http.StatusOK, &#34;&#34;, rsp.User)
+}
+
+// Update 更新用户
+func (controller *UserController) Update(context *gin.Context) {
+	// 1.获取路由中的ID
+	idStr := context.Param(&#34;id&#34;)
+	if idStr == &#34;&#34; {
+		controller.ResponseJson(context, http.StatusForbidden, &#34;route id required&#34;, []string{})
+		return
+	}
+
+	// 2.构建微服务请求体
+	req := &amp;pb.UpdateRequest{}
+	err := context.BindJSON(req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusForbidden, &#34;json params error&#34;, []string{})
+		return
+	}
+	id, _ := types.StringToInt(idStr)
+	req.Id = uint64(id)
+
+	// 3.调用服务请求
+	client := container.GetUserServiceClient()
+	rsp, err := client.Update(context, req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusInternalServerError, err.Error(), []string{})
+		return
+	}
+
+	//5.响应用户信息
+	controller.ResponseJson(context, http.StatusOK, &#34;&#34;, rsp.User)
+}
+
+// Delete 删除用户
+func (controller *UserController) Delete(context *gin.Context) {
+	//1.获取路由中的ID
+	idStr := context.Param(&#34;id&#34;)
+	if idStr == &#34;&#34; {
+		controller.ResponseJson(context, http.StatusForbidden, &#34;route id required&#34;, []string{})
+		return
+	}
+
+	//2.构建微服务请求体发起请求
+	id, _ := types.StringToInt(idStr)
+	req := &amp;pb.DeleteRequest{Id: uint64(id)}
+	client := container.GetUserServiceClient()
+	rsp, err := client.Delete(context, req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusInternalServerError, err.Error(), []string{})
+		return
+	}
+
+	//3.响应用户信息
+	controller.ResponseJson(context, http.StatusOK, &#34;&#34;, rsp.User)
+}
+
+// Show 展示单个用户
+func (controller *UserController) Show(context *gin.Context) {
+	// 1.获取路由中的ID
+	idStr := context.Param(&#34;id&#34;)
+	if idStr == &#34;&#34; {
+		controller.ResponseJson(context, http.StatusForbidden, &#34;route id required&#34;, []string{})
+		return
+	}
+
+	// 2.构建微服务请求体发起请求
+	id, _ := types.StringToInt(idStr)
+	req := &amp;pb.GetRequest{Id: uint64(id)}
+	client := container.GetUserServiceClient()
+	rsp, err := client.Get(context, req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusInternalServerError, err.Error(), []string{})
+		return
+	}
+
+	// 3.响应用户信息
+	controller.ResponseJson(context, http.StatusOK, &#34;&#34;, rsp.User)
+}
+
+// Auth 认证
+func (controller *UserController) Auth(context *gin.Context) {
+	//1.构建微服务请求体
+	req := &amp;pb.AuthRequest{}
+	err := context.BindJSON(req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusForbidden, &#34;json params error&#34;, []string{})
+		return
+	}
+
+	//2.发起请求
+	client := container.GetUserServiceClient()
+	rsp, err := client.Auth(context, req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusInternalServerError, err.Error(), []string{})
+		return
+	}
+
+	//3.响应用户信息
+	controller.ResponseJson(context, http.StatusOK, &#34;&#34;, rsp)
+}
+</code></pre><h2 id="编写重置密码控制器">编写重置密码控制器</h2>
+<pre tabindex="0"><code>touch app/http/controllers/password_controller.go
+</code></pre><pre tabindex="0"><code>package controllers
+
+import (
+	&#34;github.com/869413421/micro-service/common/api/http/controller&#34;
+	&#34;github.com/869413421/micro-service/common/pkg/container&#34;
+	pb &#34;github.com/869413421/micro-service/user/proto/user&#34;
+	&#34;github.com/gin-gonic/gin&#34;
+	&#34;net/http&#34;
+)
+
+// PasswordResetController 密码控制器
+type PasswordResetController struct {
+	controller.BaseController
+}
+
+// NewPasswordResetController 初始化密码控制器
+func NewPasswordResetController() *PasswordResetController {
+	return &amp;PasswordResetController{}
+}
+
+// Store 创建
+func (controller *PasswordResetController) Store(context *gin.Context) {
+	// 1.构建微服务请求体
+	req := &amp;pb.CreatePasswordResetRequest{}
+	client := container.GetUserServiceClient()
+	err := context.BindJSON(req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusForbidden, &#34;json params error&#34;, []string{})
+		return
+	}
+
+	// 2.发起创建请求
+	rsp, err := client.CreatePasswordReset(context, req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusInternalServerError, err.Error(), []string{})
+		return
+	}
+
+	// 3.响应信息
+	controller.ResponseJson(context, http.StatusOK, &#34;&#34;, rsp)
+}
+
+// ResetPassword 重置密码
+func (controller *PasswordResetController) ResetPassword(context *gin.Context) {
+	// 1.构建微服务请求体
+	req := &amp;pb.ResetPasswordRequest{}
+	client := container.GetUserServiceClient()
+	err := context.BindJSON(req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusForbidden, &#34;json params error&#34;, []string{})
+		return
+	}
+
+	// 2.发起创建请求
+	rsp, err := client.ResetPassword(context, req)
+	if err != nil {
+		controller.ResponseJson(context, http.StatusInternalServerError, err.Error(), []string{})
+		return
+	}
+
+	// 3.响应信息
+	controller.ResponseJson(context, http.StatusOK, &#34;&#34;, rsp)
+}
+</code></pre><p>至此我们完成了控制器的编写,其中基本的业务逻辑就是读取请求参数，然后向用户服务发起请求，再讲服务端返回的信息以更友好的格式返回给客户端。</p>
+<h2 id="封装路由">封装路由</h2>
+<pre tabindex="0"><code>mkdir -p bootstarp
+touch bootstarp/route.go
+</code></pre><pre tabindex="0"><code>package bootstarp
+
+import (
+	&#34;github.com/869413421/micro-service/user-api/routes&#34;
+	&#34;github.com/gin-gonic/gin&#34;
+	&#34;sync&#34;
+)
+
+var Router *gin.Engine
+var once sync.Once
+
+func SetupRoute() *gin.Engine {
+	once.Do(func() {
+		Router = gin.New()
+		routes.RegisterWebRoutes(Router)
+	})
+
+	return Router
+}
+</code></pre><pre tabindex="0"><code>mkdir routes
+touch routes/api.go
+</code></pre><pre tabindex="0"><code>package routes
+
+import (
+	. &#34;github.com/869413421/micro-service/user-api/app/http/controllers&#34;
+	&#34;github.com/gin-gonic/gin&#34;
+)
+
+var userController = NewUserController()
+var passwordController = NewPasswordResetController()
+
+
+
+// RegisterWebRoutes 注册路由
+func RegisterWebRoutes(router *gin.Engine) {
+	// 用户管理路由,所有路由必须包含user，因为micro网关只会映射路径中包含user的路由
+	api := router.Group(&#34;/&#34;)
+	{
+		// 登录
+		api.POST(&#34;/user/token&#34;, userController.Auth)
+		// 注册
+		api.POST(&#34;/user&#34;, userController.Store)
+	}
+	{
+		// 发起重置密码
+		api.POST(&#34;user/password&#34;, passwordController.Store)
+		// 重置密码
+		api.PUT(&#34;user/password&#34;, passwordController.ResetPassword)
+	}
+
+	userApi := api.Group(&#34;user&#34;)
+	{
+		// 用户列表
+		userApi.GET(&#34;&#34;, userController.Index)
+		// 获取单个用户
+		userApi.GET(&#34;/:id&#34;, userController.Show)
+		// 更新用户
+		userApi.PUT(&#34;/:id&#34;, userController.Update)
+		// 删除用户
+		userApi.DELETE(&#34;/:id&#34;, userController.Delete)
+	}
+}
+</code></pre><p>修改<code>main.go</code></p>
+<pre tabindex="0"><code>  ....
+  
+  // 1.初始化web客户端
+	g := bootstarp.SetupRoute()
+	var serviceName = &#34;micro.api.user&#34;
+	service := web.NewService(
+		web.Name(serviceName),
+		web.Address(&#34;:81&#34;),
+		web.Handler(g),
+		// 指定服务注册信息在注册中心的有效期。 默认为一分种
+		web.RegisterTTL(time.Minute*2),
+		// 指定服务主动向注册中心报告健康状态的时间间隔,默认为 30 秒。
+		web.RegisterInterval(time.Minute*1),
+	)
+  
+  ...
+</code></pre><h2 id="使用micro工具集成统一网关">使用micro工具集成统一网关</h2>
+<p>修改docker-compose.yaml</p>
+<pre tabindex="0"><code>...
+
+  micro-api:
+    container_name: micro-api
+    image: micro/micro:v2.9.3
+    ports:
+      - 8080:8080
+    environment:
+      MICRO_REGISTRY: &#34;etcd&#34;
+      MICRO_REGISTRY_ADDRESS: &#34;etcd1:2379,etcd2:2379,etcd3:2379&#34;
+    command: api --handler=http --namespace=micro.api
+    networks:
+      - micro-network
+      
+...
+</code></pre><p>启动网关后，网关会扫描注册中心的所有路由并统一对外暴露，不需要我们编写额外的nginx对请求进行转发。<!-- raw HTML omitted -->执行<code>docker-compose up -d </code></p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5"
+      >go-micro开发运维实践</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%AE%9E%E7%8E%B0%E7%94%A8%E6%88%B7curd%E6%9C%8D%E5%8A%A1/"
+      ><span class="mr-1.5">←</span><span>go-micro开发运维实践(实现用户CURD服务)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%BC%95%E5%85%A5rabbitmq%E4%BD%9C%E4%B8%BA%E6%B6%88%E6%81%AF%E9%A9%B1%E5%8A%A8/"
+      ><span>go-micro开发运维实践(引入rabbitmq作为消息驱动)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(31.接口的定义和实现) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="接口在go中有这至关重要的地位，如果说goroutine和channel是撑起整个GO语言并发的基石，那么接口就是类型系统的基石。
+传统的侵入式接口 什么是侵入式接口，接口作为不同类之间的抽象定义，它是一种契约方式的存在，只要契约存在，就必须要履行契约。通俗地讲只要继承了某一个接口，就必须去实现这个接口中的所有方法。
+// 声明一个&#39;iTemplate&#39;接口interface iTemplate{public function setVariable($name, $var);public function getHtml($template);}// 实现接口// 下面的写法是正确的class Template implements iTemplate{private $vars = array();public function setVariable($name, $var){$this-&gt;vars[$name] = $var;}public function getHtml($template){foreach($this-&gt;vars as $name =&gt; $value) {$template = str_replace(&#39;{&#39; . $name . &#39;}&#39;, $value, $template);}return $template;}} 这个时候如果有一个接口iTemplate2声明了与iTemplate完全一样的接口方法，甚至名字一致，只不过在不同的命名空间下，这时候编译器会认为上面的类只实现了其中某一个接口，而没有实现另一个接口。这些在我们的认知中是理所当然的，如果我们没有在代码中明确地指定接口的层级和继承自哪个接口，那么我们就没有实现这个接口。这个类和这个接口就完全没有任何关系，这些接口中的声明和实现都是显式的。我们把这种接口称之为侵入式接口，尤其是在设计标准库的时候，因为标准库必然涉及到接口设计，接口的需求方是业务实现类，只有具体编写业务实现类的时候才知道需要定义哪些方法，而在此之前，标准库的接口就已经设计好了，我们要么按照约定好的接口进行实现，如果没有合适的接口需要自己去设计，这里的问题就是接口的设计和业务的实现是分离的，接口的设计者并不能总是预判到业务方要实现哪些功能，这就造成了设计与实现的脱节。接口的过度设计会导致某些声明的方法完全不需要去实现，如果设计得太简单又无法满足业务需求。以 PHP 自带的 SessionHandlerInterface 接口为例，该接口声明的接口方法如下：
+SessionHandlerInterface {/* 方法 */abstract public close ( void ) : boolabstract public destroy ( string $session_id ) : boolabstract public gc ( int $maxlifetime ) : intabstract public open ( string $save_path , string $session_name ) : boolabstract public read ( string $session_id ) : stringabstract public write ( string $session_id , string $session_data ) : bool} 用户自定义的 Session 管理器需要实现该接口，也就是要实现该接口声明的所有方法，但是实际在做业务开发的时候，某些方法其实并不需要实现，比如如果我们基于 Redis 或 Memcached 作为 Session 存储器的话，它们自身就包含了过期回收机制，所以 gc 方法根本不需要实现，又比如 close 方法对于大部分驱动来说，也是没有什么意义的。正是因为这种不合理的设计，所以在编写 PHP 类库中的每个接口时都需要纠结以下两个问题（Java 也类似）：" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(31.接口的定义和实现)" />
+<meta property="og:description" content="golang基础(31.接口的定义和实现)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/31.%E6%8E%A5%E5%8F%A3%E7%9A%84%E5%AE%9A%E4%B9%89%E5%92%8C%E5%AE%9E%E7%8E%B0/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(31.接口的定义和实现)">
+<meta itemprop="description" content="golang基础(31.接口的定义和实现)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="395">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(31.接口的定义和实现)"/>
+<meta name="twitter:description" content="golang基础(31.接口的定义和实现)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(31.接口的定义和实现)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>接口在go中有这至关重要的地位，如果说goroutine和channel是撑起整个GO语言并发的基石，那么接口就是类型系统的基石。</p>
+<h2 id="传统的侵入式接口">传统的侵入式接口</h2>
+<p>什么是侵入式接口，接口作为不同类之间的抽象定义，它是一种契约方式的存在，只要契约存在，就必须要履行契约。通俗地讲只要继承了某一个接口，就必须去实现这个接口中的所有方法。</p>
+<pre tabindex="0"><code>// 声明一个&#39;iTemplate&#39;接口
+interface iTemplate
+{
+    public function setVariable($name, $var);
+    public function getHtml($template);
+}
+// 实现接口
+// 下面的写法是正确的
+class Template implements iTemplate
+{
+    private $vars = array();
+    public function setVariable($name, $var)
+    {
+        $this-&gt;vars[$name] = $var;
+    }
+    public function getHtml($template)
+    {
+        foreach($this-&gt;vars as $name =&gt; $value) {
+            $template = str_replace(&#39;{&#39; . $name . &#39;}&#39;, $value, $template);
+        }
+        return $template;
+    }
+}
+</code></pre><p>这个时候如果有一个接口iTemplate2声明了与iTemplate完全一样的接口方法，甚至名字一致，只不过在不同的命名空间下，这时候编译器会认为上面的类只实现了其中某一个接口，而没有实现另一个接口。<!-- raw HTML omitted -->这些在我们的认知中是理所当然的，如果我们没有在代码中明确地指定接口的层级和继承自哪个接口，那么我们就没有实现这个接口。这个类和这个接口就完全没有任何关系，这些接口中的声明和实现都是显式的。我们把这种接口称之为<code>侵入式接口</code>，尤其是在设计标准库的时候，因为标准库必然涉及到接口设计，接口的需求方是业务实现类，只有具体编写业务实现类的时候才知道需要定义哪些方法，而在此之前，标准库的接口就已经设计好了，我们要么按照约定好的接口进行实现，如果没有合适的接口需要自己去设计，这里的问题就是接口的设计和业务的实现是分离的，接口的设计者并不能总是预判到业务方要实现哪些功能，这就造成了设计与实现的脱节。<!-- raw HTML omitted -->接口的过度设计会导致某些声明的方法完全不需要去实现，如果设计得太简单又无法满足业务需求。以 PHP 自带的 <a href="https://www.php.net/manual/zh/class.sessionhandlerinterface.php">SessionHandlerInterface</a> 接口为例，该接口声明的接口方法如下：</p>
+<pre tabindex="0"><code>SessionHandlerInterface {
+    /* 方法 */
+    abstract public close ( void ) : bool
+    abstract public destroy ( string $session_id ) : bool
+    abstract public gc ( int $maxlifetime ) : int
+    abstract public open ( string $save_path , string $session_name ) : bool
+    abstract public read ( string $session_id ) : string
+    abstract public write ( string $session_id , string $session_data ) : bool
+}
+</code></pre><p>用户自定义的 Session 管理器需要实现该接口，也就是要实现该接口声明的所有方法，但是实际在做业务开发的时候，某些方法其实并不需要实现，比如如果我们基于 Redis 或 Memcached 作为 Session 存储器的话，它们自身就包含了过期回收机制，所以 gc 方法根本不需要实现，又比如 close 方法对于大部分驱动来说，也是没有什么意义的。<!-- raw HTML omitted -->正是因为这种不合理的设计，所以在编写 PHP 类库中的每个接口时都需要纠结以下两个问题（Java 也类似）：</p>
+<ol>
+<li>一个接口需要声明哪些接口方法？</li>
+<li>如果多个类实现了相同的接口方法，应该如何设计接口？比如上面这个 SessionHandlerInterface，有没有必要拆分成多个更细分的接口，以适应不同实现类的需要？</li>
+</ol>
+<p>接下我们来看看 Go 语言的接口是如何避免这些问题的。<!-- raw HTML omitted -->在go语言中，我们并不需要显式指定类要实现哪个接口，一个类只要实现了某个接口要求得所有方法，那么它就实现了这个接口。<!-- raw HTML omitted -->例如，我们定义了一个 File 类，并实现了 Read()、Write()、Seek()、Close() 四个方法：</p>
+<pre tabindex="0"><code>type File struct {
+}
+
+func (f *File) Read(buf []byte) (n int, err error) {
+	return
+}
+func (f *File) Write(buf []byte) (n int, err error) {
+	return
+}
+func (f *File) Seek(off int64, whence int) (pos int64, err error) {
+	return
+}
+func (f *File) Close() error {
+	return nil
+}
+</code></pre><p>假设我们有如下接口（Go 语言通过关键字 interface 来声明接口，以示和结构体类型的区别，花括号内包含的是待实现的方法集合）：</p>
+<pre tabindex="0"><code>type IFile interface {
+	Read(buf []byte) (n int, err error)
+	Write(buf []byte) (n int, err error)
+	Seek(off int64, whence int) (pos int64, err error)
+	Close() error
+}
+</code></pre><p>尽管file类型并没有显示指定实现了<code>IFile</code>接口，甚至不知道这个接口的存在，但是在go中我们依然任务<code>File类型实现IFile接口</code>。<!-- raw HTML omitted -->与 Java、PHP 相对，我们把 Go 语言的这种接口称作<strong>非侵入式接口</strong>，因为类与接口的实现关系不是通过显式声明，而是系统根据两者的方法集合进行判断。这样做有两个好处：</p>
+<ul>
+<li>其一，Go 语言的标准库不需要绘制类库的继承/实现树图，在 Go 语言中，类的继承树并无意义，你只需要知道这个类实现了哪些方法，每个方法是干什么的就足够了。</li>
+<li>其二，定义接口的时候，只需要关心自己应该提供哪些方法即可，不用再纠结接口需要拆得多细才合理，也不需要为了实现某个接口而引入接口所在的包，接口由使用方按需定义，不用事先设计，也不用考虑之前是否有其他模块定义过类似接口。</li>
+</ul>
+<p>这样一来，就完美地避免了传统面向对象编程中的接口设计问题。</p>
+<h2 id="通过组合实现接口继承">通过组合实现接口继承</h2>
+<p>在其他语言中大部分都支持通过<code>extends</code>关键字来实现接口之间的继承：</p>
+<pre tabindex="0"><code>&lt;?php
+interface A 
+{
+    public function foo();
+}
+interface B extends A
+{
+    public function bar();
+}
+</code></pre><p>上述代码中,定义了两个接口<code>A</code>和<code>B</code>，其中B继承自A，如果某一个类需要实现B接口，那么同时它也需要实现A接口。<!-- raw HTML omitted -->go中也支持类型接口继承的特性，不过是通过是通过组合来完成的。以上面代码为例：</p>
+<pre tabindex="0"><code>package main
+
+type A interface {
+	Foo()
+}
+
+type B interface {
+	A
+	Bar()
+}
+
+type T struct {
+}
+
+func (t T) Foo() {
+
+}
+
+func (t T) Bar() {
+
+}
+
+func TestA(a A) {
+
+}
+
+func TestB(b B) {
+
+}
+
+func main() {
+	t := new(T)
+	//t中实现了Foo方法所以可以存入
+	TestA(t)
+	//t中实现了Foo和Bar方法所以可以存入
+	TestB(t)
+}
+</code></pre><p>上述代码中，我们通过组合的方式，如过某个类型中包含了Foo和Bar两个方法，那么就意味着它，实现了接口B，也实现了接口A。因为接口实现不是强制的，是根据类实现的方法来动态判定的。<!-- raw HTML omitted -->可以认为接口组合是匿名类型组合（没有显式为组合类型设置对应的属性名称）的一个特定场景，<code>只不过接口只包含方法</code>，而不包含任何属性。Go 语言底层很多包就是基于接口组合实现的，比如 <a href="https://golang.google.cn/pkg/io/">io</a> 里面的 Reader、Writer、ReadWriter 这些接口：</p>
+<pre tabindex="0"><code>// Reader is the interface that wraps the basic Read method.
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+// Writer is the interface that wraps the basic Write method.
+type Writer interface {
+    Write(p []byte) (n int, err error)
+}
+// ReadWriter is the interface that groups the basic Read and Write methods.
+type ReadWriter interface {
+    Reader
+    Writer
+}
+</code></pre></section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/30.%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E5%AE%9E%E7%8E%B0%E7%B1%BB%E7%9A%84%E7%BB%A7%E6%89%BF%E5%92%8C%E6%96%B9%E6%B3%95%E9%87%8D%E5%86%99/"
+      ><span class="mr-1.5">←</span><span>golang基础(30.通过组合实现类的继承和方法重写)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/31.%E7%B1%BB%E5%B1%9E%E6%80%A7%E5%92%8C%E6%96%B9%E6%B3%95%E7%9A%84%E5%8F%AF%E8%A7%81%E6%80%A7/"
+      ><span>golang基础(31.类属性和方法的可见性)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(18.指针的基本概念和使用) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="指针概述 在go中我们可以通过变量来定义操作我们的物理存储空间，其本质是一块内存空间的定义。而指针的定义是指指向存储这些变量值的内存地址。
+package mainimport &#34;fmt&#34;func main() {var a = 100var ptr *intptr = &amp;afmt.Println(a) // 变量值fmt.Println(ptr) // 变量值存储地址} 上述代码定义了一个整形变量a值是一百，然后定义了一个整形指针。通过&amp;符号，将变量a的变量值地址赋值给了指针ptr。我们可以通过 *ptr 获取指针指向内存地址存储的变量值（我们通常将这种引用称作「间接引用」），ptr 本身是一个内存地址值（通过 &amp;a 可以获取变量 a 所在的内存地址）&lt;br /&gt;go语言引入指针类型，主要基于两点考虑。一个是为程序员提供操作变量对应内存数据结构的能力，一个是为了提供程序性能。（指针可以值直接传递某个变量的内存地址，可以在传递过程当中产生的值拷贝）&lt;br /&gt;指针在go中有两个使用场景类型指针 数组切片 作为类型指针时，允许对这个指针类型的数据直接进行修改指向其他内存地址，传递数据时如果使用指针则无须拷贝数据从而节省内存空间，此外和 C 语言中的指针不同，Go 语言中的类型指针不能进行偏移和运算，因此更为安全。数组切片，由指向起始元素的原始指针、元素数量和容量组成，所以切片与数组不同，是引用类型，而非值类型。
+指针的基本使用 指针类型的声明和初始化 指针变量传值时之所以可以节省空间，因为指针指向的内存地址大小是固定的，在32位机器上占4个字节，在64位上占8个字节，与指向内存存储的值无关。
+var ptr *intfmt.Println(ptr)a := 100ptr = &amp;afmt.Println(ptr)fmt.Println(*ptr) 当指针被声明后，没有指向任何变量内存地址时，它的零值是 nil，然后我们可以通过在给定变量前加上取地址符 &amp; 获取变量对应的内存地址将其赋值给声明的指针类型，这样，就是对指针的初始化了，然后我们可以通过在指针类型前加上间接引用符 * 获取指针指向内存空间存储的变量值。当然，我们也可以通过 := 对指针进行初始化：
+a := 100ptr := &amp;afmt." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(18.指针的基本概念和使用)" />
+<meta property="og:description" content="golang基础(18.指针的基本概念和使用)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/18.%E6%8C%87%E9%92%88%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5%E5%92%8C%E4%BD%BF%E7%94%A8/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(18.指针的基本概念和使用)">
+<meta itemprop="description" content="golang基础(18.指针的基本概念和使用)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="142">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(18.指针的基本概念和使用)"/>
+<meta name="twitter:description" content="golang基础(18.指针的基本概念和使用)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(18.指针的基本概念和使用)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="指针概述">指针概述</h2>
+<p>在go中我们可以通过变量来定义操作我们的物理存储空间，其本质是一块内存空间的定义。而指针的定义是指指向存储这些变量值的<code>内存地址</code>。</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	var a = 100
+	var ptr *int
+
+	ptr = &amp;a
+	fmt.Println(a)   // 变量值
+	fmt.Println(ptr) // 变量值存储地址
+}
+</code></pre><pre><code>上述代码定义了一个整形变量a值是一百，然后定义了一个整形指针。通过&amp;符号，将变量a的变量值地址赋值给了指针ptr。我们可以通过 *ptr 获取指针指向内存地址存储的变量值（我们通常将这种引用称作「间接引用」），ptr 本身是一个内存地址值（通过 &amp;a 可以获取变量 a 所在的内存地址）&lt;br /&gt;go语言引入指针类型，主要基于两点考虑。一个是为程序员提供操作变量对应内存数据结构的能力，一个是为了提供程序性能。（指针可以值直接传递某个变量的内存地址，可以在传递过程当中产生的值拷贝）&lt;br /&gt;指针在go中有两个使用场景
+</code></pre>
+<ul>
+<li>类型指针</li>
+<li>数组切片</li>
+</ul>
+<p>作为类型指针时，允许对这个指针类型的数据直接进行修改指向其他内存地址，传递数据时如果使用指针则无须拷贝数据从而节省内存空间，此外和 C 语言中的指针不同，Go 语言中的类型指针不能进行偏移和运算，因此更为安全。<!-- raw HTML omitted -->数组切片，由指向起始元素的<code>原始指针</code>、元素数量和容量组成，所以切片与数组不同，是引用类型，而非值类型。</p>
+<h2 id="指针的基本使用">指针的基本使用</h2>
+<h3 id="指针类型的声明和初始化">指针类型的声明和初始化</h3>
+<p>指针变量传值时之所以可以节省空间，因为指针指向的内存地址大小是固定的，在32位机器上占4个字节，在64位上占8个字节，与指向内存存储的值无关。</p>
+<pre tabindex="0"><code>var ptr *int
+fmt.Println(ptr)
+
+a := 100
+ptr = &amp;a
+fmt.Println(ptr)
+fmt.Println(*ptr)
+</code></pre><p>当指针被声明后，没有指向任何变量内存地址时，它的<code>零值是 nil</code>，然后我们可以通过在给定变量前加上取地址符 &amp; 获取变量对应的内存地址将其赋值给声明的指针类型，这样，就是对指针的初始化了，然后我们可以通过在指针类型前加上间接引用符 <code>* </code>获取指针指向内存空间存储的变量值。当然，我们也可以通过 <code>:=</code> 对指针进行初始化：</p>
+<pre tabindex="0"><code>a := 100
+ptr := &amp;a
+fmt.Printf(&#34;%p
+&#34;, ptr)
+fmt.Printf(&#34;%d
+&#34;, *ptr)
+</code></pre><p>底层会自动判断指针的类型，在格式化输出时，可以通过 %p 来标识指针类型。</p>
+<h3 id="通过指针传值">通过指针传值</h3>
+<p>我们再来看一个通过指针传值的示例，通过指针传值就类似于 PHP 中通过引用传值，这样做的好处是节省内存空间，此外还可以在调用函数中实现对变量值的修改，因为直接修改的是指针指向内存地址上存储的变量值，而不是值拷贝。</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func swap(a, b int) {
+	a, b = b, a
+	fmt.Println(a, b)
+}
+
+func swapPtr(a, b *int) {
+	*a, *b = *b, *a
+	fmt.Println(*a, *b)
+}
+
+func main() {
+	a := 1
+	b := 2
+	swap(a, b)
+	fmt.Println(a, b)
+	swapPtr(&amp;a, &amp;b)
+	fmt.Println(a, b)
+}
+</code></pre><p>最终输出</p>
+<pre tabindex="0"><code>2 1
+1 2
+2 1
+2 1
+</code></pre><pre><code>可以看到外部传递的变量的值已经被swapPtr方法修改了。
+</code></pre>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/17.%E5%AD%97%E5%85%B8%E9%81%8D%E5%8E%86%E6%8E%92%E5%BA%8F/"
+      ><span class="mr-1.5">←</span><span>golang基础(17.字典遍历排序)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/19.%E6%9D%A1%E4%BB%B6%E8%AF%AD%E5%8F%A5/"
+      ><span>golang基础(19.条件语句)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

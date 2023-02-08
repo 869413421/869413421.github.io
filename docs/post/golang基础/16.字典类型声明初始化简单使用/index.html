@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(16.字典类型声明，初始化，简单使用) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="字典定义 go中支持字典类型的数据，所谓字典类型，指的是一个键值对的关系集合。一个键对应一个值，go中的字典是一个无序集合，不会根据键或值进行排序。在go中声明字典：
+package mainimport (&#34;fmt&#34;&#34;strconv&#34;)func main() {var map1 map[string]intfmt.Println(map1)map2 := map[string]int{&#34;one&#34;: 1,&#34;two&#34;: 2,}fmt.Println(map2)key := &#34;two&#34;value, ok := map2[key]if ok {fmt.Printf(&#34;map has key:&#34; &#43; key &#43; &#34; values is:&#34; &#43; strconv.Itoa(value))} else {fmt.Printf(&#34;map no has key&#34;)}} 字典声明 var map1 map[string]int 在go中声明字典需要指定键的数据类型以及值得数据类型
+字典初始化 我们可以通过先声明再初始化的方式进行初始化，就像上面示例代码做的那样，也可以通过 := 将声明和初始化合并为一条语句：
+map2 := map[string]int{&#34;one&#34;: 1,&#34;two&#34;: 2,} 还可以通过make函数来初始化一个字典，使用make函数创建的字典可以直接赋值。直接声明不允许这样操作，因为数据没被初始化为nil赋值会直接抛异常。" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(16.字典类型声明，初始化，简单使用)" />
+<meta property="og:description" content="golang基础(16.字典类型声明，初始化，简单使用)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/16.%E5%AD%97%E5%85%B8%E7%B1%BB%E5%9E%8B%E5%A3%B0%E6%98%8E%E5%88%9D%E5%A7%8B%E5%8C%96%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(16.字典类型声明，初始化，简单使用)">
+<meta itemprop="description" content="golang基础(16.字典类型声明，初始化，简单使用)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="170">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(16.字典类型声明，初始化，简单使用)"/>
+<meta name="twitter:description" content="golang基础(16.字典类型声明，初始化，简单使用)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(16.字典类型声明，初始化，简单使用)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="字典定义">字典定义</h2>
+<p>go中支持字典类型的数据，所谓字典类型，指的是一个键值对的关系集合。一个键对应一个值，go中的字典是一个无序集合，不会根据键或值进行排序。<!-- raw HTML omitted -->在go中声明字典：</p>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;strconv&#34;
+)
+
+func main() {
+	var map1 map[string]int
+	fmt.Println(map1)
+	map2 := map[string]int{
+		&#34;one&#34;: 1,
+		&#34;two&#34;: 2,
+	}
+	fmt.Println(map2)
+	key := &#34;two&#34;
+	value, ok := map2[key]
+	if ok {
+		fmt.Printf(&#34;map has key:&#34; + key + &#34; values is:&#34; + strconv.Itoa(value))
+	} else {
+		fmt.Printf(&#34;map no has key&#34;)
+	}
+}
+</code></pre><h2 id="字典声明">字典声明</h2>
+<pre tabindex="0"><code>var map1 map[string]int
+</code></pre><p>在go中声明字典需要指定键的数据类型以及值得数据类型</p>
+<h2 id="字典初始化">字典初始化</h2>
+<p>我们可以通过先声明再初始化的方式进行初始化，就像上面示例代码做的那样，也可以通过 := 将声明和初始化合并为一条语句：</p>
+<pre tabindex="0"><code>map2 := map[string]int{
+		&#34;one&#34;: 1,
+		&#34;two&#34;: 2,
+}
+</code></pre><p>还可以通过make函数来初始化一个字典，使用make函数创建的字典可以直接赋值。直接声明不允许这样操作，因为数据没被初始化为nil赋值会直接抛异常。</p>
+<pre tabindex="0"><code>package main
+
+func main() {
+	map1 := make(map[string]int)
+	map1[&#34;test&#34;] = 1
+	map1[&#34;test2&#34;] = 2
+}
+</code></pre><p>也可以选择是否在创建时指定该字典的初始存储能力（超出会自动扩容）：</p>
+<pre tabindex="0"><code>testMap = make(map[string]int, 100)
+</code></pre><h2 id="元素赋值">元素赋值</h2>
+<p>直接指定key和值便可以对字典进行修改</p>
+<pre tabindex="0"><code>map1[&#34;test&#34;] = 1
+</code></pre><p>字段初始化之后才能进行赋值操作，如果仅仅是声明，此时 testMap 的值为 nil，在 nil 上进行操作编译期间会报 panic（运行时恐慌），导致编译不通过。</p>
+<h2 id="查找元素">查找元素</h2>
+<p>上面的示例代码已经显示，在字典中输入键值，可以返回两个参数，一个为键的值，第二个参数为布尔类型代表是否获取成功，如果失败第一个参数为nil。</p>
+<pre tabindex="0"><code>  value, ok := map2[key]
+	if ok {
+		fmt.Printf(&#34;map has key:&#34; + key + &#34; values is:&#34; + strconv.Itoa(value))
+	} else {
+		fmt.Printf(&#34;map no has key&#34;)
+	}
+</code></pre><p>:::warning
+需要注意的是，go的字典内部是通过hash表来实现的。当用户设置键值时，首先会将键转换为一个hash值进行存储。而在查找时也会将键转换为hash值在hash表中进行查询，从而提交查找性能。但是hash会存在hash冲突，即不同的键也会产生同样的hash值，这个时候 Go 底层还会判断原始键的值和类型是否相等。也正因如此，我们在声明字典的键类型时，要求数据类型必须是支持通过 == 或 != 进行判等操作的类型，比如数字类型、字符串类型、数组类型、结构体类型等，不过为了提高字典查询性能，类型长度越短约好，通常，我们会将其设置为整型或者长度较短的字符串类型。
+:::</p>
+<h2 id="删除元素">删除元素</h2>
+<p>Go 语言提供了一个内置函数 delete()，用于删除容器内的元素，我们可以通过这个函数来实现字典元素的删除：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	map1 := make(map[string]int)
+	map1[&#34;test&#34;] = 1
+	map1[&#34;test2&#34;] = 2
+	fmt.Println(map1)
+	delete(map1, &#34;test&#34;)
+	fmt.Println(map1)
+}
+</code></pre><p>:::warning
+这个键不存在或者字典尚未初始化，这个调用也不会有什么副作用。
+:::</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/15.%E6%95%B0%E7%BB%84%E5%88%87%E7%89%87%E5%A2%9E%E5%88%A0/"
+      ><span class="mr-1.5">←</span><span>golang基础(15.数组切片增删)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/17.%E5%AD%97%E5%85%B8%E9%81%8D%E5%8E%86%E6%8E%92%E5%BA%8F/"
+      ><span>golang基础(17.字典遍历排序)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

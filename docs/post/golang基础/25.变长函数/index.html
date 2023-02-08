@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(25.变长函数) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="所谓变长参数指的是函数参数的数量不确定，可以按照需要传递任意数量的参数到指定函数，比如前面演示过的 fmt.Printf 函数的参数显然就是变长参数。
+Go 语言中的变长参数 合适地使用变长参数，可以让代码更简洁，尤其是输入输出类函数，比如日志函数。接下来，作为对比，我们来介绍下 Go 语言中的变长参数的用法，和 PHP 类似，只是把 &hellip; 作用到类型上，这样就可以约束变长参数的类型：
+package mainimport &#34;fmt&#34;func myFunc(numbers ...int) {for _, number := range numbers {fmt.Println(number)}}func main() {myFunc(1, 2, 3, 4, 5)} 或者还可以传递一个数组切片，传递切片时需要在末尾加上 &hellip; 作为标识，表示对应的参数类型是变长参数：
+package mainimport &#34;fmt&#34;func myFunc(numbers ...int) {for _, number := range numbers {fmt.Println(number)}}func main() {myFunc(1, 2, 3, 4, 5)slice1 := []int{7, 8, 9, 10}myFunc(slice1." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(25.变长函数)" />
+<meta property="og:description" content="golang基础(25.变长函数)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/25.%E5%8F%98%E9%95%BF%E5%87%BD%E6%95%B0/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(25.变长函数)">
+<meta itemprop="description" content="golang基础(25.变长函数)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="168">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(25.变长函数)"/>
+<meta name="twitter:description" content="golang基础(25.变长函数)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(25.变长函数)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>所谓变长参数指的是<code>函数参数的数量不确定</code>，可以按照需要<code>传递任意数量</code>的参数到指定函数，比如前面演示过的 fmt.Printf 函数的参数显然就是变长参数。</p>
+<h2 id="go-语言中的变长参数">Go 语言中的变长参数</h2>
+<p>合适地使用变长参数，可以让代码更简洁，尤其是输入输出类函数，比如日志函数。接下来，作为对比，我们来介绍下 Go 语言中的变长参数的用法，和 PHP 类似，只是把 &hellip; 作用到类型上，这样就可以约束变长参数的类型：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func myFunc(numbers ...int) {
+	for _, number := range numbers {
+		fmt.Println(number)
+	}
+}
+
+func main() {
+	myFunc(1, 2, 3, 4, 5)
+}
+</code></pre><p>或者还可以传递一个数组切片，传递切片时需要在末尾加上 &hellip; 作为标识，表示对应的参数类型是变长参数：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func myFunc(numbers ...int) {
+	for _, number := range numbers {
+		fmt.Println(number)
+	}
+}
+
+func main() {
+	myFunc(1, 2, 3, 4, 5)
+	slice1 := []int{7, 8, 9, 10}
+	myFunc(slice1...)
+}
+</code></pre><p>从底层实现原理上看，类型 &hellip;type 本质上是一个数组切片，也就是 []type，这也是为什么上面的参数 numbers 可以用 for 循环来获取每个传入的参数值。</p>
+<h2 id="任意类型的变长参数">任意类型的变长参数</h2>
+<p>PHP 是弱类型语言，声明变长参数时不需要指定参数类型，Go 语言则不同，但是用过 fmt.Printf 函数的同学可能知道，我们可以向其中传递任意类型的参数值，可见 Go 语言也可以支持传递任意类型的值作为变成参数，那这又是如何实现的呢？答案是可以指定变长参数类型为 interface{}（空接口类型可以用于表示任意类型）</p>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;reflect&#34;
+)
+
+func myPrintf(args ...interface{}) {
+	for _, arg := range args {
+		switch reflect.TypeOf(arg).Kind() {
+		case reflect.Int:
+			fmt.Println(arg, &#34;is an int value.&#34;)
+		case reflect.String:
+			fmt.Printf(&#34;\&#34;%s\&#34; is a string value.
+&#34;, arg)
+		case reflect.Array:
+			fmt.Println(arg, &#34;is an array type.&#34;)
+		case reflect.Bool:
+			fmt.Println(arg, &#34;is an bool type.&#34;)
+		case reflect.Slice:
+			fmt.Println(arg, &#34;is an Slice type.&#34;)
+
+		default:
+			fmt.Println(arg, &#34;is an unknown type.&#34;)
+		}
+	}
+}
+
+func main() {
+	myPrintf(1, &#34;1&#34;, [1]int{1}, true,[]string{&#34;111&#34;})
+}
+</code></pre></section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/24.%E5%87%BD%E6%95%B0%E7%9A%84%E4%BC%A0%E5%8F%82%E5%92%8C%E8%BF%94%E5%9B%9E%E5%80%BC/"
+      ><span class="mr-1.5">←</span><span>golang基础(24.函数的传参和返回值)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/26.%E5%8C%BF%E5%90%8D%E5%87%BD%E6%95%B0%E4%B8%8E%E9%97%AD%E5%8C%85/"
+      ><span>golang基础(26.匿名函数与闭包)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

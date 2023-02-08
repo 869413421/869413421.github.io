@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(33.接口类型以及转化) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="在其他编程语言中，我们可以使用instanceof关键字来判断某个对象是否属于某个类（包括他的父类），而再GO语言中也同样有这样的机制。
+接口的断言 package mainimport &#34;fmt&#34;type String1 interface {func1(s string)func2(s string)}type String2 interface {func1(s string)}type String stringfunc (s String) func1(str string) {fmt.Println(str)}func (s String) func2(str string) {}func main() {var s String = &#34;test&#34;var s1 String2 = sif s2, ok := s1.(String2); ok {s2.func1(&#34;test2&#34;)}} 上述代码中我们定义了两个接口`String1`和`String2`,其中`String1`作为`String2`的子集。然后定义了一个String类型，实现了这两个接口。在main中我们实例化了一个`String`类型，然后讲其赋值给`String2`接口得到变量`s1`,通过`变量.(类型)`的方式断言变量是否属于`String2`接口。如果是，ok 值为 true，然后执行 if 语句块中的代码；否则 ok 值为 false，不执行 if 语句块中的代码。需要注意的是，类型断言是否成功要在运行期才能够确定，它不像接口赋值，编译器只需要通过静态类型检查即可判断赋值是否可行。结构体类型断言 结构体类型断言实现语法和接口类型断言一样，基本一致。由于类型断言语法 ." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(33.接口类型以及转化)" />
+<meta property="og:description" content="golang基础(33.接口类型以及转化)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/33.%E6%8E%A5%E5%8F%A3%E7%B1%BB%E5%9E%8B%E4%BB%A5%E5%8F%8A%E8%BD%AC%E5%8C%96/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(33.接口类型以及转化)">
+<meta itemprop="description" content="golang基础(33.接口类型以及转化)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="435">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(33.接口类型以及转化)"/>
+<meta name="twitter:description" content="golang基础(33.接口类型以及转化)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(33.接口类型以及转化)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>在其他编程语言中，我们可以使用instanceof关键字来判断某个对象是否属于某个类（包括他的父类），而再GO语言中也同样有这样的机制。</p>
+<h2 id="接口的断言">接口的断言</h2>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+type String1 interface {
+	func1(s string)
+	func2(s string)
+}
+
+type String2 interface {
+	func1(s string)
+}
+
+type String string
+
+func (s String) func1(str string) {
+	fmt.Println(str)
+}
+
+func (s String) func2(str string) {
+
+}
+
+func main() {
+	var s String = &#34;test&#34;
+	var s1 String2 = s
+	if s2, ok := s1.(String2); ok {
+		s2.func1(&#34;test2&#34;)
+	}
+}
+</code></pre><pre><code>上述代码中我们定义了两个接口`String1`和`String2`,其中`String1`作为`String2`的子集。然后定义了一个String类型，实现了这两个接口。在main中我们实例化了一个`String`类型，然后讲其赋值给`String2`接口得到变量`s1`,通过`变量.(类型)`的方式断言变量是否属于`String2`接口。如果是，ok 值为 true，然后执行 if 语句块中的代码；否则 ok 值为 false，不执行 if 语句块中的代码。需要注意的是，类型断言是否成功要在运行期才能够确定，它不像接口赋值，编译器只需要通过静态类型检查即可判断赋值是否可行。
+</code></pre>
+<h2 id="结构体类型断言">结构体类型断言</h2>
+<p>结构体类型断言实现语法和接口类型断言一样，基本一致。由于类型断言语法 . 左侧的变量类型必须是接口类型，所以我们需要新增一个接口。</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+type IAnimal interface {
+	Call(s string)
+}
+
+type Dog struct {
+}
+
+func (d Dog) Call(s string) {
+	fmt.Println(s)
+}
+
+func main() {
+	dog := Dog{}
+	var ianimal IAnimal = &amp;dog
+	if animal, ok := ianimal.(*Dog); ok {
+		animal.Call(&#34;ssss&#34;)
+	}else{
+		fmt.Println(&#34;xxxx&#34;)
+	}
+}
+</code></pre><p>如果 ianimal 变量是 Dog 类型，则 ok 值为 true，执行 if 语句块中的代码；否则 ok 值为 false。<!-- raw HTML omitted -->需要注意的是，在 Go 语言结构体类型断言时，子类的实例并不归属于父类，即使子类和父类属性名和成员方法列表完全一致，因为类与类之间的「继承」是通过组合实现的，并不是 Java/PHP 中的那种父子继承关系，这是新手需要注意的地方。同理，父类实现了某个接口，不代表组合类它的子类也实现了这个接口。<!-- raw HTML omitted -->比如，我们把上述代码中的 ianimal.(Dog) 替换成 ianimal.(Animal)，则查询结果的 ok 值为 false。当然，由于 Dog 实现了 IAnimal 接口，所以接口类型断言 ianimal.(IAnimal) 也会成功，但是如果 Dog 没有实现该接口，则断言失败，即使父类 Animal 实现了这个接口也不行。</p>
+<h2 id="基于反射动态断言类型">基于反射动态断言类型</h2>
+<p>此外，还可以基于反射在运行时动态进行类型断言，使用 reflect 包提供的 TypeOf 函数即可实现。</p>
+<pre tabindex="0"><code>fmt.Println(reflect.TypeOf(ianimal))
+</code></pre><p>返回的结果是 animal.Dog。<!-- raw HTML omitted -->对于<a href="https://geekr.dev/posts/go-data-types#toc-1">基本数据类型</a>，比如 int、string、bool 这些，不必通过反射，直接使用 variable.(type) 表达式即可获取 variable 变量对应的类型值：</p>
+<pre tabindex="0"><code>package main
+
+import (
+	&#34;fmt&#34;
+	&#34;reflect&#34;
+)
+
+type IAnimal interface {
+	Call(s string)
+}
+
+type Dog struct {
+}
+
+func (d Dog) Call(s string) {
+	fmt.Println(s)
+}
+
+func main() {
+	dog := Dog{}
+	var ianimal IAnimal = &amp;dog
+	if animal, ok := ianimal.(IAnimal); ok {
+		animal.Call(&#34;ssss&#34;)
+	} else {
+		fmt.Println(&#34;xxxx&#34;)
+	}
+
+	fmt.Println(reflect.TypeOf(ianimal))
+	var i interface{} = 1
+	switch i.(type) {
+	case int:
+		fmt.Println(&#34;is int&#34;)
+	}
+
+	a := i.(int)
+	fmt.Println(a)
+
+}
+</code></pre><pre><code>其中i.(type)必须在switch中使用。i.(基础类型)，用来作为断言变量为某个类型。
+</code></pre>
+<pre tabindex="0"><code>func (p *pp) printArg(arg interface{}, verb rune) {
+    p.arg = arg
+    p.value = reflect.Value{}
+    ...
+    // Some types can be done without reflection.
+    switch f := arg.(type) {
+    case bool:
+        p.fmtBool(f, verb)
+    case float32:
+        p.fmtFloat(float64(f), 32, verb)
+    case float64:
+        p.fmtFloat(f, 64, verb)
+    case complex64:
+        p.fmtComplex(complex128(f), 64, verb)
+    case complex128:
+        p.fmtComplex(f, 128, verb)
+    case int:
+        p.fmtInteger(uint64(f), signed, verb)
+    case int8:
+        p.fmtInteger(uint64(f), signed, verb)
+    case int16:
+        p.fmtInteger(uint64(f), signed, verb)
+    case int32:
+        p.fmtInteger(uint64(f), signed, verb)
+    case int64:
+        p.fmtInteger(uint64(f), signed, verb)
+    case uint:
+        p.fmtInteger(uint64(f), unsigned, verb)
+    case uint8:
+        p.fmtInteger(uint64(f), unsigned, verb)
+    case uint16:
+        p.fmtInteger(uint64(f), unsigned, verb)
+    case uint32:
+        p.fmtInteger(uint64(f), unsigned, verb)
+    case uint64:
+        p.fmtInteger(f, unsigned, verb)
+    case uintptr:
+        p.fmtInteger(uint64(f), unsigned, verb)
+    case string:
+        p.fmtString(f, verb)
+    case []byte:
+        p.fmtBytes(f, verb, &#34;[]byte&#34;)
+    case reflect.Value:
+        // Handle extractable values with special methods
+        // since printValue does not handle them at depth 0.
+        if f.IsValid() &amp;&amp; f.CanInterface() {
+            p.arg = f.Interface()
+            if p.handleMethods(verb) {
+                return
+            }
+        }
+        p.printValue(f, verb, 0)
+    default:
+        // If the type is not simple, it might have methods.
+        if !p.handleMethods(verb) {
+            // Need to use reflection, since the type had no
+            // interface methods that could be used for formatting.
+            p.printValue(reflect.ValueOf(f), verb, 0)
+        }
+    }
+}
+</code></pre></section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/32.%E6%8E%A5%E5%8F%A3%E8%B5%8B%E5%80%BC/"
+      ><span class="mr-1.5">←</span><span>golang基础(32.接口赋值)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/34.%E7%A9%BA%E6%8E%A5%E5%8F%A3%E5%8F%8D%E5%B0%84%E6%B3%9B%E5%9E%8B/"
+      ><span>golang基础(34.空接口，反射，泛型)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

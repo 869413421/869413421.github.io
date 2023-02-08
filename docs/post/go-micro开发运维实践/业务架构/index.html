@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>go-micro开发运维实践(业务架构) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="业务准备 一个传统web系统，用户模块永远是不可或缺的一环，也作为一个系统的基石。下列的教程中将使用go-micro来编写一个用户服务，以此作为开发的基础。下面是一个用户服务中暴露的api以及内部调用rpc方法规划。
+api /user POST 注册 /user/:id GET 获取用户信息 /user/token POST 认证获取token /user GET 获取用户列表 /user/:id PUT 更新用户 /user/:id DELETE 删除用户 /user/password POST 发起密码重置 /user/password PUT 重置密码 rpc Get 根据ID获取用户信息 Pagination 获取分页数据 Create 创建用户 Update 更新用户 Delete 删除用户 Auth 认证获取token Validate 验证token CreatePasswordReset 创建密码重置记录 ResetPassword 密码重置 架构设计 技术选型 注册中心：etcd api网关：micro-api v2 api服务：gin 微服务：go-micro v2 数据库：mysql 服务追踪：opentracing/jaeger 服务监控：prometheus &#43; grafana 消息队列：rabbit-mq 缓存系统：redis 搜索服务：elasticsearch 日志系统：ELK 上述中所有描述的组件，在单机阶段我们都使用docker-compose来进行实践。后续我完成编码以及单机部署后再基于k8s进行部署
+总结一下上图中用户请求到响应的整个流程，用户在前端发起请求，请求到达服务器后通过nginx或其他的负载均衡器中，通过反向代理把请求转发到micro-api统一网关。关于micro-api网关，你同样可以把他理解为一个分发路由，micro-api启动后会通过服务发现找到所有已经注册的api服务，然后解析路由规则将请求分发到到我们指定的api服务。而api服务会通过grpc向service请求，实际中api服务并不参与过多的密集计算或IO处理，最终处理压力交由service来承担。service处理完成将响应返回给api服务，api再返回响应给到接入层（nginx）,从而完成整个请求响应的闭环。至于上图中出现的服务治理，服务监控，链路追踪等细节，我们后续在执行到相关知识时再详细了解。" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="go-micro开发运维实践(业务架构)" />
+<meta property="og:description" content="go-micro开发运维实践(业务架构)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E4%B8%9A%E5%8A%A1%E6%9E%B6%E6%9E%84/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="go-micro开发运维实践(业务架构)">
+<meta itemprop="description" content="go-micro开发运维实践(业务架构)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="65">
+<meta itemprop="keywords" content="go-micro开发运维实践," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="go-micro开发运维实践(业务架构)"/>
+<meta name="twitter:description" content="go-micro开发运维实践(业务架构)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">go-micro开发运维实践(业务架构)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h2 id="业务准备">业务准备</h2>
+<p>一个传统web系统，用户模块永远是不可或缺的一环，也作为一个系统的基石。下列的教程中将使用go-micro来编写一个用户服务，以此作为开发的基础。下面是一个用户服务中暴露的api以及内部调用rpc方法规划。</p>
+<h4 id="api">api</h4>
+<table>
+<thead>
+<tr>
+<th>/user</th>
+<th>POST</th>
+<th>注册</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>/user/:id</td>
+<td>GET</td>
+<td>获取用户信息</td>
+</tr>
+<tr>
+<td>/user/token</td>
+<td>POST</td>
+<td>认证获取token</td>
+</tr>
+<tr>
+<td>/user</td>
+<td>GET</td>
+<td>获取用户列表</td>
+</tr>
+<tr>
+<td>/user/:id</td>
+<td>PUT</td>
+<td>更新用户</td>
+</tr>
+<tr>
+<td>/user/:id</td>
+<td>DELETE</td>
+<td>删除用户</td>
+</tr>
+<tr>
+<td>/user/password</td>
+<td>POST</td>
+<td>发起密码重置</td>
+</tr>
+<tr>
+<td>/user/password</td>
+<td>PUT</td>
+<td>重置密码</td>
+</tr>
+</tbody>
+</table>
+<h4 id="rpc">rpc</h4>
+<table>
+<thead>
+<tr>
+<th>Get</th>
+<th>根据ID获取用户信息</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pagination</td>
+<td>获取分页数据</td>
+</tr>
+<tr>
+<td>Create</td>
+<td>创建用户</td>
+</tr>
+<tr>
+<td>Update</td>
+<td>更新用户</td>
+</tr>
+<tr>
+<td>Delete</td>
+<td>删除用户</td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>认证获取token</td>
+</tr>
+<tr>
+<td>Validate</td>
+<td>验证token</td>
+</tr>
+<tr>
+<td>CreatePasswordReset</td>
+<td>创建密码重置记录</td>
+</tr>
+<tr>
+<td>ResetPassword</td>
+<td>密码重置</td>
+</tr>
+</tbody>
+</table>
+<h2 id="架构设计">架构设计</h2>
+<p><img src="https://cdn.nlark.com/yuque/0/2022/png/26186945/1650849460496-995293c0-cad9-4353-895e-26d8131c5897.png#clientId=u53e354aa-fd68-4&amp;from=ui&amp;id=u0b5769d5&amp;name=%E7%94%A8%E6%88%B7%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%9B%BE-%E7%AC%AC%202%20%E9%A1%B5.drawio.png&amp;originHeight=957&amp;originWidth=1608&amp;originalType=binary&amp;ratio=1&amp;rotation=0&amp;showTitle=false&amp;size=125940&amp;status=done&amp;style=none&amp;taskId=u9bf40ead-e99a-4690-8dca-70bb066e345&amp;title=" alt="用户服务架构图-第 2 页.drawio.png"></p>
+<h3 id="技术选型">技术选型</h3>
+<ul>
+<li>注册中心：<a href="https://github.com/etcd-io/etcd">etcd</a></li>
+<li>api网关：<a href="https://github.com/asim/go-micro/tree/v2.9.1">micro-api v2</a></li>
+<li>api服务：<a href="https://github.com/gin-gonic/gin">gin</a></li>
+<li>微服务：<a href="https://github.com/asim/go-micro/tree/v2.9.1">go-micro v2</a></li>
+<li>数据库：mysql</li>
+<li>服务追踪：<a href="https://github.com/jaegertracing/jaeger">opentracing/jaeger</a></li>
+<li>服务监控：prometheus + grafana</li>
+<li>消息队列：rabbit-mq</li>
+<li>缓存系统：redis</li>
+<li>搜索服务：elasticsearch</li>
+<li>日志系统：ELK</li>
+</ul>
+<p>上述中所有描述的组件，在单机阶段我们都使用<code>docker-compose</code>来进行实践。后续我完成编码以及单机部署后再基于<code>k8s</code>进行部署</p>
+<p>总结一下上图中用户请求到响应的整个流程，用户在前端发起请求，请求到达服务器后通过<code>nginx</code>或其他的负载均衡器中，通过反向代理把请求转发到<code>micro-api</code>统一网关。关于micro-api网关，你同样可以把他理解为一个分发路由，micro-api启动后会通过服务发现找到所有已经注册的api服务，然后解析路由规则将请求分发到到我们指定的api服务。而api服务会通过grpc向service请求，实际中api服务并不参与过多的密集计算或IO处理，最终处理压力交由service来承担。service处理完成将响应返回给api服务，api再返回响应给到接入层<code>（nginx）</code>,从而完成整个请求响应的闭环。至于上图中出现的服务治理，服务监控，链路追踪等细节，我们后续在执行到相关知识时再详细了解。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5"
+      >go-micro开发运维实践</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/elastice1/"
+      ><span class="mr-1.5">←</span><span>ElasticSearch系列（集群内部原理）</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/go-micro%E5%BC%80%E5%8F%91%E8%BF%90%E7%BB%B4%E5%AE%9E%E8%B7%B5/%E5%88%9D%E5%A7%8B%E5%8C%96%E7%94%A8%E6%88%B7api%E9%A1%B9%E7%9B%AE/"
+      ><span>go-micro开发运维实践(初始化用户API项目)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

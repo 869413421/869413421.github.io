@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(23.函数的基本调用和定义) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="在 Go 语言中，函数的基本组成为：关键字 func、函数名、参数列表、返回值、函数体和返回语句，作为强类型语言，无论是参数还是返回值，在定义函数时，都要声明其类型。函数主要分为三种类型
+普通函数 匿名函数 类型系统方法 函数定义 func add(a, b int) int {return a &#43; b} 如果函数的参数列表中包含若干个类型相同的参数，比如上面例子中的 a 和 b，则可以在参数列表中省略前面变量的类型声明，只保留最后一个。
+函数调用 函数调用非常方便，如果是在同一个包中（即定义在同一个目录下的 Go 文件中），只需直接调用即可：
+package mainimport &#34;fmt&#34;func add(a, b int) int {return a &#43; b}func main() {fmt.Println(add(1, 2))} 需要先导入了该函数所在的包，然后才能调用该函数，比如，我们将 add 函数放到单独的 mymath 包中（函数名首字母改为大写）：package mymathfunc Add(a, b int) int {return a &#43; b} 然后我们可以这样在 main 包中调用 Add 函数：" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(23.函数的基本调用和定义)" />
+<meta property="og:description" content="golang基础(23.函数的基本调用和定义)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/23.%E5%87%BD%E6%95%B0%E7%9A%84%E5%9F%BA%E6%9C%AC%E8%B0%83%E7%94%A8%E5%92%8C%E5%AE%9A%E4%B9%89/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(23.函数的基本调用和定义)">
+<meta itemprop="description" content="golang基础(23.函数的基本调用和定义)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="95">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(23.函数的基本调用和定义)"/>
+<meta name="twitter:description" content="golang基础(23.函数的基本调用和定义)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(23.函数的基本调用和定义)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>在 Go 语言中，函数的基本组成为：关键字 func、函数名、参数列表、返回值、函数体和返回语句，作为强类型语言，无论是参数还是返回值，在定义函数时，都要声明其类型。<!-- raw HTML omitted -->函数主要分为三种类型</p>
+<ul>
+<li>普通函数</li>
+<li>匿名函数</li>
+<li>类型系统方法</li>
+</ul>
+<h2 id="函数定义">函数定义</h2>
+<pre tabindex="0"><code>func add(a, b int) int {
+	return a + b
+}
+</code></pre><p>如果函数的参数列表中包含若干个类型相同的参数，比如上面例子中的 a 和 b，则可以在参数列表中省略前面变量的类型声明，只保留最后一个。</p>
+<h2 id="函数调用">函数调用</h2>
+<p>函数调用非常方便，如果是在同一个包中（即定义在同一个目录下的 Go 文件中），只需直接调用即可：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func add(a, b int) int {
+	return a + b
+}
+
+func main() {
+	fmt.Println(add(1, 2))
+}
+</code></pre><pre><code>需要先导入了该函数所在的包，然后才能调用该函数，比如，我们将 add 函数放到单独的 mymath 包中（函数名首字母改为大写）：
+</code></pre>
+<pre tabindex="0"><code>package mymath
+
+func Add(a, b int) int  {
+    return a + b
+}
+</code></pre><p>然后我们可以这样在 main 包中调用 Add 函数：</p>
+<pre tabindex="0"><code>package main
+
+import (
+    &#34;fmt&#34;
+    &#34;mymath&#34;
+)
+
+func main()  {
+    fmt.Println(mymath.Add(1, 2))   // 3
+}
+</code></pre><p>在跨包调用时，只有首字母大写的函数才可以被调用，这个涉及到包的可见性，后面在介绍面向对象时会详细讨论这个，这里你只需要了解首字母大写的 Go 函数即相当于其它语言的 public 函数，Go 语言中没有 public、protected、private 之类的关键字，它是通过首字母的大小写来区分可见性：首字母小写的函数只能在同一个包中访问，首字母大写的函数才可以在其他包中调用，Go 文件中定义的全局变量也是如此。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/22.%E8%B7%B3%E8%BD%AC%E8%AF%AD%E5%8F%A5/"
+      ><span class="mr-1.5">←</span><span>golang基础(22.跳转语句)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/24.%E5%87%BD%E6%95%B0%E7%9A%84%E4%BC%A0%E5%8F%82%E5%92%8C%E8%BF%94%E5%9B%9E%E5%80%BC/"
+      ><span>golang基础(24.函数的传参和返回值)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

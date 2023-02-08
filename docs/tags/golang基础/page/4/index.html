@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+  <link
+    rel="alternate"
+    type="application/rss&#43;xml"
+    href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80/index.xml"
+    title="清水泥沙"
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80/" />
+
+  
+  <meta itemprop="name" content="golang基础">
+<meta itemprop="description" content="">
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础"/>
+<meta name="twitter:description" content=""/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+
+
+<h1 class="mb-24">golang基础</h1>
+
+
+
+
+
+
+
+ 
+
+
+
+
+<section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
+  <h2 class="!my-0 pb-1 !leading-none">golang基础(36.error 接口及其使用)</h2>
+  <time class="text-sm opacity-60"
+    >Feb 7, 2023</time
+  >
+  <a class="absolute inset-0" href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/36.error-%E6%8E%A5%E5%8F%A3%E5%8F%8A%E5%85%B6%E4%BD%BF%E7%94%A8/"></a>
+</section>
+
+
+
+
+
+<section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
+  <h2 class="!my-0 pb-1 !leading-none">golang基础(37.defer 语句及使用示例)</h2>
+  <time class="text-sm opacity-60"
+    >Feb 7, 2023</time
+  >
+  <a class="absolute inset-0" href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/37.defer-%E8%AF%AD%E5%8F%A5%E5%8F%8A%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B/"></a>
+</section>
+
+
+
+
+
+<section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
+  <h2 class="!my-0 pb-1 !leading-none">golang基础(38.panic和recover)</h2>
+  <time class="text-sm opacity-60"
+    >Feb 7, 2023</time
+  >
+  <a class="absolute inset-0" href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/38.panic%E5%92%8Crecover/"></a>
+</section>
+
+
+
+
+
+<section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
+  <h2 class="!my-0 pb-1 !leading-none">golang基础(39.多进程，多线程，携程)</h2>
+  <time class="text-sm opacity-60"
+    >Feb 7, 2023</time
+  >
+  <a class="absolute inset-0" href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/39.%E5%A4%9A%E8%BF%9B%E7%A8%8B%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%90%BA%E7%A8%8B/"></a>
+</section>
+
+
+
+
+
+<section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
+  <h2 class="!my-0 pb-1 !leading-none">golang基础(4.代码包)</h2>
+  <time class="text-sm opacity-60"
+    >Feb 7, 2023</time
+  >
+  <a class="absolute inset-0" href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/4.%E4%BB%A3%E7%A0%81%E5%8C%85/"></a>
+</section>
+
+
+
+
+
+<section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
+  <h2 class="!my-0 pb-1 !leading-none">golang基础(40.GO携程实现原理)</h2>
+  <time class="text-sm opacity-60"
+    >Feb 7, 2023</time
+  >
+  <a class="absolute inset-0" href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/40.go%E6%90%BA%E7%A8%8B%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86/"></a>
+</section>
+
+
+
+
+
+<section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
+  <h2 class="!my-0 pb-1 !leading-none">golang基础(41.基于共享内存的携程通信)</h2>
+  <time class="text-sm opacity-60"
+    >Feb 7, 2023</time
+  >
+  <a class="absolute inset-0" href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/41.%E5%9F%BA%E4%BA%8E%E5%85%B1%E4%BA%AB%E5%86%85%E5%AD%98%E7%9A%84%E6%90%BA%E7%A8%8B%E9%80%9A%E4%BF%A1/"></a>
+</section>
+
+
+
+
+
+<section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
+  <h2 class="!my-0 pb-1 !leading-none">golang基础(42.基于消息的携程通信)</h2>
+  <time class="text-sm opacity-60"
+    >Feb 7, 2023</time
+  >
+  <a class="absolute inset-0" href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/42.%E5%9F%BA%E4%BA%8E%E6%B6%88%E6%81%AF%E7%9A%84%E6%90%BA%E7%A8%8B%E9%80%9A%E4%BF%A1/"></a>
+</section>
+
+
+
+
+
+<section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
+  <h2 class="!my-0 pb-1 !leading-none">golang基础(43.通道基本语法和缓冲通道)</h2>
+  <time class="text-sm opacity-60"
+    >Feb 7, 2023</time
+  >
+  <a class="absolute inset-0" href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/43.%E9%80%9A%E9%81%93%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95%E5%92%8C%E7%BC%93%E5%86%B2%E9%80%9A%E9%81%93/"></a>
+</section>
+
+
+
+
+
+<section class="relative my-10 first-of-type:mt-0 last-of-type:mb-0">
+  <h2 class="!my-0 pb-1 !leading-none">golang基础(44.单向通道)</h2>
+  <time class="text-sm opacity-60"
+    >Feb 7, 2023</time
+  >
+  <a class="absolute inset-0" href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/44.%E5%8D%95%E5%90%91%E9%80%9A%E9%81%93/"></a>
+</section>
+
+
+
+
+<nav class="mt-24 flex">
+  
+  <a class="btn" href="/tags/golang%E5%9F%BA%E7%A1%80/page/3/">← Prev Page</a>
+  
+  
+  <a class="btn ml-auto" href="/tags/golang%E5%9F%BA%E7%A1%80/page/5/"
+    >Next Page →</a
+  >
+  
+</nav>
+
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

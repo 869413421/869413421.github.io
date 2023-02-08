@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(15.数组切片增删) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="动态增加元素切片比数组强大之处在于能够动态增加元素，甚至可以在容量不足的情况下自动扩容。元素个数和元素可以分配的空间是两个不同的值，元素个数是长度，元素可分配空间是容量。一个切片容量的初始值可以根据创建方式改变
+对于基于数组和切片创建的切片而言，默认容量是从切片起始索引到对应底层数组的结尾索引； 对于通过内置 make 函数创建的切片而言，在没有指定容量参数的情况下，默认容量和切片长度一致。 函数append()可以为数组末尾增加参数。如果追加的元素个数超出 原切片的的默认容量，则底层会自动进行扩容：
+package mainimport &#34;fmt&#34;func main() {slice1 := make([]int, 4, 10)fmt.Println(len(slice1))fmt.Println(cap(slice1))slice2 := append(slice1, 1, 2, 3)fmt.Println(len(slice2)) // 长度7fmt.Println(cap(slice2)) // 容量10slice1 = append(slice1, slice2...)fmt.Println(slice1) fmt.Println(len(slice1)) // 长度11fmt.Println(cap(slice1)) // 容量20} 需要注意的是append方法并不会改变原来的切片，而是会生成一个新的容量 更大切片当中，将原有的元素和新增的元素一并拷贝到新的切片中一并放回。默认情况下，扩容后的`新切片是原切片容量的2倍`。如果还不足以容纳新元素则会再次进行扩容，直到新的容量足够容纳下所有的元素。但是，当原切片的长度大于或等于 `1024 `时，Go 语言将会以原容量的 `1.25 `倍作为新容量的基准。&lt;br /&gt;因此在开发阶段我们应该合理地分配容量值，减少内部因扩容重新分配内存和搬送内存的操作次数，提高程序性能。内容复制 go中拥有一个复制数组切片的函数copy，作用是讲一个数组切片的元素搬运到另一个数组切片。如果两个数组切片的元素个数不一致，会按其中较小的切片进行复制。
+package mainimport &#34;fmt&#34;func main() {slice1 := []int{1, 2, 3, 4, 5}slice2 := []int{6, 7, 8}// 复制slice1到slice2//copy(slice2, slice1)//fmt." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(15.数组切片增删)" />
+<meta property="og:description" content="golang基础(15.数组切片增删)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/15.%E6%95%B0%E7%BB%84%E5%88%87%E7%89%87%E5%A2%9E%E5%88%A0/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(15.数组切片增删)">
+<meta itemprop="description" content="golang基础(15.数组切片增删)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="200">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(15.数组切片增删)"/>
+<meta name="twitter:description" content="golang基础(15.数组切片增删)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(15.数组切片增删)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>动态增加元素<!-- raw HTML omitted -->切片比数组强大之处在于能够动态增加元素，甚至可以在容量不足的情况下自动扩容。元素个数和元素可以分配的空间是两个不同的值，元素个数是长度，元素可分配空间是容量。<!-- raw HTML omitted -->一个切片容量的初始值可以根据创建方式改变</p>
+<ul>
+<li>对于基于数组和切片创建的切片而言，默认容量是从切片起始索引到对应底层数组的结尾索引；</li>
+<li>对于通过内置 make 函数创建的切片而言，在没有指定容量参数的情况下，默认容量和切片长度一致。</li>
+</ul>
+<p>函数<code>append()</code>可以为数组末尾增加参数。如果追加的元素个数超出 原切片的的默认容量，则底层会自动进行扩容：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	slice1 := make([]int, 4, 10)
+	fmt.Println(len(slice1))
+	fmt.Println(cap(slice1))
+
+	slice2 := append(slice1, 1, 2, 3)
+	fmt.Println(len(slice2)) // 长度7
+	fmt.Println(cap(slice2)) // 容量10
+
+	slice1 = append(slice1, slice2...)
+	fmt.Println(slice1) 
+	fmt.Println(len(slice1)) // 长度11
+	fmt.Println(cap(slice1)) // 容量20
+
+}
+</code></pre><pre><code>需要注意的是append方法并不会改变原来的切片，而是会生成一个新的容量 更大切片当中，将原有的元素和新增的元素一并拷贝到新的切片中一并放回。默认情况下，扩容后的`新切片是原切片容量的2倍`。如果还不足以容纳新元素则会再次进行扩容，直到新的容量足够容纳下所有的元素。但是，当原切片的长度大于或等于 `1024 `时，Go 语言将会以原容量的 `1.25 `倍作为新容量的基准。&lt;br /&gt;因此在开发阶段我们应该合理地分配容量值，减少内部因扩容重新分配内存和搬送内存的操作次数，提高程序性能。
+</code></pre>
+<h2 id="内容复制">内容复制</h2>
+<p>go中拥有一个复制数组切片的函数<code>copy</code>，作用是讲一个数组切片的元素搬运到另一个数组切片。如果两个数组切片的元素个数不一致，会按其中较小的切片进行复制。</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	slice1 := []int{1, 2, 3, 4, 5}
+	slice2 := []int{6, 7, 8}
+
+	// 复制slice1到slice2
+	//copy(slice2, slice1)
+	//fmt.Println(slice2) // 输出1,2,3
+
+	// 复制slice2到slice1
+	copy(slice1, slice2)
+	fmt.Println(slice1) // 输出6,7,8,4,5
+}
+</code></pre><h2 id="动态删除元素">动态删除元素</h2>
+<p>除了支持动态增加元素之外，还可以动态删除元素，在切片中动态删除元素可以通过多种方式实现（其实是通过切片重新赋值实现的「伪删除」）：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	slice1 := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	slice1 = slice1[:len(slice1)-5] // 删除尾部的5个元素
+	fmt.Println(slice1)
+	slice1 = slice1[1:] // 删除头部的1个元素
+	fmt.Println(slice1)
+}
+</code></pre><p>此时删除后的切片并非原来的切片，而是内部新构建返回的一个切片数组。其容量基于新的计算逻辑来决定。<!-- raw HTML omitted -->此外，还可以通过上述介绍的 append 函数和 copy 函数实现切片元素的「删除」：</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+func main() {
+	slice1 := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	slice1 = slice1[:len(slice1)-5] // 删除尾部的5个元素
+	fmt.Println(slice1)
+	slice1 = slice1[1:] // 删除头部的1个元素
+	fmt.Println(slice1)
+
+	slice3 := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	//slice4 := append(slice3[:0], slice3[3:]...) //删除开头三个元素
+	//fmt.Println(slice4)
+
+	//slice5 := append(slice3[:1], slice3[4:]...) // 删除中间三个元素
+	//fmt.Println(slice5)
+
+	//slice6 := append(slice3[:0], slice3[:7]...)  // 删除最后三个元素
+	//fmt.Println(slice6)
+
+	slice7 := slice3[:copy(slice3, slice3[3:])]  // 删除开头前三个元素
+	fmt.Println(slice7)
+}
+</code></pre><p>append 相对好理解一些，copy 之所以可以用于删除元素，是因为其返回值是拷贝成功的元素个数，我们可以根据这个值完成新切片的设置从而达到「删除」元素的效果。和动态增加元素一样，原切片的值并没有变动，而是创建出一个新的内存空间来存放新切片并将其赋值给其它变量。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/14.%E6%95%B0%E7%BB%84%E5%88%87%E7%89%87/"
+      ><span class="mr-1.5">←</span><span>golang基础(14.数组切片)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/16.%E5%AD%97%E5%85%B8%E7%B1%BB%E5%9E%8B%E5%A3%B0%E6%98%8E%E5%88%9D%E5%A7%8B%E5%8C%96%E7%AE%80%E5%8D%95%E4%BD%BF%E7%94%A8/"
+      ><span>golang基础(16.字典类型声明，初始化，简单使用)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>golang基础(32.接口赋值) - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="接口是不能直接实例化的，因为它只是一个契约的存在，只能通过具体类来实例化。但是在go中我们支持接口赋值操作，从而快速实现接口和示例的映射和转换。接口赋值有两种情况：
+将实现的类实例化后赋值给接口 将一个接口赋值给另一个接口 将类赋值给接口 在go中，只要我们的某个类实现了某个接口，实例化后我们就可以将这个对象赋值给接口。
+package mainimport &#34;fmt&#34;type Integer intfunc (i Integer) Add(a, b Integer) Integer {return a &#43; b}func (i Integer) Multiply(b Integer) Integer {return i * b}type Math interface {Add(a, b Integer) IntegerMultiply(i Integer) Integer}func main() {var a Integer = 1var m Mathm = afmt.Println(m.Add(2, 1))} 按照 Go 语言的约定，Integer 类型实现了 Math 接口。然后我们可以这样将 Integer 类型的实例 a 直接赋值给 Math 接口类型的变量 m：" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="golang基础(32.接口赋值)" />
+<meta property="og:description" content="golang基础(32.接口赋值)" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/32.%E6%8E%A5%E5%8F%A3%E8%B5%8B%E5%80%BC/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-02-07T15:52:40+08:00" />
+<meta property="article:modified_time" content="2023-02-07T15:52:40+08:00" />
+
+  
+  <meta itemprop="name" content="golang基础(32.接口赋值)">
+<meta itemprop="description" content="golang基础(32.接口赋值)"><meta itemprop="datePublished" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="dateModified" content="2023-02-07T15:52:40+08:00" />
+<meta itemprop="wordCount" content="402">
+<meta itemprop="keywords" content="golang基础," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="golang基础(32.接口赋值)"/>
+<meta name="twitter:description" content="golang基础(32.接口赋值)"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">golang基础(32.接口赋值)</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Feb 7, 2023</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><p>接口是不能直接实例化的，因为它只是一个契约的存在，只能通过具体类来实例化。但是在go中我们支持接口赋值操作，从而快速实现接口和示例的映射和转换。<!-- raw HTML omitted -->接口赋值有两种情况：</p>
+<ul>
+<li>将实现的类实例化后赋值给接口</li>
+<li>将一个接口赋值给另一个接口</li>
+</ul>
+<h2 id="将类赋值给接口">将类赋值给接口</h2>
+<p>在go中，只要我们的某个类实现了某个接口，实例化后我们就可以将这个对象赋值给接口。</p>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+type Integer int
+
+func (i Integer) Add(a, b Integer) Integer {
+	return a + b
+}
+
+func (i Integer) Multiply(b Integer) Integer {
+	return i * b
+}
+
+type Math interface {
+	Add(a, b Integer) Integer
+	Multiply(i Integer) Integer
+}
+
+func main() {
+	var a Integer = 1
+	var m Math
+	m = a
+	fmt.Println(m.Add(2, 1))
+}
+</code></pre><p>按照 Go 语言的约定，Integer 类型实现了 Math 接口。然后我们可以这样将 Integer 类型的实例 a 直接赋值给 Math 接口类型的变量 m：</p>
+<pre tabindex="0"><code>	var a Integer = 1
+	var m Math
+	m = a
+	fmt.Println(m.Add(2, 1))
+</code></pre><p>对于值方法而言，进行接口赋值时传递 a 实例的指针引用也是可以的：</p>
+<pre tabindex="0"><code>var a Integer = 1 
+var m Math = &amp;a
+fmt.Println(m.Add(1))
+</code></pre><p>因为对于非指针方法，Go 底层会自动生成一个与之对应的指针成员方法：</p>
+<pre tabindex="0"><code>func (a *Integer) Add(i Integer) Integer { 
+    return (*a).Add(i) 
+}
+func (a *Integer) Multiply(i Integer) Integer { 
+    return (*a).Multiply(i) 
+}
+</code></pre><h3 id="包含指针方法">包含指针方法</h3>
+<p>不过如果 Integer 类型中包含了归属于指针的实现方法：</p>
+<pre tabindex="0"><code>type Integer int
+func (a *Integer) Add(b Integer) {
+    *a = (*a) + b
+}
+func (a Integer) Multiply(b Integer) Integer {
+    return a * b
+}
+type Math interface {
+    Add(i Integer)
+    Multiply(i Integer) Integer
+}
+</code></pre><p>那么在做接口赋值时，就只能传递指针类型的变量了：</p>
+<pre tabindex="0"><code>var a Integer = 1
+var m Math = &amp;a
+m.Add(2)
+fmt.Printf(&#34;1 + 2 = %d
+&#34;, a)
+</code></pre><p>因为 Integer 类型不包含指针方法（参考前面介绍的<a href="https://geekr.dev/posts/go-struct-and-class#toc-5">值方法与指针方法区别</a>），所以此时只有 *Integer 类型实现了 Math 接口，如果我们直接将 a 的值类型赋值给 m，编译时会报错<!-- raw HTML omitted -->综上所述，如果 Integer 类中实现接口的成员方法都是值方法，则进行接口赋值时，传递类实例的值类型或者指针类型均可，否则只能传递指针类型实例，从代码性能角度来说，值拷贝需要消耗更多的内存空间，统一使用指针类型代码性能会更好。</p>
+<h2 id="接口赋值接口">接口赋值接口</h2>
+<p>在 Go 语言中，只要两个接口拥有相同的方法列表（与顺序无关），那么它们就是等同的，可以相互赋值。不过，这里有一个前提，那就是接口变量持有的是基于对应实现类的实例值，所以接口与接口间的赋值是基于类实例与接口间的赋值的。</p>
+<h3 id="完全对等">完全对等</h3>
+<pre tabindex="0"><code>package main
+
+import &#34;fmt&#34;
+
+type Number1 interface {
+	Equal(i int) bool
+	Less(i int) bool
+	More(i int) bool
+}
+
+type Number2 interface {
+	Equal(i int) bool
+	Less(i int) bool
+	More(i int) bool
+}
+
+type Number int
+
+func (n Number) Equal(i int) bool {
+	return int(n) == i
+}
+func (n Number) Less(i int) bool {
+	return int(n) &lt; i
+}
+func (n Number) More(i int) bool {
+	return int(n) &gt; i
+}
+
+func main() {
+	var num Number = 1
+	var num2 Number1
+	num2 = num
+	var num3 = num2
+	fmt.Println(num3)
+}
+</code></pre><pre><code>这里我们定义了两个完全一致的接口，，一个叫 Number1，一个Number2，两者都定义三个相同的方法，只是顺序不同而已。在 Go 语言中，这两个接口实际上并无区别，因为：
+</code></pre>
+<ul>
+<li>任何实现了 Number1 接口的类，也实现了 Number2；</li>
+<li>任何实现了 Number1 接口的类实例都可以赋值给 Number2，反之亦然；</li>
+<li>在任何地方使用 Number1 接口与使用 Number2 并无差异。</li>
+</ul>
+<h3 id="方法子集">方法子集</h3>
+<p>此外，接口赋值并不要求两个接口完全等价（方法完全相同）。如果接口 A 的方法列表是接口 B 的方法列表的子集，那么接口 B 也可以赋值给接口 A。例如，假设 Number2 接口定义如下：</p>
+<pre tabindex="0"><code>type Number2 interface {
+    Equal(i int) bool
+    MoreThan(i int) bool
+    LessThan(i int) bool
+    Add(i int)
+}
+</code></pre><p>要让 Number 类继续保持实现这两个接口，需要在 Number 类定义中新增一个 Add 方法实现（这里定义了一个指针方法）：</p>
+<pre tabindex="0"><code>func (n *Number) Add(i int) {
+    *n = *n + Number(i)
+}
+</code></pre><p>接下来，将上面的接口赋值语句改写如下即可：</p>
+<pre tabindex="0"><code>var num1 Number = 1
+var num2 Number2 = &amp;num1
+var num3 Number1 = num2 
+</code></pre><p>这样一来，就实现了接口赋值，但是反过来不行：</p>
+<pre tabindex="0"><code>var num1 Number = 1
+var num2 Number1 = &amp;num1
+var num3 Number2 = num2   
+</code></pre><p>因为 Number1 接口中没有声明 Add 方法，或者换句话说，实现了 Number2 接口的类肯定实现了 Number1，但是实现了 Number1 接口的类不一定实现了 Number2。类似我们其他语言中，子类示例化后可以直接赋值给父类，但是父类实例化之后不能赋值给子类。</p>
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/golang%E5%9F%BA%E7%A1%80"
+      >golang基础</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/31.%E7%B1%BB%E5%B1%9E%E6%80%A7%E5%92%8C%E6%96%B9%E6%B3%95%E7%9A%84%E5%8F%AF%E8%A7%81%E6%80%A7/"
+      ><span class="mr-1.5">←</span><span>golang基础(31.类属性和方法的可见性)</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/golang%E5%9F%BA%E7%A1%80/33.%E6%8E%A5%E5%8F%A3%E7%B1%BB%E5%9E%8B%E4%BB%A5%E5%8F%8A%E8%BD%AC%E5%8C%96/"
+      ><span>golang基础(33.接口类型以及转化)</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2023
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>
