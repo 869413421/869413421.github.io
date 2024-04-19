@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>基于关联规则实现的智能推荐算法 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="基于关联规则实现的智能推荐算法 在最近工作上偶然的发现了接触到关联规则这项技术，了解到这个算法适用于实现智能推荐算法，所以打算对其深入了解一下，觊觎一下CURD仔没曾看见过的算法世界。 作为一个偏向业务的程序员，我们最常接触的到智能推荐的应用场景无疑是商城中的推荐商品，以及咨询中的咨询推荐。
+常见的推荐系统分类有：
+基于应用领域: 电子商务/社交好友推荐等 基于设计思想: 基于协同过滤的推荐等 基于使用数据: 基于用户标签的推荐等 比如在商品详情页下推荐类似的商品，在新闻详情页下推送类似的新闻。
+关联规则是什么？ 关联规则通常指的是关联规则学习（Association Rule Learning），这是数据挖掘和机器学习领域的一个技术，用于发现数据集中项之间的有趣关系。 关联规则主要用于在大规模数据集中识别项之间的频繁关联或规律，常用于市场篮子分析、商品推荐等应用场景。最常见的关联规则算法是 Apriori 和 FP-growth。
+从上面的解析我们可以得出，我们可以使用关联规则，商品和商品之间的关系。比如在用户的订单中经常会出现牛奶和面包这两件商品，那么这时候就会形成一个关联规则，由此我们可以推断出购买牛奶的用户也极大的 几率会去购买面包。
+关联规则的三种关系 当我们在计算出商品的关联规则时，我们需要了解到这些规则中存在三种关系。
+强关联：强关联的商品彼此间会互相存在，比如商品A剃须刀，商品B剃须膏。如果购买了剃须膏就必须购买剃须刀，购买了剃须刀就比徐购买剃须刀。这种关系是双向的，称之为双向关联。单向关联，比如香烟和打火机，购买了香烟的人可能需要购买打火机，但是购买了打火机的人不一定需要购买香烟。 弱关联：两个关联程度不高的商品，两种可能存在关联的商品，可以考虑将他们摆放一起，如果后续关联度提高，那么意味着他们会存在强关联关系，目前关联度不高可能是因为陈列原因造成。 排斥：指两个商品不会同时出现。 商品关联分析三度 支持度 支持度 = （同时包含商品A和商品B的订单总数） / 总订单数 * 100% 支持度主要表示，在所有交易中出现关联商品的概率。即是有多少用户会同时购买关联的商品
+可信度 可信度 = （同时包含商品A和商品B的订单总数） / 包含商品A的总订单数 * 100% 表示在购买了A商品的订单中有多少包含了商品B
+提升度 提升度 = 可信度 / 商品B在总订单中出现的概率 * 100 提升度用于表示商品A对商品B销量提升的影响
+可以这样理解： 支持度代表这组关联商品的份额是否够大 置信度(可信度)代表关联度的强弱 而提升度则是看该关联规则是否有利用价值和值得推广，用了(客户购买后推荐)比没用(客户自然而然的购买)要提高多少。
+基础数据预览 下面我们导入实现算法所需要的数据，以及取出前十五畅销的商品
+import pandas as pd # 基础绘图库 import matplotlib.pyplot as plt import seaborn as sns # %matplotlib inline # 各种细节配置如 文字大小，图例文字等杂项 large = 22 med = 16 small = 12 params = {&#39;axes." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="基于关联规则实现的智能推荐算法" />
+<meta property="og:description" content="基于关联规则实现的智能推荐算法" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/%E5%9F%BA%E4%BA%8E%E5%85%B3%E8%81%94%E8%A7%84%E5%88%99%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95/%E5%9F%BA%E4%BA%8E%E5%85%B3%E8%81%94%E8%A7%84%E5%88%99%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-19T17:35:18+08:00" />
+<meta property="article:modified_time" content="2024-04-19T17:35:18+08:00" />
+
+  
+  <meta itemprop="name" content="基于关联规则实现的智能推荐算法">
+<meta itemprop="description" content="基于关联规则实现的智能推荐算法"><meta itemprop="datePublished" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="dateModified" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="wordCount" content="863">
+<meta itemprop="keywords" content="算法,Python,推荐算法," />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="基于关联规则实现的智能推荐算法"/>
+<meta name="twitter:description" content="基于关联规则实现的智能推荐算法"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">基于关联规则实现的智能推荐算法</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Apr 19, 2024</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h1 id="基于关联规则实现的智能推荐算法">基于关联规则实现的智能推荐算法</h1>
+<p>在最近工作上偶然的发现了接触到关联规则这项技术，了解到这个算法适用于实现智能推荐算法，所以打算对其深入了解一下，觊觎一下CURD仔没曾看见过的算法世界。
+作为一个偏向业务的程序员，我们最常接触的到智能推荐的应用场景无疑是商城中的推荐商品，以及咨询中的咨询推荐。</p>
+<p>常见的推荐系统分类有：</p>
+<ul>
+<li>基于应用领域: 电子商务/社交好友推荐等</li>
+<li>基于设计思想: 基于协同过滤的推荐等</li>
+<li>基于使用数据: 基于用户标签的推荐等</li>
+</ul>
+<p>比如在商品详情页下推荐类似的商品，在新闻详情页下推送类似的新闻。</p>
+<h1 id="关联规则是什么">关联规则是什么？</h1>
+<blockquote>
+<p>关联规则通常指的是关联规则学习（Association Rule Learning），这是数据挖掘和机器学习领域的一个技术，用于发现数据集中项之间的有趣关系。
+关联规则主要用于在大规模数据集中识别项之间的频繁关联或规律，常用于市场篮子分析、商品推荐等应用场景。最常见的关联规则算法是 Apriori 和 FP-growth。</p>
+</blockquote>
+<p>从上面的解析我们可以得出，我们可以使用关联规则，商品和商品之间的关系。比如在用户的订单中经常会出现牛奶和面包这两件商品，那么这时候就会形成一个关联规则，由此我们可以推断出购买牛奶的用户也极大的 几率会去购买面包。</p>
+<h1 id="关联规则的三种关系">关联规则的三种关系</h1>
+<p>当我们在计算出商品的关联规则时，我们需要了解到这些规则中存在三种关系。</p>
+<ul>
+<li>强关联：强关联的商品彼此间会互相存在，比如商品A剃须刀，商品B剃须膏。如果购买了剃须膏就必须购买剃须刀，购买了剃须刀就比徐购买剃须刀。这种关系是双向的，称之为双向关联。单向关联，比如香烟和打火机，购买了香烟的人可能需要购买打火机，但是购买了打火机的人不一定需要购买香烟。</li>
+<li>弱关联：两个关联程度不高的商品，两种可能存在关联的商品，可以考虑将他们摆放一起，如果后续关联度提高，那么意味着他们会存在强关联关系，目前关联度不高可能是因为陈列原因造成。</li>
+<li>排斥：指两个商品不会同时出现。</li>
+</ul>
+<h1 id="商品关联分析三度">商品关联分析三度</h1>
+<h2 id="支持度">支持度</h2>
+<p>支持度 = （同时包含商品A和商品B的订单总数） / 总订单数 * 100%
+支持度主要表示，在所有交易中出现关联商品的概率。即是有多少用户会同时购买关联的商品</p>
+<h2 id="可信度">可信度</h2>
+<p>可信度 = （同时包含商品A和商品B的订单总数） / 包含商品A的总订单数 * 100%
+表示在购买了A商品的订单中有多少包含了商品B</p>
+<h2 id="提升度">提升度</h2>
+<p>提升度 = 可信度 / 商品B在总订单中出现的概率 * 100
+提升度用于表示商品A对商品B销量提升的影响</p>
+<p>可以这样理解：
+支持度代表这组关联商品的份额是否够大
+置信度(可信度)代表关联度的强弱
+而提升度则是看该关联规则是否有利用价值和值得推广，用了(客户购买后推荐)比没用(客户自然而然的购买)要提高多少。</p>
+<h1 id="基础数据预览">基础数据预览</h1>
+<p>下面我们导入实现算法所需要的数据，以及取出前十五畅销的商品</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 基础绘图库</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> matplotlib.pyplot <span style="color:#66d9ef">as</span> plt
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> seaborn <span style="color:#66d9ef">as</span> sns
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># %matplotlib inline</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 各种细节配置如 文字大小，图例文字等杂项</span>
+</span></span><span style="display:flex;"><span>large <span style="color:#f92672">=</span> <span style="color:#ae81ff">22</span>
+</span></span><span style="display:flex;"><span>med <span style="color:#f92672">=</span> <span style="color:#ae81ff">16</span>
+</span></span><span style="display:flex;"><span>small <span style="color:#f92672">=</span> <span style="color:#ae81ff">12</span>
+</span></span><span style="display:flex;"><span>params <span style="color:#f92672">=</span> {<span style="color:#e6db74">&#39;axes.titlesize&#39;</span>: large,
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#39;legend.fontsize&#39;</span>: med,
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#39;figure.figsize&#39;</span>: (<span style="color:#ae81ff">16</span>, <span style="color:#ae81ff">10</span>),
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#39;axes.labelsize&#39;</span>: med,
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#39;xtick.labelsize&#39;</span>: med,
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#39;ytick.labelsize&#39;</span>: med,
+</span></span><span style="display:flex;"><span>          <span style="color:#e6db74">&#39;figure.titlesize&#39;</span>: large}
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>rcParams<span style="color:#f92672">.</span>update(params)
+</span></span><span style="display:flex;"><span>sns<span style="color:#f92672">.</span>set_style(<span style="color:#e6db74">&#34;whitegrid&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 使用Seaborn设置风格</span>
+</span></span><span style="display:flex;"><span>sns<span style="color:#f92672">.</span>set_style(<span style="color:#e6db74">&#34;white&#34;</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>rc(<span style="color:#e6db74">&#39;font&#39;</span>, <span style="color:#f92672">**</span>{<span style="color:#e6db74">&#39;family&#39;</span>: <span style="color:#e6db74">&#39;Microsoft YaHei, SimHei&#39;</span>})  <span style="color:#75715e"># 设置中文字体的支持</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># sns.set(font=&#39;SimHei&#39;)  # 解决Seaborn中文显示问题，但会自动添加背景灰色网格</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>rcParams[<span style="color:#e6db74">&#39;axes.unicode_minus&#39;</span>] <span style="color:#f92672">=</span> <span style="color:#66d9ef">False</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 解决保存图像是负号&#39;-&#39;显示为方块的问题</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>df <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;bike_data.csv&#39;</span>, encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;gbk&#39;</span>)
+</span></span><span style="display:flex;"><span>df<span style="color:#f92672">.</span>info()
+</span></span><span style="display:flex;"><span>df<span style="color:#f92672">.</span>head()
+</span></span></code></pre></div><pre><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 52761 entries, 0 to 52760
+Data columns (total 3 columns):
+ #   Column       Non-Null Count  Dtype 
+---  ------       --------------  ----- 
+ 0   OrderNumber  52761 non-null  object
+ 1   LineNumber   52761 non-null  int64 
+ 2   Model        52761 non-null  object
+dtypes: int64(1), object(2)
+memory usage: 1.2+ MB
+</code></pre>
+<!-- raw HTML omitted -->
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p><!-- raw HTML omitted --></p>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 检查数据是否重复</span>
+</span></span><span style="display:flex;"><span>duplicates <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span>duplicated()<span style="color:#f92672">.</span>sum()
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;重复行数: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">, 总行数: </span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>format(duplicates, df<span style="color:#f92672">.</span>shape[<span style="color:#ae81ff">0</span>]))
+</span></span></code></pre></div><pre><code>重复行数: 0, 总行数: 52761
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 展示商品</span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;数据集中共有</span><span style="color:#e6db74">{</span>df[<span style="color:#e6db74">&#39;Model&#39;</span>]<span style="color:#f92672">.</span>nunique()<span style="color:#e6db74">}</span><span style="color:#e6db74">种商品&#34;</span>)
+</span></span><span style="display:flex;"><span>model_names <span style="color:#f92672">=</span> df[<span style="color:#e6db74">&#39;Model&#39;</span>]<span style="color:#f92672">.</span>unique()
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;商品名分别为：&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 5 个为一行显示</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, len(model_names), <span style="color:#ae81ff">5</span>):
+</span></span><span style="display:flex;"><span>    print(model_names[i:i <span style="color:#f92672">+</span> <span style="color:#ae81ff">5</span>])
+</span></span></code></pre></div><pre><code>数据集中共有37种商品
+商品名分别为：
+['山地英骑' '山地车水壶架' '运动水壶' 'hl山地外胎' '山地车内胎']
+['运动型头盔' '普通公路车' '公路车内胎' 'hl公路外胎' '竞速公路车']
+['公路车水壶架' '长袖骑车衣' '山地车挡泥板' '自行车帽' '山地车400']
+['ml山地外胎' '修补工具' '山地车500' '公路车550' '短袖经典车衣']
+['旅游型自行车(大)' '竞速袜' '半掌手套' '公路车350' 'ml公路外胎']
+['水壶包' '旅游型自行车(小)' '旅游型自行车(中)' '旅游车内胎' 'll公路车外胎']
+['旅游自行车外胎(通用)' '万能自行车座' '洗车喷剂' '经典背心' 'll山地胎']
+['故障栓钩' &quot;Women's Mountain Shorts&quot;]
+</code></pre>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 最畅销的 15 种商品</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 往 reset_index 中添加 name 参数可快速重命名列名</span>
+</span></span><span style="display:flex;"><span>grouped <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span>groupby(<span style="color:#e6db74">&#39;Model&#39;</span>)[<span style="color:#e6db74">&#39;Model&#39;</span>]<span style="color:#f92672">.</span>count()<span style="color:#f92672">.</span>reset_index(name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;count&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 排序后取销量前十五的商品</span>
+</span></span><span style="display:flex;"><span>top_15 <span style="color:#f92672">=</span> grouped<span style="color:#f92672">.</span>sort_values(by<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;count&#39;</span>, ascending<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)<span style="color:#f92672">.</span>head(<span style="color:#ae81ff">15</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 绘图展示</span>
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>figure(figsize<span style="color:#f92672">=</span>(<span style="color:#ae81ff">8</span>, <span style="color:#ae81ff">6</span>))
+</span></span><span style="display:flex;"><span>sns<span style="color:#f92672">.</span>barplot(data<span style="color:#f92672">=</span>top_15, x<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;count&#39;</span>, y<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Model&#39;</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>grid(<span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>plt<span style="color:#f92672">.</span>show()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>top_15 <span style="color:#f92672">=</span> top_15[<span style="color:#e6db74">&#39;Model&#39;</span>]<span style="color:#f92672">.</span>tolist()
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#39;初步分析，该自行车店的排名前15的畅销单品为如下：&#39;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, len(top_15), <span style="color:#ae81ff">5</span>):
+</span></span><span style="display:flex;"><span>    print(top_15[i:i <span style="color:#f92672">+</span> <span style="color:#ae81ff">5</span>])
+</span></span></code></pre></div><p>​ <br>
+<img src="output_5_0.png" alt="png">
+​</p>
+<pre><code>初步分析，该自行车店的排名前15的畅销单品为如下：
+['运动型头盔', '运动水壶', '修补工具', '山地车内胎', '山地英骑']
+['公路车内胎', '自行车帽', '山地车挡泥板', '山地车水壶架', '公路车水壶架']
+['长袖骑车衣', '短袖经典车衣', '竞速公路车', '旅游车内胎', '半掌手套']
+</code></pre>
+<h1 id="使用apriori算法生成关联规则">使用Apriori算法生成关联规则</h1>
+<ol>
+<li>有关Apriori算法已经相当成熟，我们只需要做一个调包侠即可。下面引入相关的算法包，并传入数据集。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 构建所需要的数据集合</span>
+</span></span><span style="display:flex;"><span>df_group <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span>groupby(<span style="color:#e6db74">&#34;OrderNumber&#34;</span>)
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> name, group <span style="color:#f92672">in</span> df_group:
+</span></span><span style="display:flex;"><span>    dataset<span style="color:#f92672">.</span>append(list(set(group[<span style="color:#e6db74">&#34;Model&#34;</span>])))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(dataset[:<span style="color:#ae81ff">5</span>])
+</span></span></code></pre></div><pre><code>[['公路车水壶架', '普通公路车'], ['旅游型自行车(中)', '运动型头盔'], ['山地英骑', '运动水壶', '山地车水壶架'], ['公路车内胎', '万能自行车座', '普通公路车', 'hl公路外胎'], ['长袖骑车衣', '运动型头盔', '公路车水壶架', '运动水壶', '普通公路车']]
+</code></pre>
+<ol start="2">
+<li>我们可以通过如下方式将其转换为正确的格式：TransactionEncoder</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> mlxtend.preprocessing <span style="color:#f92672">import</span> TransactionEncoder
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>te <span style="color:#f92672">=</span> TransactionEncoder()
+</span></span><span style="display:flex;"><span>te_ary <span style="color:#f92672">=</span> te<span style="color:#f92672">.</span>fit(dataset)<span style="color:#f92672">.</span>transform(dataset)
+</span></span><span style="display:flex;"><span>new_df <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>DataFrame(te_ary, columns<span style="color:#f92672">=</span>te<span style="color:#f92672">.</span>columns_)
+</span></span></code></pre></div><ol start="3">
+<li>通过Apriori算法生成关联规则，将最小支持度设置为0.01,最小置信度设置为0.1。</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> mlxtend.frequent_patterns <span style="color:#f92672">import</span> apriori, association_rules
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 使用apriori算法找出频繁项集</span>
+</span></span><span style="display:flex;"><span>frequent_itemsets <span style="color:#f92672">=</span> apriori(df<span style="color:#f92672">=</span>new_df, min_support<span style="color:#f92672">=</span><span style="color:#ae81ff">0.01</span>, use_colnames<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, max_len<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 生成关联规则</span>
+</span></span><span style="display:flex;"><span>rules <span style="color:#f92672">=</span> association_rules(frequent_itemsets, metric<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;confidence&#39;</span>, min_threshold<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 显示结果</span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;频繁项集：&#34;</span>)
+</span></span><span style="display:flex;"><span>print(frequent_itemsets[<span style="color:#ae81ff">0</span>:<span style="color:#ae81ff">2</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">关联规则：&#34;</span>)
+</span></span><span style="display:flex;"><span>print(rules<span style="color:#f92672">.</span>head(<span style="color:#ae81ff">2</span>))
+</span></span></code></pre></div><pre><code>频繁项集：
+    support                   itemsets
+0  0.045072  (Women's Mountain Shorts)
+1  0.037826                   (hl公路外胎)
+
+关联规则：
+&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 102 entries, 0 to 101
+Data columns (total 10 columns):
+ #   Column              Non-Null Count  Dtype  
+---  ------              --------------  -----  
+ 0   antecedents         102 non-null    object 
+ 1   consequents         102 non-null    object 
+ 2   antecedent support  102 non-null    float64
+ 3   consequent support  102 non-null    float64
+ 4   support             102 non-null    float64
+ 5   confidence          102 non-null    float64
+ 6   lift                102 non-null    float64
+ 7   leverage            102 non-null    float64
+ 8   conviction          102 non-null    float64
+ 9   zhangs_metric       102 non-null    float64
+dtypes: float64(8), object(2)
+memory usage: 8.1+ KB
+None
+</code></pre>
+<ol>
+<li>
+<p><strong>antecedents</strong>：前项，即规则左侧的项集。在这个示例中，<code>(hl公路外胎)</code>是前项。</p>
+</li>
+<li>
+<p><strong>consequents</strong>：后项，即规则右侧的项集。在这个示例中，<code>(修补工具)</code>和<code>(公路车内胎)</code>是后项。</p>
+</li>
+<li>
+<p><strong>antecedent support</strong>：前项支持度，表示数据集中包含前项的比例。在这个示例中，<code>hl公路外胎</code>的支持度为0.037826。</p>
+</li>
+<li>
+<p><strong>consequent support</strong>：后项支持度，表示数据集中包含后项的比例。在这个示例中，<code>修补工具</code>的支持度为0.141614，<code>公路车内胎</code>的支持度为0.104258。</p>
+</li>
+<li>
+<p><strong>support</strong>：支持度，表示同时包含前项和后项的比例。在这个示例中，同时包含<code>hl公路外胎</code>和<code>修补工具</code>的比例为0.010209，同时包含<code>hl公路外胎</code>和<code>公路车内胎</code>的比例为0.025970。</p>
+</li>
+<li>
+<p><strong>confidence</strong>：置信度，表示在包含前项的情况下同时包含后项的概率。在这个示例中，置信度为0.269900和0.686567。</p>
+</li>
+<li>
+<p><strong>lift</strong>：提升度，表示规则的关联程度。提升度大于1表示正相关，提升度等于1表示没有关联，提升度小于1表示负相关。在这个示例中，<code>修补工具</code>的提升度为1.905892，<code>公路车内胎</code>的提升度为6.585282，这些都是正相关。</p>
+</li>
+<li>
+<p><strong>leverage</strong>：杠杆值，表示前项和后项出现的频率超过它们如果是独立的预期频率的程度。在这个示例中，<code>修补工具</code>的杠杆值为0.004853，<code>公路车内胎</code>的杠杆值为0.022027。</p>
+</li>
+<li>
+<p><strong>conviction</strong>：确信度，表示规则后项出现的条件下，前项不出现的相对风险。在这个示例中，<code>修补工具</code>的确信度为1.175711，<code>公路车内胎</code>的确信度为2.857844。</p>
+</li>
+<li>
+<p><strong>zhangs_metric</strong>：Zhang的度量，是一种基于置信度和支持度的度量。在这个示例中，<code>修补工具</code>的Zhang&rsquo;s度量为0.493997，<code>公路车内胎</code>的Zhang&rsquo;s度量为0.881490。</p>
+</li>
+</ol>
+<h1 id="需要重点关注的参数">需要重点关注的参数</h1>
+<ul>
+<li>support: 支持度，山地车内胎 和 ll山地胎 同时出现在一张购物小票中的概率</li>
+<li>confidence: 置信度，购买了 山地车内胎 的前提下，同时购买 ll山地胎 的概率</li>
+<li>lift：向购买了 山地车内胎 的客户推荐 ll山地胎 的话，这个客户购买 ll山地胎 的概率是这个客户自然而然购买 ll山地胎 的 400% 左右，即高了 300% 多，通俗理解：消费者平时较少单独购买桌角防撞海绵，可能偶尔想到的时候或自己小孩碰到的时候才会想起购买，如果我们在桌子(书桌饭桌)的成功下单页面添加桌角防撞海绵的推荐，则很大程度上可以提高防撞海绵的销量。这也符合我们在探索性数据分析中发现的前 15 名畅销商品后并希望通过畅销商品带动“相对非畅销商品”的宗旨。</li>
+</ul>
+<h1 id="筛选出互补和互斥的数据">筛选出互补和互斥的数据</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 查找出lift &gt; 1 和 1 &lt; 的数据</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 找出 lift &gt; 1 的数据</span>
+</span></span><span style="display:flex;"><span>lift_1 <span style="color:#f92672">=</span> rules[rules[<span style="color:#e6db74">&#39;lift&#39;</span>] <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">1</span>]<span style="color:#f92672">.</span>sort_values(by<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lift&#39;</span>, ascending<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)<span style="color:#f92672">.</span>head(<span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 找出 1 &lt; lift 的数据</span>
+</span></span><span style="display:flex;"><span>lift_2 <span style="color:#f92672">=</span> rules[rules[<span style="color:#e6db74">&#39;lift&#39;</span>] <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">1</span>]<span style="color:#f92672">.</span>sort_values(by<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lift&#39;</span>, ascending<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)<span style="color:#f92672">.</span>head(<span style="color:#ae81ff">5</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 打印出 lift &gt; 1 的数据</span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;互补规则：&#34;</span>)
+</span></span><span style="display:flex;"><span>print(lift_1)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;互斥规则：&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 打印出 1 &lt; lift 的数据</span>
+</span></span><span style="display:flex;"><span>print(lift_2)
+</span></span></code></pre></div><pre><code>互补规则：
+      antecedents    consequents  antecedent support  consequent support  \
+82        (旅游车内胎)  (旅游自行车外胎(通用))            0.065726            0.041449   
+83  (旅游自行车外胎(通用))        (旅游车内胎)            0.041449            0.065726   
+2         (公路车内胎)       (hl公路外胎)            0.104258            0.037826   
+1        (hl公路外胎)        (公路车内胎)            0.037826            0.104258   
+21       (ml公路外胎)        (公路车内胎)            0.041873            0.104258   
+
+     support  confidence       lift  leverage  conviction  zhangs_metric  
+82  0.035662    0.542591  13.090553  0.032938    2.095611       0.988584  
+83  0.035662    0.860386  13.090553  0.032938    6.691835       0.963547  
+2   0.025970    0.249097   6.585282  0.022027    1.281356       0.946864  
+1   0.025970    0.686567   6.585282  0.022027    2.857844       0.881490  
+21  0.027288    0.651685   6.250710  0.022922    2.571647       0.876729  
+互斥规则：
+   antecedents consequents  antecedent support  consequent support   support  \
+61      (山地英骑)     (运动型头盔)            0.116537            0.290332  0.033404   
+62     (运动型头盔)      (山地英骑)            0.290332            0.116537  0.033404   
+56     (山地车内胎)      (山地英骑)            0.136815            0.116537  0.015573   
+55      (山地英骑)     (山地车内胎)            0.116537            0.136815  0.015573   
+90     (竞速公路车)     (运动型头盔)            0.067890            0.290332  0.019054   
+
+    confidence      lift  leverage  conviction  zhangs_metric  
+61    0.286637  0.987274 -0.000431    0.994821      -0.014380  
+62    0.115054  0.987274 -0.000431    0.998324      -0.017839  
+56    0.113824  0.976717 -0.000371    0.996938      -0.026874  
+55    0.133629  0.976717 -0.000371    0.996323      -0.026274  
+90    0.280665  0.966706 -0.000656    0.986562      -0.035633  
+</code></pre>
+<h1 id="根据需求推荐数据">根据需求推荐数据</h1>
+<p>需要结合业务需求</p>
+<ul>
+<li>获得最大营销响应度？&ndash; 看置信度，越高越好</li>
+<li>销售最大化？&ndash; 看提升度，越高越好</li>
+<li>用户未产生消费，我们向其推荐商品？</li>
+</ul>
+<h2 id="以获得最高的营销相应率为目标">以获得最高的营销相应率为目标</h2>
+<p>如果一个新客户刚刚下单了 山地车英骑 这个产品，</p>
+<p>如果希望获得最高的营销响应率，那在他付费成功页面上最应该推荐什么产品？</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 使用的是左手规则：lhs(left hand rule)，lhs 表示的是购买的产品</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 使用 frozenset 来对字典的键进行选择</span>
+</span></span><span style="display:flex;"><span>purchase_good <span style="color:#f92672">=</span> rules[rules[<span style="color:#e6db74">&#39;antecedents&#39;</span>] <span style="color:#f92672">==</span> frozenset({<span style="color:#e6db74">&#39;山地英骑&#39;</span>})]
+</span></span><span style="display:flex;"><span>purchase_good<span style="color:#f92672">.</span>sample(<span style="color:#ae81ff">3</span>)
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p><!-- raw HTML omitted --></p>
+<!-- raw HTML omitted -->
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 根据置信度排序</span>
+</span></span><span style="display:flex;"><span>purchase_good<span style="color:#f92672">.</span>sort_values(by<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;confidence&#39;</span>, ascending<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)<span style="color:#f92672">.</span>head(<span style="color:#ae81ff">5</span>)
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p><!-- raw HTML omitted --></p>
+<!-- raw HTML omitted -->
+<h1 id="以最大化总体销售额为目标">以最大化总体销售额为目标</h1>
+<p>如果一个新客户刚下单了 山地英骑 这个产品，</p>
+<p>如果希望最大化提升总体的销售额，那么在他付费成功的页面上应该推荐什么产品？</p>
+<p>目标：最大化销售额</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 使用提升度来进行推荐</span>
+</span></span><span style="display:flex;"><span>purchase_good<span style="color:#f92672">.</span>sort_values(by<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;lift&#39;</span>, ascending<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)<span style="color:#f92672">.</span>head(<span style="color:#ae81ff">5</span>)
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p><!-- raw HTML omitted --></p>
+<!-- raw HTML omitted -->
+<p>再次重申提升度通俗含义</p>
+<p>提升度是相对于自然而然购买而言，A对B的提升度为4.0的理解如下</p>
+<p>向购买了A的用户推荐B，则该用户购买B的概率是该用户单独<br>
+（即自然而然的购买）购买B的概率的 400%</p>
+<p>向购买了A的用户推荐B，则该用户购买B的概率比该用户单独<br>
+（即自然而然的购买）购买B的概率高300%</p>
+<h1 id="用户并未产生消费我们为其推荐某样商品">用户并未产生消费，我们为其推荐某样商品</h1>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 如果希望推荐山地英骑自行车，应该如何制定营销策略？</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 这里应该选出右手规则，因为直接就是推荐的产品，</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">##没有产生消费，消费了的即买了的才使用左手规则</span>
+</span></span><span style="display:flex;"><span>purchase_good <span style="color:#f92672">=</span> rules[rules[<span style="color:#e6db74">&#39;consequents&#39;</span>] <span style="color:#f92672">==</span> frozenset({<span style="color:#e6db74">&#39;山地英骑&#39;</span>})]<span style="color:#f92672">.</span>sort_values(<span style="color:#e6db74">&#39;lift&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 根据置信度或提升度排序都可以，因为直接根据右手规则选出来的数据框中，</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## confidence 和 lift 成正比例关系，你高我就高</span>
+</span></span><span style="display:flex;"><span>purchase_good
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 所以山地英骑跟山地车水壶架，山地车挡泥板，hl山地外胎一起推荐比较好</span>
+</span></span></code></pre></div><!-- raw HTML omitted -->
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
+
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
+<p><!-- raw HTML omitted --></p>
+<!-- raw HTML omitted -->
+</section>
+
+  
+  
+  <footer class="mt-12 flex flex-wrap">
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/%E7%AE%97%E6%B3%95"
+      >算法</a
+    >
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/python"
+      >Python</a
+    >
+     
+    <a
+      class="mr-1.5 mb-1.5 rounded-lg bg-black/[3%] px-5 py-2 no-underline dark:bg-white/[8%]"
+      href="https://869413421.github.io/tags/%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95"
+      >推荐算法</a
+    >
+    
+  </footer>
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/redis/"
+      ><span>Redis（底层和应用）</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2024
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>
