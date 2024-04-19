@@ -23,8 +23,8 @@ theme = "paper"
 
   # home page profile
   avatar = 'GRAVATAR_EMAIL'                 # gravatar email or image url
-  name = '清水'
-  bio = '满腔热情喂饱风的小码农'
+  name = '清水泥沙'
+  bio = ''
 
 
   # misc
