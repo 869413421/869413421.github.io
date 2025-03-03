@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>Transformer 学习之路 - Prompt Tuning 实战 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="Transformer 学习之路 - Prompt Tuning 实战 在深度学习的浩瀚宇宙中，Transformer 模型以其强大的表现力和广泛的应用场景，成为了自然语言处理（NLP）领域的明星。然而，随着模型规模的不断膨胀，如何高效地微调这些庞然大物以适应特定任务，成为了一个亟待解决的问题。今天，我们就来聊聊一种名为 Prompt Tuning 的参数高效微调方法，它如何在大型语言模型（如 GPT、BERT 等）中大显身手。
+Prompt Tuning 的基本原理 传统的微调方法通常需要调整整个模型的参数，这不仅计算资源消耗巨大，而且在大规模模型上实施起来颇为困难。Prompt Tuning 则另辟蹊径，它通过在输入前面加入一组可学习的提示（prompt）来引导模型产生期望的输出，而不是微调模型的全部参数。
+关键点 仅调整提示部分的参数：Prompt Tuning 引入了一组可训练的嵌入向量，作为输入的提示词，将它们放置在输入文本的前面，以调整模型的输出行为。 冻结模型权重：模型的主干参数保持不变，只有提示词的嵌入参数在训练中被优化。 Prompt Tuning 的优点 减少计算资源和存储需求：相比调整整个模型，Prompt Tuning 只更新提示词的嵌入向量，因而需要的计算和存储资源少得多。 迁移性好：在不同的任务上可以快速部署。尤其适合在大型模型上快速进行多任务适应。 提升少样本学习能力：Prompt Tuning 通过定制化提示引导模型，使得模型在少量样本任务中表现更为优异。 Prompt Tuning 与微调的对比 特性 传统微调 Prompt Tuning 调整的参数范围 整个模型参数 仅提示嵌入参数 计算资源需求 高 低 适用场景 大数据、复杂任务 少样本、特定任务 适用的模型大小 中小型模型 大型模型效果尤为显著 示例：Prompt Tuning 的应用场景 例如，如果我们要用 Prompt Tuning 来训练一个大型语言模型完成情感分类任务，可以采用以下步骤：
+定义提示向量：给定一个输入句子“这个电影真棒！”，可以在前面加上一组初始的提示词，生成输入格式为： [提示词1] [提示词2] ... [提示词n] 这个电影真棒！ 训练提示词：冻结模型参数，仅更新这些提示词，使得模型能够从中识别出情感信息。 微调优化：在情感分类数据集上优化这些提示词，以便在推理时引导模型准确地输出“正面”或“负面”情感分类。 Soft Prompt 和 Hard Prompt 的对比 在 Prompt Tuning 中，Soft Prompt 和 Hard Prompt 是两种不同的提示方式，用于引导模型执行特定任务。" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="Transformer 学习之路 - Prompt Tuning 实战" />
+<meta property="og:description" content="深入解析 Prompt Tuning 技术及其在 Transformer 模型中的应用" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/chatbot_prompt_tuning/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-19T17:35:18+08:00" />
+<meta property="article:modified_time" content="2024-04-19T17:35:18+08:00" />
+
+  
+  <meta itemprop="name" content="Transformer 学习之路 - Prompt Tuning 实战">
+<meta itemprop="description" content="深入解析 Prompt Tuning 技术及其在 Transformer 模型中的应用"><meta itemprop="datePublished" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="dateModified" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="wordCount" content="307">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Transformer 学习之路 - Prompt Tuning 实战"/>
+<meta name="twitter:description" content="深入解析 Prompt Tuning 技术及其在 Transformer 模型中的应用"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">Transformer 学习之路 - Prompt Tuning 实战</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Apr 19, 2024</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h1 id="transformer-学习之路---prompt-tuning-实战">Transformer 学习之路 - Prompt Tuning 实战</h1>
+<p>在深度学习的浩瀚宇宙中，Transformer 模型以其强大的表现力和广泛的应用场景，成为了自然语言处理（NLP）领域的明星。然而，随着模型规模的不断膨胀，如何高效地微调这些庞然大物以适应特定任务，成为了一个亟待解决的问题。今天，我们就来聊聊一种名为 <strong>Prompt Tuning</strong> 的参数高效微调方法，它如何在大型语言模型（如 GPT、BERT 等）中大显身手。</p>
+<h2 id="prompt-tuning-的基本原理">Prompt Tuning 的基本原理</h2>
+<p>传统的微调方法通常需要调整整个模型的参数，这不仅计算资源消耗巨大，而且在大规模模型上实施起来颇为困难。Prompt Tuning 则另辟蹊径，它通过在输入前面加入一组可学习的提示（prompt）来引导模型产生期望的输出，而不是微调模型的全部参数。</p>
+<h3 id="关键点">关键点</h3>
+<ol>
+<li><strong>仅调整提示部分的参数</strong>：Prompt Tuning 引入了一组可训练的嵌入向量，作为输入的提示词，将它们放置在输入文本的前面，以调整模型的输出行为。</li>
+<li><strong>冻结模型权重</strong>：模型的主干参数保持不变，只有提示词的嵌入参数在训练中被优化。</li>
+</ol>
+<h2 id="prompt-tuning-的优点">Prompt Tuning 的优点</h2>
+<ol>
+<li><strong>减少计算资源和存储需求</strong>：相比调整整个模型，Prompt Tuning 只更新提示词的嵌入向量，因而需要的计算和存储资源少得多。</li>
+<li><strong>迁移性好</strong>：在不同的任务上可以快速部署。尤其适合在大型模型上快速进行多任务适应。</li>
+<li><strong>提升少样本学习能力</strong>：Prompt Tuning 通过定制化提示引导模型，使得模型在少量样本任务中表现更为优异。</li>
+</ol>
+<h2 id="prompt-tuning-与微调的对比">Prompt Tuning 与微调的对比</h2>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>传统微调</th>
+<th>Prompt Tuning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>调整的参数范围</td>
+<td>整个模型参数</td>
+<td>仅提示嵌入参数</td>
+</tr>
+<tr>
+<td>计算资源需求</td>
+<td>高</td>
+<td>低</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>大数据、复杂任务</td>
+<td>少样本、特定任务</td>
+</tr>
+<tr>
+<td>适用的模型大小</td>
+<td>中小型模型</td>
+<td>大型模型效果尤为显著</td>
+</tr>
+</tbody>
+</table>
+<h2 id="示例prompt-tuning-的应用场景">示例：Prompt Tuning 的应用场景</h2>
+<p>例如，如果我们要用 Prompt Tuning 来训练一个大型语言模型完成情感分类任务，可以采用以下步骤：</p>
+<ol>
+<li><strong>定义提示向量</strong>：给定一个输入句子“这个电影真棒！”，可以在前面加上一组初始的提示词，生成输入格式为：
+<pre tabindex="0"><code>[提示词1] [提示词2] ... [提示词n] 这个电影真棒！
+</code></pre></li>
+<li><strong>训练提示词</strong>：冻结模型参数，仅更新这些提示词，使得模型能够从中识别出情感信息。</li>
+<li><strong>微调优化</strong>：在情感分类数据集上优化这些提示词，以便在推理时引导模型准确地输出“正面”或“负面”情感分类。</li>
+</ol>
+<h2 id="soft-prompt-和-hard-prompt-的对比">Soft Prompt 和 Hard Prompt 的对比</h2>
+<p>在 Prompt Tuning 中，<strong>Soft Prompt</strong> 和 <strong>Hard Prompt</strong> 是两种不同的提示方式，用于引导模型执行特定任务。</p>
+<h3 id="soft-prompt软提示">Soft Prompt（软提示）</h3>
+<p><strong>Soft Prompt</strong> 使用的是<strong>可学习的嵌入向量</strong>，而不是具体的文本词汇。其提示向量可以在训练过程中通过反向传播进行优化，从而让模型逐渐学会任务的上下文。</p>
+<h4 id="特点">特点</h4>
+<ul>
+<li><strong>不需要具体的文本</strong>：Soft Prompt 不需要语言学意义上的单词，而是直接插入到模型的输入嵌入空间中。</li>
+<li><strong>高度可适应性</strong>：通过训练，Soft Prompt 向量会调整成对特定任务最有利的形式。</li>
+<li><strong>更适合大型语言模型</strong>：在大型模型中，只微调提示嵌入向量，而不是整个模型参数，能显著降低计算资源需求。</li>
+</ul>
+<h3 id="hard-prompt硬提示">Hard Prompt（硬提示）</h3>
+<p><strong>Hard Prompt</strong> 则是指具体的、由人类手动设计的文本提示。这类提示通常直接采用自然语言中的单词或短语，并将它们拼接到输入文本前或后，以此为模型提供上下文引导。</p>
+<h4 id="特点-1">特点</h4>
+<ul>
+<li><strong>人为设定</strong>：Hard Prompt 是显式的文本提示，可以为模型提供特定的上下文或结构。</li>
+<li><strong>灵活性较低</strong>：一旦设计好，Hard Prompt 的内容就相对固定，难以适应更多任务。</li>
+<li><strong>更适合小型任务</strong>：Hard Prompt 的设计可以帮助较小的模型理解任务，但对于更复杂的上下文和信息传递效果较差。</li>
+</ul>
+<h3 id="对比">对比</h3>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>Soft Prompt（软提示）</th>
+<th>Hard Prompt（硬提示）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>表达形式</td>
+<td>嵌入向量（非语言）</td>
+<td>明确的自然语言文本</td>
+</tr>
+<tr>
+<td>是否需要训练</td>
+<td>需要，提示向量会在训练中优化</td>
+<td>不需要，提示文本人为设定</td>
+</tr>
+<tr>
+<td>灵活性</td>
+<td>高，适应性强</td>
+<td>较低，适用于特定任务</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>大模型和多任务环境</td>
+<td>小模型或特定领域的简单任务</td>
+</tr>
+<tr>
+<td>实现难度</td>
+<td>较高，需要训练调整</td>
+<td>较低，依赖经验和任务语境</td>
+</tr>
+</tbody>
+</table>
+<h2 id="代码实战">代码实战</h2>
+<h3 id="导入相关包">导入相关包</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> datasets <span style="color:#f92672">import</span> Dataset
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoTokenizer, AutoModelForCausalLM, DataCollatorForSeq2Seq, TrainingArguments, Trainer
+</span></span></code></pre></div><h3 id="加载数据集">加载数据集</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>ds <span style="color:#f92672">=</span> Dataset<span style="color:#f92672">.</span>load_from_disk(<span style="color:#e6db74">&#34;/content/drive/MyDrive/ai-learning/3-PEFT/data/alpaca_data_zh/&#34;</span>)
+</span></span><span style="display:flex;"><span>ds[:<span style="color:#ae81ff">3</span>]
+</span></span></code></pre></div><h3 id="数据集预处理">数据集预处理</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;Langboat/bloom-1b4-zh&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">process_func</span>(example):
+</span></span><span style="display:flex;"><span>    MAX_LENGTH <span style="color:#f92672">=</span> <span style="color:#ae81ff">256</span>
+</span></span><span style="display:flex;"><span>    input_ids, attention_mask, labels <span style="color:#f92672">=</span> [], [], []
+</span></span><span style="display:flex;"><span>    instruction <span style="color:#f92672">=</span> tokenizer(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>join([<span style="color:#e6db74">&#34;Human: &#34;</span> <span style="color:#f92672">+</span> example[<span style="color:#e6db74">&#34;instruction&#34;</span>], example[<span style="color:#e6db74">&#34;input&#34;</span>]])<span style="color:#f92672">.</span>strip() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n\n</span><span style="color:#e6db74">Assistant: &#34;</span>)
+</span></span><span style="display:flex;"><span>    response <span style="color:#f92672">=</span> tokenizer(example[<span style="color:#e6db74">&#34;output&#34;</span>] <span style="color:#f92672">+</span> tokenizer<span style="color:#f92672">.</span>eos_token)
+</span></span><span style="display:flex;"><span>    input_ids <span style="color:#f92672">=</span> instruction[<span style="color:#e6db74">&#34;input_ids&#34;</span>] <span style="color:#f92672">+</span> response[<span style="color:#e6db74">&#34;input_ids&#34;</span>]
+</span></span><span style="display:flex;"><span>    attention_mask <span style="color:#f92672">=</span> instruction[<span style="color:#e6db74">&#34;attention_mask&#34;</span>] <span style="color:#f92672">+</span> response[<span style="color:#e6db74">&#34;attention_mask&#34;</span>]
+</span></span><span style="display:flex;"><span>    labels <span style="color:#f92672">=</span> [<span style="color:#f92672">-</span><span style="color:#ae81ff">100</span>] <span style="color:#f92672">*</span> len(instruction[<span style="color:#e6db74">&#34;input_ids&#34;</span>]) <span style="color:#f92672">+</span> response[<span style="color:#e6db74">&#34;input_ids&#34;</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> len(input_ids) <span style="color:#f92672">&gt;</span> MAX_LENGTH:
+</span></span><span style="display:flex;"><span>        input_ids <span style="color:#f92672">=</span> input_ids[:MAX_LENGTH]
+</span></span><span style="display:flex;"><span>        attention_mask <span style="color:#f92672">=</span> attention_mask[:MAX_LENGTH]
+</span></span><span style="display:flex;"><span>        labels <span style="color:#f92672">=</span> labels[:MAX_LENGTH]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;input_ids&#34;</span>: input_ids,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;attention_mask&#34;</span>: attention_mask,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;labels&#34;</span>: labels
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tokenized_ds <span style="color:#f92672">=</span> ds<span style="color:#f92672">.</span>map(process_func, remove_columns<span style="color:#f92672">=</span>ds<span style="color:#f92672">.</span>column_names)
+</span></span></code></pre></div><h3 id="创建模型">创建模型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModelForCausalLM<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;Langboat/bloom-1b4-zh&#34;</span>, low_cpu_mem_usage<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span></code></pre></div><h3 id="配置-prompt-tuning">配置 Prompt Tuning</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> peft <span style="color:#f92672">import</span> PromptTuningConfig, get_peft_model, TaskType, PromptTuningInit
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>config <span style="color:#f92672">=</span> PromptTuningConfig(task_type<span style="color:#f92672">=</span>TaskType<span style="color:#f92672">.</span>CAUSAL_LM,
+</span></span><span style="display:flex;"><span>                            prompt_tuning_init<span style="color:#f92672">=</span>PromptTuningInit<span style="color:#f92672">.</span>TEXT,
+</span></span><span style="display:flex;"><span>                            prompt_tuning_init_text<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;下面是一段人与机器人的对话。&#34;</span>,
+</span></span><span style="display:flex;"><span>                            num_virtual_tokens<span style="color:#f92672">=</span>len(tokenizer(<span style="color:#e6db74">&#34;下面是一段人与机器人的对话。&#34;</span>)[<span style="color:#e6db74">&#34;input_ids&#34;</span>]),
+</span></span><span style="display:flex;"><span>                            tokenizer_name_or_path<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Langboat/bloom-1b4-zh&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> get_peft_model(model, config)
+</span></span></code></pre></div><h3 id="配置训练参数">配置训练参数</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>environ[<span style="color:#e6db74">&#34;WANDB_DISABLED&#34;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>args <span style="color:#f92672">=</span> TrainingArguments(
+</span></span><span style="display:flex;"><span>    output_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./chatbot&#34;</span>,
+</span></span><span style="display:flex;"><span>    per_device_train_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    gradient_accumulation_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>,
+</span></span><span style="display:flex;"><span>    logging_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>,
+</span></span><span style="display:flex;"><span>    num_train_epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h3 id="创建训练器">创建训练器</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>trainer <span style="color:#f92672">=</span> Trainer(
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">=</span>model,
+</span></span><span style="display:flex;"><span>    args<span style="color:#f92672">=</span>args,
+</span></span><span style="display:flex;"><span>    tokenizer<span style="color:#f92672">=</span>tokenizer,
+</span></span><span style="display:flex;"><span>    train_dataset<span style="color:#f92672">=</span>tokenized_ds,
+</span></span><span style="display:flex;"><span>    data_collator<span style="color:#f92672">=</span>DataCollatorForSeq2Seq(tokenizer<span style="color:#f92672">=</span>tokenizer, padding<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>),
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h3 id="模型训练">模型训练</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>trainer<span style="color:#f92672">.</span>train()
+</span></span></code></pre></div><h3 id="模型推理">模型推理</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>cuda()
+</span></span><span style="display:flex;"><span>ipt <span style="color:#f92672">=</span> tokenizer(<span style="color:#e6db74">&#34;Human: </span><span style="color:#e6db74">{}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>format(<span style="color:#e6db74">&#34;考试有哪些技巧？&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>)<span style="color:#f92672">.</span>strip() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n\n</span><span style="color:#e6db74">Assistant: &#34;</span>, return_tensors<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pt&#34;</span>)<span style="color:#f92672">.</span>to(model<span style="color:#f92672">.</span>device)
+</span></span><span style="display:flex;"><span>tokenizer<span style="color:#f92672">.</span>decode(model<span style="color:#f92672">.</span>generate(<span style="color:#f92672">**</span>ipt, max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">128</span>, do_sample<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)[<span style="color:#ae81ff">0</span>], skip_special_tokens<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span></code></pre></div><h2 id="总结">总结</h2>
+<p>Prompt Tuning 作为一种轻量级的微调方法，不仅大幅降低了计算资源的需求，还在少样本学习和多任务适应方面展现了强大的潜力。通过本文的详细解析和代码实战，相信你已经对 Prompt Tuning 有了更深入的理解，并能够在实际项目中灵活运用。在未来的深度学习探索中，Prompt Tuning 无疑将成为你手中的一把利器，助你在 NLP 的海洋中乘风破浪。</p>
+</section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/chatbot_prefix_tuning/"
+      ><span class="mr-1.5">←</span><span>Transformer 学习之路 - Prefix-Tuning 实战</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/pipe/"
+      ><span>Transformer 学习之路 - 从零开始理解文本分类</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

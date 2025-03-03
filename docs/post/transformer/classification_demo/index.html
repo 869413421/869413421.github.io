@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>Transformer 学习之路 - 文本分类实战 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="Transformer 学习之路 - 文本分类实战 在这篇文章中，我们将通过一个完整的文本分类任务，深入解析 Transformer 技术的应用。我们将从数据集的准备开始，逐步完成模型的训练、评估和预测，并结合代码示例详细讲解每一步的实现细节。
+1. 准备数据集 1.1 下载并保存数据集 首先，我们需要一个用于训练和测试的数据集。这里我们使用 ChnSentiCorp_htl_all.csv 数据集，它包含了酒店评论及其对应的情感标签（正面或负面）。
+import os import requests # 创建 &#39;dataset&#39; 文件夹（如果不存在） os.makedirs(&#34;dataset&#34;, exist_ok=True) # 文件 URL url = &#34;https://github.com/SophonPlus/ChineseNlpCorpus/raw/master/datasets/ChnSentiCorp_htl_all/ChnSentiCorp_htl_all.csv&#34; # 发出 GET 请求获取文件内容 response = requests.get(url) # 文件保存路径 file_path = os.path.join(&#34;dataset&#34;, &#34;ChnSentiCorp_htl_all.csv&#34;) # 将内容保存到指定目录的文件中 with open(file_path, &#34;wb&#34;) as file: file.write(response.content) 1.2 查看数据集 下载完成后，我们可以使用 pandas 来查看数据集的基本信息。
+import pandas as pd # 读取保存在 &#39;dataset&#39; 文件夹中的 CSV 文件 df = pd.read_csv(file_path) # 查看表头（列名） print(&#34;表头（列名）：&#34;) print(df." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="Transformer 学习之路 - 文本分类实战" />
+<meta property="og:description" content="深入解析如何使用 Transformer 进行文本分类任务，涵盖数据集准备、模型训练与评估的全流程。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/classification_demo/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-19T17:35:18+08:00" />
+<meta property="article:modified_time" content="2024-04-19T17:35:18+08:00" />
+
+  
+  <meta itemprop="name" content="Transformer 学习之路 - 文本分类实战">
+<meta itemprop="description" content="深入解析如何使用 Transformer 进行文本分类任务，涵盖数据集准备、模型训练与评估的全流程。"><meta itemprop="datePublished" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="dateModified" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="wordCount" content="335">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Transformer 学习之路 - 文本分类实战"/>
+<meta name="twitter:description" content="深入解析如何使用 Transformer 进行文本分类任务，涵盖数据集准备、模型训练与评估的全流程。"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">Transformer 学习之路 - 文本分类实战</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Apr 19, 2024</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h1 id="transformer-学习之路---文本分类实战">Transformer 学习之路 - 文本分类实战</h1>
+<p>在这篇文章中，我们将通过一个完整的文本分类任务，深入解析 Transformer 技术的应用。我们将从数据集的准备开始，逐步完成模型的训练、评估和预测，并结合代码示例详细讲解每一步的实现细节。</p>
+<h2 id="1-准备数据集">1. 准备数据集</h2>
+<h3 id="11-下载并保存数据集">1.1 下载并保存数据集</h3>
+<p>首先，我们需要一个用于训练和测试的数据集。这里我们使用 <code>ChnSentiCorp_htl_all.csv</code> 数据集，它包含了酒店评论及其对应的情感标签（正面或负面）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建 &#39;dataset&#39; 文件夹（如果不存在）</span>
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>makedirs(<span style="color:#e6db74">&#34;dataset&#34;</span>, exist_ok<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 文件 URL</span>
+</span></span><span style="display:flex;"><span>url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://github.com/SophonPlus/ChineseNlpCorpus/raw/master/datasets/ChnSentiCorp_htl_all/ChnSentiCorp_htl_all.csv&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 发出 GET 请求获取文件内容</span>
+</span></span><span style="display:flex;"><span>response <span style="color:#f92672">=</span> requests<span style="color:#f92672">.</span>get(url)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 文件保存路径</span>
+</span></span><span style="display:flex;"><span>file_path <span style="color:#f92672">=</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>join(<span style="color:#e6db74">&#34;dataset&#34;</span>, <span style="color:#e6db74">&#34;ChnSentiCorp_htl_all.csv&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 将内容保存到指定目录的文件中</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">with</span> open(file_path, <span style="color:#e6db74">&#34;wb&#34;</span>) <span style="color:#66d9ef">as</span> file:
+</span></span><span style="display:flex;"><span>    file<span style="color:#f92672">.</span>write(response<span style="color:#f92672">.</span>content)
+</span></span></code></pre></div><h3 id="12-查看数据集">1.2 查看数据集</h3>
+<p>下载完成后，我们可以使用 <code>pandas</code> 来查看数据集的基本信息。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 读取保存在 &#39;dataset&#39; 文件夹中的 CSV 文件</span>
+</span></span><span style="display:flex;"><span>df <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(file_path)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看表头（列名）</span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;表头（列名）：&#34;</span>)
+</span></span><span style="display:flex;"><span>print(df<span style="color:#f92672">.</span>columns)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 查看行数</span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">行数：&#34;</span>)
+</span></span><span style="display:flex;"><span>print(len(df))
+</span></span></code></pre></div><h3 id="13-去除空数据">1.3 去除空数据</h3>
+<p>为了确保数据质量，我们需要去除数据集中的空值。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>df <span style="color:#f92672">=</span> df<span style="color:#f92672">.</span>dropna()
+</span></span><span style="display:flex;"><span>df
+</span></span></code></pre></div><h2 id="2-创建自定义数据集">2. 创建自定义数据集</h2>
+<p>接下来，我们使用 <code>datasets</code> 库来加载并处理数据集。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">!</span>pip install datasets evaluate
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> DataCollatorWithPadding, AutoTokenizer
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> datasets <span style="color:#f92672">import</span> load_dataset
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>csv_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;dataset/ChnSentiCorp_htl_all.csv&#34;</span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;csv&#34;</span>, data_files<span style="color:#f92672">=</span>csv_path, split<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;train&#39;</span>)
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> dataset<span style="color:#f92672">.</span>filter(<span style="color:#66d9ef">lambda</span> x: x[<span style="color:#e6db74">&#34;review&#34;</span>] <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> <span style="color:#66d9ef">None</span>)
+</span></span><span style="display:flex;"><span>dataset
+</span></span></code></pre></div><h2 id="3-拆分数据集">3. 拆分数据集</h2>
+<p>为了进行模型训练和验证，我们需要将数据集拆分为训练集和验证集。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>datasets <span style="color:#f92672">=</span> dataset<span style="color:#f92672">.</span>train_test_split(test_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>)
+</span></span><span style="display:flex;"><span>datasets
+</span></span></code></pre></div><h2 id="4-数据预处理">4. 数据预处理</h2>
+<p>在将数据输入模型之前，我们需要对文本进行预处理，包括分词和转换为模型可接受的格式。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/chinese-macbert-large&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">process_function</span>(examples):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 减少 max_length，可以让训练数据减少，占用更少的内存</span>
+</span></span><span style="display:flex;"><span>    tokenized_examples <span style="color:#f92672">=</span> tokenizer(examples[<span style="color:#e6db74">&#34;review&#34;</span>], max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">128</span>, truncation<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    tokenized_examples[<span style="color:#e6db74">&#34;labels&#34;</span>] <span style="color:#f92672">=</span> examples[<span style="color:#e6db74">&#34;label&#34;</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> tokenized_examples
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tokenized_datasets <span style="color:#f92672">=</span> datasets<span style="color:#f92672">.</span>map(process_function, batched<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, remove_columns<span style="color:#f92672">=</span>datasets[<span style="color:#e6db74">&#34;train&#34;</span>]<span style="color:#f92672">.</span>column_names)
+</span></span><span style="display:flex;"><span>tokenized_datasets
+</span></span></code></pre></div><h2 id="5-创建模型及优化器">5. 创建模型及优化器</h2>
+<p>我们使用 <code>AutoModelForSequenceClassification</code> 来加载预训练模型，并准备进行微调。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoModelForSequenceClassification
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModelForSequenceClassification<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/chinese-macbert-large&#34;</span>)
+</span></span></code></pre></div><h2 id="6-创建评估函数">6. 创建评估函数</h2>
+<p>为了评估模型的性能，我们定义了准确率和 F1 分数作为评估指标。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> evaluate
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>acc_metric <span style="color:#f92672">=</span> evaluate<span style="color:#f92672">.</span>load(<span style="color:#e6db74">&#34;accuracy&#34;</span>)
+</span></span><span style="display:flex;"><span>f1_metric <span style="color:#f92672">=</span> evaluate<span style="color:#f92672">.</span>load(<span style="color:#e6db74">&#34;f1&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">eval_metric</span>(eval_predict):
+</span></span><span style="display:flex;"><span>    predictions, labels <span style="color:#f92672">=</span> eval_predict
+</span></span><span style="display:flex;"><span>    predictions <span style="color:#f92672">=</span> predictions<span style="color:#f92672">.</span>argmax(axis<span style="color:#f92672">=-</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    acc <span style="color:#f92672">=</span> acc_metric<span style="color:#f92672">.</span>compute(predictions<span style="color:#f92672">=</span>predictions, references<span style="color:#f92672">=</span>labels)
+</span></span><span style="display:flex;"><span>    f1 <span style="color:#f92672">=</span> f1_metric<span style="color:#f92672">.</span>compute(predictions<span style="color:#f92672">=</span>predictions, references<span style="color:#f92672">=</span>labels)
+</span></span><span style="display:flex;"><span>    acc<span style="color:#f92672">.</span>update(f1)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> acc
+</span></span></code></pre></div><h2 id="7-创建-trainingarguments">7. 创建 TrainingArguments</h2>
+<p><code>TrainingArguments</code> 是用于配置训练过程的参数集合。我们可以通过调整这些参数来优化训练效果。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> TrainingArguments
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_args <span style="color:#f92672">=</span> TrainingArguments(
+</span></span><span style="display:flex;"><span>    output_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./checkpoints&#34;</span>,      <span style="color:#75715e"># 输出文件夹</span>
+</span></span><span style="display:flex;"><span>    per_device_train_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">64</span>,   <span style="color:#75715e"># 训练时的 batch_size</span>
+</span></span><span style="display:flex;"><span>    optim<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;adafactor&#34;</span>,               <span style="color:#75715e"># 使用 Adafactor 优化器</span>
+</span></span><span style="display:flex;"><span>    per_device_eval_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span>,    <span style="color:#75715e"># 验证时的 batch_size</span>
+</span></span><span style="display:flex;"><span>    num_train_epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>,              <span style="color:#75715e"># 训练轮数</span>
+</span></span><span style="display:flex;"><span>    logging_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>,                <span style="color:#75715e"># log 打印的频率</span>
+</span></span><span style="display:flex;"><span>    eval_strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;epoch&#34;</span>,           <span style="color:#75715e"># 每个 epoch 进行评估</span>
+</span></span><span style="display:flex;"><span>    save_strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;epoch&#34;</span>,           <span style="color:#75715e"># 每个 epoch 保存模型</span>
+</span></span><span style="display:flex;"><span>    save_total_limit<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>,              <span style="color:#75715e"># 最大保存数</span>
+</span></span><span style="display:flex;"><span>    learning_rate<span style="color:#f92672">=</span><span style="color:#ae81ff">2e-5</span>,              <span style="color:#75715e"># 学习率</span>
+</span></span><span style="display:flex;"><span>    weight_decay<span style="color:#f92672">=</span><span style="color:#ae81ff">0.001</span>,              <span style="color:#75715e"># 权重衰减</span>
+</span></span><span style="display:flex;"><span>    metric_for_best_model<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;f1&#34;</span>,      <span style="color:#75715e"># 使用 F1 作为评估指标</span>
+</span></span><span style="display:flex;"><span>    load_best_model_at_end<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>      <span style="color:#75715e"># 训练完成后加载最优模型</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h2 id="8-创建-trainer">8. 创建 Trainer</h2>
+<p><code>Trainer</code> 是 Hugging Face 提供的一个高级 API，它封装了训练、评估和预测的过程。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> DataCollatorWithPadding, Trainer
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>trainer <span style="color:#f92672">=</span> Trainer(
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">=</span>model,
+</span></span><span style="display:flex;"><span>    args<span style="color:#f92672">=</span>train_args,
+</span></span><span style="display:flex;"><span>    train_dataset<span style="color:#f92672">=</span>tokenized_datasets[<span style="color:#e6db74">&#34;train&#34;</span>],
+</span></span><span style="display:flex;"><span>    eval_dataset<span style="color:#f92672">=</span>tokenized_datasets[<span style="color:#e6db74">&#34;test&#34;</span>],
+</span></span><span style="display:flex;"><span>    data_collator<span style="color:#f92672">=</span>DataCollatorWithPadding(tokenizer<span style="color:#f92672">=</span>tokenizer),
+</span></span><span style="display:flex;"><span>    compute_metrics<span style="color:#f92672">=</span>eval_metric
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h2 id="9-训练模型">9. 训练模型</h2>
+<p>现在，我们可以开始训练模型了。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> param <span style="color:#f92672">in</span> model<span style="color:#f92672">.</span>parameters():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> param<span style="color:#f92672">.</span>is_contiguous():
+</span></span><span style="display:flex;"><span>        param<span style="color:#f92672">.</span>data <span style="color:#f92672">=</span> param<span style="color:#f92672">.</span>contiguous()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>trainer<span style="color:#f92672">.</span>train()
+</span></span></code></pre></div><h2 id="10-模型评估">10. 模型评估</h2>
+<p>训练完成后，我们可以使用验证集来评估模型的性能。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>trainer<span style="color:#f92672">.</span>evaluate(tokenized_datasets[<span style="color:#e6db74">&#34;test&#34;</span>])
+</span></span></code></pre></div><h2 id="11-模型预测">11. 模型预测</h2>
+<p>最后，我们可以使用训练好的模型对新的文本进行预测。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> pipeline
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>id2_label <span style="color:#f92672">=</span> {<span style="color:#ae81ff">0</span>: <span style="color:#e6db74">&#34;差评！&#34;</span>, <span style="color:#ae81ff">1</span>: <span style="color:#e6db74">&#34;好评！&#34;</span>}
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>config<span style="color:#f92672">.</span>id2label <span style="color:#f92672">=</span> id2_label
+</span></span><span style="display:flex;"><span>pipe <span style="color:#f92672">=</span> pipeline(<span style="color:#e6db74">&#34;text-classification&#34;</span>, model<span style="color:#f92672">=</span>model, tokenizer<span style="color:#f92672">=</span>tokenizer, device<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sen <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;我觉得不错！&#34;</span>
+</span></span><span style="display:flex;"><span>pipe(sen)
+</span></span></code></pre></div><h2 id="总结">总结</h2>
+<p>通过这个完整的文本分类实战，我们深入了解了如何使用 Transformer 进行自然语言处理任务。从数据集的准备到模型的训练、评估和预测，每一步都至关重要。希望这篇文章能帮助你更好地理解和应用 Transformer 技术。如果你有任何问题或建议，欢迎在评论区留言讨论！</p>
+</section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/datasets-checkpoint/"
+      ><span class="mr-1.5">←</span><span>Transformer 学习之路 - 数据集加载与预处理</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/cross_model/"
+      ><span>Transformer 学习之路 - 文本相似度实例</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

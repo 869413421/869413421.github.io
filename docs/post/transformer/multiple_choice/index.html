@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title> - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="--- title: &#34;Transformer 学习之路 - 多项选择任务实现&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析如何使用 Transformer 技术实现多项选择任务，涵盖数据预处理、模型训练与评估等关键步骤。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 多项选择任务实现 在自然语言处理（NLP）领域，多项选择任务是一种常见的任务类型，旨在从给定的多个选项中选择最合适的答案。本文将深入探讨如何使用 Transformer 技术实现多项选择任务，并详细分析其中的技术原理和实现步骤。 ## 1. 导入相关包 首先，我们需要导入必要的 Python 包。这些包包括 `evaluate`、`datasets` 和 `transformers`，它们分别用于评估模型性能、加载数据集以及构建和训练 Transformer 模型。 ```python !pip install evaluate from google.colab import drive import sys drive.mount(&#39;/content/drive&#39;) import evaluate from datasets import load_dataset from transformers import AutoModelForMultipleChoice, AutoTokenizer, TrainingArguments, Trainer 2. 加载数据集 接下来，我们加载 C3 数据集。C3 是一个中文多项选择数据集，包含上下文、问题和多个选项。我们首先加载数据集，并检查其结构和内容。
+c3 = load_dataset(&#34;clue/clue&#34;, &#34;c3&#34;, cache_dir=&#34;." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="" />
+<meta property="og:description" content="--- title: &#34;Transformer 学习之路 - 多项选择任务实现&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析如何使用 Transformer 技术实现多项选择任务，涵盖数据预处理、模型训练与评估等关键步骤。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 多项选择任务实现 在自然语言处理（NLP）领域，多项选择任务是一种常见的任务类型，旨在从给定的多个选项中选择最合适的答案。本文将深入探讨如何使用 Transformer 技术实现多项选择任务，并详细分析其中的技术原理和实现步骤。 ## 1. 导入相关包 首先，我们需要导入必要的 Python 包。这些包包括 `evaluate`、`datasets` 和 `transformers`，它们分别用于评估模型性能、加载数据集以及构建和训练 Transformer 模型。 ```python !pip install evaluate from google.colab import drive import sys drive.mount(&#39;/content/drive&#39;) import evaluate from datasets import load_dataset from transformers import AutoModelForMultipleChoice, AutoTokenizer, TrainingArguments, Trainer 2. 加载数据集 接下来，我们加载 C3 数据集。C3 是一个中文多项选择数据集，包含上下文、问题和多个选项。我们首先加载数据集，并检查其结构和内容。
+c3 = load_dataset(&#34;clue/clue&#34;, &#34;c3&#34;, cache_dir=&#34;." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/multiple_choice/" /><meta property="article:section" content="post" />
+
+
+
+  
+  <meta itemprop="name" content="">
+<meta itemprop="description" content="--- title: &#34;Transformer 学习之路 - 多项选择任务实现&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析如何使用 Transformer 技术实现多项选择任务，涵盖数据预处理、模型训练与评估等关键步骤。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 多项选择任务实现 在自然语言处理（NLP）领域，多项选择任务是一种常见的任务类型，旨在从给定的多个选项中选择最合适的答案。本文将深入探讨如何使用 Transformer 技术实现多项选择任务，并详细分析其中的技术原理和实现步骤。 ## 1. 导入相关包 首先，我们需要导入必要的 Python 包。这些包包括 `evaluate`、`datasets` 和 `transformers`，它们分别用于评估模型性能、加载数据集以及构建和训练 Transformer 模型。 ```python !pip install evaluate from google.colab import drive import sys drive.mount(&#39;/content/drive&#39;) import evaluate from datasets import load_dataset from transformers import AutoModelForMultipleChoice, AutoTokenizer, TrainingArguments, Trainer 2. 加载数据集 接下来，我们加载 C3 数据集。C3 是一个中文多项选择数据集，包含上下文、问题和多个选项。我们首先加载数据集，并检查其结构和内容。
+c3 = load_dataset(&#34;clue/clue&#34;, &#34;c3&#34;, cache_dir=&#34;.">
+
+<meta itemprop="wordCount" content="417">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="--- title: &#34;Transformer 学习之路 - 多项选择任务实现&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析如何使用 Transformer 技术实现多项选择任务，涵盖数据预处理、模型训练与评估等关键步骤。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 多项选择任务实现 在自然语言处理（NLP）领域，多项选择任务是一种常见的任务类型，旨在从给定的多个选项中选择最合适的答案。本文将深入探讨如何使用 Transformer 技术实现多项选择任务，并详细分析其中的技术原理和实现步骤。 ## 1. 导入相关包 首先，我们需要导入必要的 Python 包。这些包包括 `evaluate`、`datasets` 和 `transformers`，它们分别用于评估模型性能、加载数据集以及构建和训练 Transformer 模型。 ```python !pip install evaluate from google.colab import drive import sys drive.mount(&#39;/content/drive&#39;) import evaluate from datasets import load_dataset from transformers import AutoModelForMultipleChoice, AutoTokenizer, TrainingArguments, Trainer 2. 加载数据集 接下来，我们加载 C3 数据集。C3 是一个中文多项选择数据集，包含上下文、问题和多个选项。我们首先加载数据集，并检查其结构和内容。
+c3 = load_dataset(&#34;clue/clue&#34;, &#34;c3&#34;, cache_dir=&#34;."/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5"></h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      
+    </div>
+    
+  </header>
+
+  <section><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>title: &#34;Transformer 学习之路 - 多项选择任务实现&#34;
+</span></span><span style="display:flex;"><span>date: 2024-04-19T17:35:18+08:00
+</span></span><span style="display:flex;"><span>draft: false
+</span></span><span style="display:flex;"><span>description: &#34;深入解析如何使用 Transformer 技术实现多项选择任务，涵盖数据预处理、模型训练与评估等关键步骤。&#34;
+</span></span><span style="display:flex;"><span>categories: [&#34;Python&#34;, &#34;Transformer&#34;]
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># Transformer 学习之路 - 多项选择任务实现
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>在自然语言处理（NLP）领域，多项选择任务是一种常见的任务类型，旨在从给定的多个选项中选择最合适的答案。本文将深入探讨如何使用 Transformer 技术实现多项选择任务，并详细分析其中的技术原理和实现步骤。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 1. 导入相关包
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>首先，我们需要导入必要的 Python 包。这些包包括 <span style="color:#e6db74">`evaluate`</span>、`datasets` 和 <span style="color:#e6db74">`transformers`</span>，它们分别用于评估模型性能、加载数据集以及构建和训练 Transformer 模型。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>```python
+</span></span><span style="display:flex;"><span>!pip install evaluate
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>from google.colab import drive
+</span></span><span style="display:flex;"><span>import sys
+</span></span><span style="display:flex;"><span>drive.mount(&#39;/content/drive&#39;)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>import evaluate
+</span></span><span style="display:flex;"><span>from datasets import load_dataset
+</span></span><span style="display:flex;"><span>from transformers import AutoModelForMultipleChoice, AutoTokenizer, TrainingArguments, Trainer
+</span></span></code></pre></div><h2 id="2-加载数据集">2. 加载数据集</h2>
+<p>接下来，我们加载 C3 数据集。C3 是一个中文多项选择数据集，包含上下文、问题和多个选项。我们首先加载数据集，并检查其结构和内容。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>c3 <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;clue/clue&#34;</span>, <span style="color:#e6db74">&#34;c3&#34;</span>, cache_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./cache&#34;</span>)
+</span></span><span style="display:flex;"><span>c3[<span style="color:#e6db74">&#34;train&#34;</span>][<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>c3[<span style="color:#e6db74">&#39;test&#39;</span>][<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 剔除 test 集，因为其 answer 为空</span>
+</span></span><span style="display:flex;"><span>c3<span style="color:#f92672">.</span>pop(<span style="color:#e6db74">&#34;test&#34;</span>)
+</span></span><span style="display:flex;"><span>c3
+</span></span></code></pre></div><h2 id="3-数据预处理">3. 数据预处理</h2>
+<p>在将数据输入模型之前，我们需要对其进行预处理。具体来说，我们将上下文和问题-选项对进行合并，并使用分词器将其转换为模型可接受的输入格式。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/chinese-macbert-base&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">process_function</span>(examples):
+</span></span><span style="display:flex;"><span>    context <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    question_choice <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    labels <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> idx <span style="color:#f92672">in</span> range(len(examples[<span style="color:#e6db74">&#34;context&#34;</span>])):
+</span></span><span style="display:flex;"><span>        ctx <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>join([c<span style="color:#f92672">.</span>strip() <span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> examples[<span style="color:#e6db74">&#34;context&#34;</span>][idx]]) <span style="color:#66d9ef">if</span> isinstance(examples[<span style="color:#e6db74">&#34;context&#34;</span>][idx], list) <span style="color:#66d9ef">else</span> examples[<span style="color:#e6db74">&#34;context&#34;</span>][idx]<span style="color:#f92672">.</span>strip()
+</span></span><span style="display:flex;"><span>        question <span style="color:#f92672">=</span> examples[<span style="color:#e6db74">&#34;question&#34;</span>][idx]
+</span></span><span style="display:flex;"><span>        choices <span style="color:#f92672">=</span> examples[<span style="color:#e6db74">&#34;choice&#34;</span>][idx]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> choice <span style="color:#f92672">in</span> choices:
+</span></span><span style="display:flex;"><span>            context<span style="color:#f92672">.</span>append(ctx)
+</span></span><span style="display:flex;"><span>            question_choice<span style="color:#f92672">.</span>append(question <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; &#34;</span> <span style="color:#f92672">+</span> choice)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> len(choices) <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">4</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">4</span> <span style="color:#f92672">-</span> len(choices)):
+</span></span><span style="display:flex;"><span>                context<span style="color:#f92672">.</span>append(ctx)
+</span></span><span style="display:flex;"><span>                question_choice<span style="color:#f92672">.</span>append(question <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; &#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;不知道&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        labels<span style="color:#f92672">.</span>append(choices<span style="color:#f92672">.</span>index(examples[<span style="color:#e6db74">&#34;answer&#34;</span>][idx]))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">assert</span> all(isinstance(c, str) <span style="color:#66d9ef">for</span> c <span style="color:#f92672">in</span> context), <span style="color:#e6db74">&#34;Context 包含非字符串值&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">assert</span> all(isinstance(qc, str) <span style="color:#66d9ef">for</span> qc <span style="color:#f92672">in</span> question_choice), <span style="color:#e6db74">&#34;Question_choice 包含非字符串值&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    tokenized_examples <span style="color:#f92672">=</span> tokenizer(
+</span></span><span style="display:flex;"><span>        context,
+</span></span><span style="display:flex;"><span>        question_choice,
+</span></span><span style="display:flex;"><span>        truncation<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;only_first&#34;</span>,
+</span></span><span style="display:flex;"><span>        max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">256</span>,
+</span></span><span style="display:flex;"><span>        padding<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;max_length&#34;</span>,
+</span></span><span style="display:flex;"><span>        return_tensors<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pt&#34;</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    tokenized_examples <span style="color:#f92672">=</span> {k: [v[i: i <span style="color:#f92672">+</span> <span style="color:#ae81ff">4</span>] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, len(v), <span style="color:#ae81ff">4</span>)] <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> tokenized_examples<span style="color:#f92672">.</span>items()}
+</span></span><span style="display:flex;"><span>    tokenized_examples[<span style="color:#e6db74">&#34;labels&#34;</span>] <span style="color:#f92672">=</span> labels
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> tokenized_examples
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>res <span style="color:#f92672">=</span> c3[<span style="color:#e6db74">&#34;train&#34;</span>]<span style="color:#f92672">.</span>select(range(<span style="color:#ae81ff">10</span>))<span style="color:#f92672">.</span>map(process_function, batched<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>res
+</span></span></code></pre></div><h2 id="4-创建模型">4. 创建模型</h2>
+<p>我们使用 <code>AutoModelForMultipleChoice</code> 类来创建一个适用于多项选择任务的 Transformer 模型。这里我们选择了一个预训练的中文模型 <code>hfl/chinese-macbert-base</code>。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModelForMultipleChoice<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/chinese-macbert-base&#34;</span>)
+</span></span></code></pre></div><h2 id="5-创建模型评估函数">5. 创建模型评估函数</h2>
+<p>为了评估模型的性能，我们定义了一个计算准确率的函数。该函数将模型的预测结果与真实标签进行比较，并返回准确率。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>accuracy <span style="color:#f92672">=</span> evaluate<span style="color:#f92672">.</span>load(<span style="color:#e6db74">&#34;accuracy&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">compute_metric</span>(pred):
+</span></span><span style="display:flex;"><span>    predictions, labels <span style="color:#f92672">=</span> pred
+</span></span><span style="display:flex;"><span>    predictions <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>argmax(predictions, axis<span style="color:#f92672">=-</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> accuracy<span style="color:#f92672">.</span>compute(predictions<span style="color:#f92672">=</span>predictions, references<span style="color:#f92672">=</span>labels)
+</span></span></code></pre></div><h2 id="6-配置训练参数">6. 配置训练参数</h2>
+<p>我们使用 <code>TrainingArguments</code> 类来配置模型的训练参数，包括批量大小、训练轮数、日志记录频率等。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>args <span style="color:#f92672">=</span> TrainingArguments(
+</span></span><span style="display:flex;"><span>    output_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./muliple_choice&#34;</span>,
+</span></span><span style="display:flex;"><span>    per_device_train_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">16</span>,
+</span></span><span style="display:flex;"><span>    per_device_eval_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">16</span>,
+</span></span><span style="display:flex;"><span>    num_train_epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    logging_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>,
+</span></span><span style="display:flex;"><span>    eval_strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;epoch&#34;</span>,
+</span></span><span style="display:flex;"><span>    save_strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;epoch&#34;</span>,
+</span></span><span style="display:flex;"><span>    load_best_model_at_end<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>    fp16<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h2 id="7-创建-trainer">7. 创建 Trainer</h2>
+<p><code>Trainer</code> 类是 Hugging Face Transformers 库中的一个高级 API，用于简化模型的训练和评估过程。我们将模型、训练参数、数据集和评估函数传递给 <code>Trainer</code>。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>trainer <span style="color:#f92672">=</span> Trainer(
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">=</span>model,
+</span></span><span style="display:flex;"><span>    args<span style="color:#f92672">=</span>args,
+</span></span><span style="display:flex;"><span>    tokenizer<span style="color:#f92672">=</span>tokenizer,
+</span></span><span style="display:flex;"><span>    train_dataset<span style="color:#f92672">=</span>tokenized_c3[<span style="color:#e6db74">&#34;train&#34;</span>],
+</span></span><span style="display:flex;"><span>    eval_dataset<span style="color:#f92672">=</span>tokenized_c3[<span style="color:#e6db74">&#34;validation&#34;</span>],
+</span></span><span style="display:flex;"><span>    compute_metrics<span style="color:#f92672">=</span>compute_metric
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h2 id="8-训练模型">8. 训练模型</h2>
+<p>在配置好所有参数后，我们开始训练模型。训练过程中，模型会根据训练数据进行参数更新，并在每个 epoch 结束时进行评估。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> param <span style="color:#f92672">in</span> model<span style="color:#f92672">.</span>parameters():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> param<span style="color:#f92672">.</span>is_contiguous():
+</span></span><span style="display:flex;"><span>        param<span style="color:#f92672">.</span>data <span style="color:#f92672">=</span> param<span style="color:#f92672">.</span>contiguous()
+</span></span><span style="display:flex;"><span>trainer<span style="color:#f92672">.</span>train()
+</span></span></code></pre></div><h2 id="9-评估模型">9. 评估模型</h2>
+<p>训练完成后，我们使用自定义的流水线来评估模型的性能。该流水线将上下文、问题和选项作为输入，并返回模型预测的答案。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> Any
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">MultipleChoicePipeline</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, model, tokenizer) <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>model <span style="color:#f92672">=</span> model
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>tokenizer <span style="color:#f92672">=</span> tokenizer
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>device <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>device
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">preprocess</span>(self, context, quesiton, choices):
+</span></span><span style="display:flex;"><span>        cs, qcs <span style="color:#f92672">=</span> [], []
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> choice <span style="color:#f92672">in</span> choices:
+</span></span><span style="display:flex;"><span>            cs<span style="color:#f92672">.</span>append(context)
+</span></span><span style="display:flex;"><span>            qcs<span style="color:#f92672">.</span>append(quesiton <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34; &#34;</span> <span style="color:#f92672">+</span> choice)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> tokenizer(cs, qcs, truncation<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;only_first&#34;</span>, max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">256</span>, return_tensors<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pt&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">predict</span>(self, inputs):
+</span></span><span style="display:flex;"><span>        inputs <span style="color:#f92672">=</span> {k: v<span style="color:#f92672">.</span>unsqueeze(<span style="color:#ae81ff">0</span>)<span style="color:#f92672">.</span>to(self<span style="color:#f92672">.</span>device) <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> inputs<span style="color:#f92672">.</span>items()}
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>model(<span style="color:#f92672">**</span>inputs)<span style="color:#f92672">.</span>logits
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">postprocess</span>(self, logits, choices):
+</span></span><span style="display:flex;"><span>        predition <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>argmax(logits, dim<span style="color:#f92672">=-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">.</span>cpu()<span style="color:#f92672">.</span>item()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> choices[predition]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __call__(self, context, question, choices) <span style="color:#f92672">-&gt;</span> Any:
+</span></span><span style="display:flex;"><span>        inputs <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>preprocess(context, question, choices)
+</span></span><span style="display:flex;"><span>        logits <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>predict(inputs)
+</span></span><span style="display:flex;"><span>        result <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>postprocess(logits, choices)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> result
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>pipe <span style="color:#f92672">=</span> MultipleChoicePipeline(model, tokenizer)
+</span></span><span style="display:flex;"><span>pipe(<span style="color:#e6db74">&#34;我爱你你却爱着他&#34;</span>, <span style="color:#e6db74">&#34;你爱谁？&#34;</span>, [<span style="color:#e6db74">&#34;他&#34;</span>, <span style="color:#e6db74">&#34;你&#34;</span>, <span style="color:#e6db74">&#34;我&#34;</span>])
+</span></span></code></pre></div><h2 id="10-保存模型">10. 保存模型</h2>
+<p>最后，我们将训练好的模型保存到指定路径，以便后续使用或部署。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model_save_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/04-multiple-choice/model&#34;</span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>save_pretrained(model_save_path)
+</span></span></code></pre></div><p>通过以上步骤，我们成功地使用 Transformer 技术实现了一个多项选择任务。希望本文能帮助你更好地理解 Transformer 在 NLP 任务中的应用。</p>
+<pre tabindex="0"><code></code></pre></section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/mrc_simple_version/"
+      ><span class="mr-1.5">←</span><span></span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/ner/"
+      ><span></span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>Transformer 学习之路 - 向量召回与排序实战 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="Transformer 学习之路 - 向量召回与排序实战 在自然语言处理（NLP）领域，Transformer 模型已经成为一种革命性的技术。它不仅广泛应用于机器翻译、文本生成等任务，还在信息检索、问答系统等领域展现了强大的能力。本文将结合代码示例，深入探讨 Transformer 在向量召回与排序中的应用，帮助你理解其技术原理并实际应用。
+1. 背景与问题 在问答系统中，如何快速准确地找到与用户问题最相关的答案是一个核心挑战。传统的基于关键词匹配的方法往往无法捕捉语义信息，导致召回效果不佳。而 Transformer 模型通过将文本转化为高维向量，能够更好地表达语义信息，从而实现更精准的召回与排序。
+2. 技术原理 2.1 向量召回 向量召回的核心思想是将文本（如问题与答案）映射到高维向量空间，然后通过计算向量之间的相似度来找到最相关的结果。具体步骤如下：
+文本向量化：使用预训练的 Transformer 模型（如 Sentence-BERT）将文本转化为固定长度的向量。 向量存储：将生成的向量存储到向量数据库（如 PostgreSQL 的 vector 扩展）。 相似度计算：通过计算查询向量与存储向量的余弦相似度，找到最相关的结果。 2.2 向量排序 在召回的结果中，可能存在多个相关但质量不同的答案。为了进一步提升结果质量，可以使用排序模型对召回结果进行二次排序。排序模型通过计算查询与候选答案的匹配分数，选择最合适的答案。
+3. 代码实现 3.1 读取数据集 首先，我们加载一个法律问答数据集（law_faq.csv），其中包含问题（title）和答案（reply）。
+import pandas as pd data = pd.read_csv(&#39;law_faq.csv&#39;, encoding=&#39;utf-8&#39;) documents = data[&#39;title&#39;].tolist() print(documents[0:5]) # 打印前5个问题 3.2 加载向量模型 使用 sentence-transformers 库加载预训练的向量模型，并将文本转化为向量。
+from sentence_transformers import SentenceTransformer model = SentenceTransformer(&#34;TencentBAC/Conan-embedding-v1&#34;, cache_folder=&#34;cache&#34;) document_vectors = model.encode(documents[0:5], convert_to_numpy=True) print(document_vectors.shape) # 打印向量维度 3." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="Transformer 学习之路 - 向量召回与排序实战" />
+<meta property="og:description" content="深入解析 Transformer 技术在向量召回与排序中的应用，结合代码示例讲解其原理与实现。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/retrieval_chatbot2/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-19T17:35:18+08:00" />
+<meta property="article:modified_time" content="2024-04-19T17:35:18+08:00" />
+
+  
+  <meta itemprop="name" content="Transformer 学习之路 - 向量召回与排序实战">
+<meta itemprop="description" content="深入解析 Transformer 技术在向量召回与排序中的应用，结合代码示例讲解其原理与实现。"><meta itemprop="datePublished" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="dateModified" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="wordCount" content="294">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Transformer 学习之路 - 向量召回与排序实战"/>
+<meta name="twitter:description" content="深入解析 Transformer 技术在向量召回与排序中的应用，结合代码示例讲解其原理与实现。"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">Transformer 学习之路 - 向量召回与排序实战</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Apr 19, 2024</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h1 id="transformer-学习之路---向量召回与排序实战">Transformer 学习之路 - 向量召回与排序实战</h1>
+<p>在自然语言处理（NLP）领域，Transformer 模型已经成为一种革命性的技术。它不仅广泛应用于机器翻译、文本生成等任务，还在信息检索、问答系统等领域展现了强大的能力。本文将结合代码示例，深入探讨 Transformer 在向量召回与排序中的应用，帮助你理解其技术原理并实际应用。</p>
+<hr>
+<h2 id="1-背景与问题">1. 背景与问题</h2>
+<p>在问答系统中，如何快速准确地找到与用户问题最相关的答案是一个核心挑战。传统的基于关键词匹配的方法往往无法捕捉语义信息，导致召回效果不佳。而 Transformer 模型通过将文本转化为高维向量，能够更好地表达语义信息，从而实现更精准的召回与排序。</p>
+<hr>
+<h2 id="2-技术原理">2. 技术原理</h2>
+<h3 id="21-向量召回">2.1 向量召回</h3>
+<p>向量召回的核心思想是将文本（如问题与答案）映射到高维向量空间，然后通过计算向量之间的相似度来找到最相关的结果。具体步骤如下：</p>
+<ol>
+<li><strong>文本向量化</strong>：使用预训练的 Transformer 模型（如 Sentence-BERT）将文本转化为固定长度的向量。</li>
+<li><strong>向量存储</strong>：将生成的向量存储到向量数据库（如 PostgreSQL 的 <code>vector</code> 扩展）。</li>
+<li><strong>相似度计算</strong>：通过计算查询向量与存储向量的余弦相似度，找到最相关的结果。</li>
+</ol>
+<h3 id="22-向量排序">2.2 向量排序</h3>
+<p>在召回的结果中，可能存在多个相关但质量不同的答案。为了进一步提升结果质量，可以使用排序模型对召回结果进行二次排序。排序模型通过计算查询与候选答案的匹配分数，选择最合适的答案。</p>
+<hr>
+<h2 id="3-代码实现">3. 代码实现</h2>
+<h3 id="31-读取数据集">3.1 读取数据集</h3>
+<p>首先，我们加载一个法律问答数据集（<code>law_faq.csv</code>），其中包含问题（<code>title</code>）和答案（<code>reply</code>）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> pandas <span style="color:#66d9ef">as</span> pd
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> pd<span style="color:#f92672">.</span>read_csv(<span style="color:#e6db74">&#39;law_faq.csv&#39;</span>, encoding<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;utf-8&#39;</span>)
+</span></span><span style="display:flex;"><span>documents <span style="color:#f92672">=</span> data[<span style="color:#e6db74">&#39;title&#39;</span>]<span style="color:#f92672">.</span>tolist()
+</span></span><span style="display:flex;"><span>print(documents[<span style="color:#ae81ff">0</span>:<span style="color:#ae81ff">5</span>])  <span style="color:#75715e"># 打印前5个问题</span>
+</span></span></code></pre></div><h3 id="32-加载向量模型">3.2 加载向量模型</h3>
+<p>使用 <code>sentence-transformers</code> 库加载预训练的向量模型，并将文本转化为向量。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> sentence_transformers <span style="color:#f92672">import</span> SentenceTransformer
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> SentenceTransformer(<span style="color:#e6db74">&#34;TencentBAC/Conan-embedding-v1&#34;</span>, cache_folder<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;cache&#34;</span>)
+</span></span><span style="display:flex;"><span>document_vectors <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>encode(documents[<span style="color:#ae81ff">0</span>:<span style="color:#ae81ff">5</span>], convert_to_numpy<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>print(document_vectors<span style="color:#f92672">.</span>shape)  <span style="color:#75715e"># 打印向量维度</span>
+</span></span></code></pre></div><h3 id="33-连接-postgresql-数据库">3.3 连接 PostgreSQL 数据库</h3>
+<p>将生成的向量存储到 PostgreSQL 数据库中，并创建向量索引以加速查询。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> psycopg2
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>connection <span style="color:#f92672">=</span> psycopg2<span style="color:#f92672">.</span>connect(
+</span></span><span style="display:flex;"><span>    host<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;127.0.0.1&#34;</span>,
+</span></span><span style="display:flex;"><span>    port<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;5432&#34;</span>,
+</span></span><span style="display:flex;"><span>    user<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;root&#34;</span>,
+</span></span><span style="display:flex;"><span>    dbname<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;test&#34;</span>,
+</span></span><span style="display:flex;"><span>    password<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Ym135168.&#34;</span>,
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>connection<span style="color:#f92672">.</span>autocommit <span style="color:#f92672">=</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>curr <span style="color:#f92672">=</span> connection<span style="color:#f92672">.</span>cursor()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 创建向量扩展和表</span>
+</span></span><span style="display:flex;"><span>curr<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;CREATE EXTENSION IF NOT EXISTS vector;&#34;</span>)
+</span></span><span style="display:flex;"><span>curr<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    CREATE TABLE IF NOT EXISTS public.law_faq (
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        id SERIAL PRIMARY KEY,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        title VARCHAR NOT NULL,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        reply VARCHAR NOT NULL,
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        embedding vector(1792) NOT NULL
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    );
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">&#34;&#34;&#34;</span>)
+</span></span><span style="display:flex;"><span>curr<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">&#34;CREATE INDEX ON public.law_faq USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);&#34;</span>)
+</span></span></code></pre></div><h3 id="34-向量化数据并写入数据库">3.4 向量化数据并写入数据库</h3>
+<p>将数据集中的文本批量转化为向量，并存储到数据库中。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> tqdm <span style="color:#f92672">import</span> tqdm
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> psycopg2.extras <span style="color:#f92672">import</span> execute_batch
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>batch_size <span style="color:#f92672">=</span> <span style="color:#ae81ff">5</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> tqdm(range(<span style="color:#ae81ff">0</span>, len(documents), batch_size), desc<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;Encoding Progress&#34;</span>):
+</span></span><span style="display:flex;"><span>    batch <span style="color:#f92672">=</span> documents[i:i <span style="color:#f92672">+</span> batch_size]
+</span></span><span style="display:flex;"><span>    batch_vectors <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>encode(batch, convert_to_numpy<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    insert_data <span style="color:#f92672">=</span> [(data<span style="color:#f92672">.</span>values[i <span style="color:#f92672">+</span> j][<span style="color:#ae81ff">0</span>], data<span style="color:#f92672">.</span>values[i <span style="color:#f92672">+</span> j][<span style="color:#ae81ff">1</span>], batch_vectors[j]<span style="color:#f92672">.</span>tolist()) <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(len(batch))]
+</span></span><span style="display:flex;"><span>    execute_batch(curr, <span style="color:#e6db74">&#34;INSERT INTO public.law_faq (title, reply, embedding) VALUES (</span><span style="color:#e6db74">%s</span><span style="color:#e6db74">, </span><span style="color:#e6db74">%s</span><span style="color:#e6db74">, </span><span style="color:#e6db74">%s</span><span style="color:#e6db74">)&#34;</span>, insert_data)
+</span></span></code></pre></div><h3 id="35-根据向量查询">3.5 根据向量查询</h3>
+<p>将用户查询转化为向量，并从数据库中检索最相关的结果。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>query <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;怎么才算寻衅滋事呢？&#34;</span>
+</span></span><span style="display:flex;"><span>query_vector <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>encode(query, convert_to_numpy<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">retrieve_similar</span>(curr, query_vector, top_k<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>):
+</span></span><span style="display:flex;"><span>    query_vector <span style="color:#f92672">=</span> query_vector<span style="color:#f92672">.</span>flatten()<span style="color:#f92672">.</span>tolist()
+</span></span><span style="display:flex;"><span>    query_vector_sql <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;ARRAY[&#34;</span> <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;,&#34;</span><span style="color:#f92672">.</span>join(map(str, query_vector)) <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;]::vector&#34;</span>
+</span></span><span style="display:flex;"><span>    curr<span style="color:#f92672">.</span>execute(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;&#34;&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        SELECT id, title, reply, embedding
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        FROM public.law_faq
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        ORDER BY embedding &lt;-&gt; </span><span style="color:#e6db74">{</span>query_vector_sql<span style="color:#e6db74">}</span><span style="color:#e6db74">
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">        LIMIT %s;
+</span></span></span><span style="display:flex;"><span><span style="color:#e6db74">    &#34;&#34;&#34;</span>, (top_k,))
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> curr<span style="color:#f92672">.</span>fetchall()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>similar_results <span style="color:#f92672">=</span> retrieve_similar(curr, query_vector)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> result <span style="color:#f92672">in</span> similar_results:
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;问题: </span><span style="color:#e6db74">{</span>result[<span style="color:#ae81ff">1</span>]<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">回复: </span><span style="color:#e6db74">{</span>result[<span style="color:#ae81ff">2</span>]<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>)
+</span></span></code></pre></div><h3 id="36-加载排序模型并打分">3.6 加载排序模型并打分</h3>
+<p>使用 <code>FlagEmbedding</code> 库对召回结果进行排序，选择最佳答案。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> FlagEmbedding <span style="color:#f92672">import</span> FlagReranker
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>reranker <span style="color:#f92672">=</span> FlagReranker(<span style="color:#e6db74">&#39;BAAI/bge-reranker-base&#39;</span>, use_fp16<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, cache_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;cache&#34;</span>)
+</span></span><span style="display:flex;"><span>ranker_data <span style="color:#f92672">=</span> [[query, i[<span style="color:#ae81ff">2</span>]] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> similar_results]
+</span></span><span style="display:flex;"><span>ranker_results <span style="color:#f92672">=</span> reranker<span style="color:#f92672">.</span>compute_score(ranker_data, normalize<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>max_index <span style="color:#f92672">=</span> ranker_results<span style="color:#f92672">.</span>index(max(ranker_results))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;问题:&#34;</span>, query)
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;最佳回复标题:&#34;</span>, similar_results[max_index][<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>print(<span style="color:#e6db74">&#34;最佳回复内容:&#34;</span>, similar_results[max_index][<span style="color:#ae81ff">2</span>])
+</span></span></code></pre></div><hr>
+<h2 id="4-总结">4. 总结</h2>
+<p>本文通过一个法律问答系统的示例，详细介绍了如何使用 Transformer 模型实现向量召回与排序。通过将文本转化为向量并利用向量数据库进行高效检索，我们能够快速找到与用户问题最相关的答案。此外，通过引入排序模型，进一步提升了结果的质量。希望本文能帮助你深入理解 Transformer 技术的应用，并在实际项目中灵活运用。</p>
+<p>如果你对代码实现有任何疑问，欢迎在评论区留言讨论！</p>
+</section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/evaluate/"
+      ><span class="mr-1.5">←</span><span>Transformer 学习之路 - 使用 evaluate 库进行模型评估</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/summarizatioin/"
+      ><span>Transformer 学习之路 - 基于 T5 的文本摘要</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

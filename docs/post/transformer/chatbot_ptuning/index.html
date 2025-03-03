@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title> - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="--- title: &#34;Transformer 学习之路 - P-tuning 技术深入解析&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析 P-tuning 技术，探讨其核心思想、工作原理、优点及应用场景，并结合代码示例进行讲解。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - P-tuning 技术深入解析 P-tuning 是 Prompt Tuning 的一种增强版本，最早由清华大学提出，设计初衷是通过优化提示词来提升预训练模型在下游任务上的表现。P-tuning 不仅仅是简单的 Prompt Tuning，而是进一步利用**可学习的嵌入向量**来模拟提示词，以适应特定任务需求。P-tuning 特别适合语言模型微调，不仅适用于小规模的下游任务，也适用于需要更高灵活性的大模型。 ## P-tuning 的核心思想 与普通的 Prompt Tuning 通过固定的提示词嵌入来引导模型不同，P-tuning 使用一组可训练的嵌入向量作为提示词，这些嵌入向量会在训练过程中自动调整，生成特定任务的嵌入表示。相比普通的 Prompt Tuning，P-tuning 的灵活性和适应性更高。 ## P-tuning 的工作原理 1. **初始化嵌入向量**： - 与普通 Prompt Tuning 类似，P-tuning 初始化时也会创建一组提示词嵌入向量（即提示 token），但这些向量是随机初始化的，没有特定的含义。 2. **提示词和输入拼接**： - 将这些嵌入向量与实际输入文本拼接，形成输入序列。例如，对于句子 &#34;I love this product!&#34;，模型接收的输入会是： ``` [提示1] [提示2] ... [提示N] I love this product!" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="" />
+<meta property="og:description" content="--- title: &#34;Transformer 学习之路 - P-tuning 技术深入解析&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析 P-tuning 技术，探讨其核心思想、工作原理、优点及应用场景，并结合代码示例进行讲解。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - P-tuning 技术深入解析 P-tuning 是 Prompt Tuning 的一种增强版本，最早由清华大学提出，设计初衷是通过优化提示词来提升预训练模型在下游任务上的表现。P-tuning 不仅仅是简单的 Prompt Tuning，而是进一步利用**可学习的嵌入向量**来模拟提示词，以适应特定任务需求。P-tuning 特别适合语言模型微调，不仅适用于小规模的下游任务，也适用于需要更高灵活性的大模型。 ## P-tuning 的核心思想 与普通的 Prompt Tuning 通过固定的提示词嵌入来引导模型不同，P-tuning 使用一组可训练的嵌入向量作为提示词，这些嵌入向量会在训练过程中自动调整，生成特定任务的嵌入表示。相比普通的 Prompt Tuning，P-tuning 的灵活性和适应性更高。 ## P-tuning 的工作原理 1. **初始化嵌入向量**： - 与普通 Prompt Tuning 类似，P-tuning 初始化时也会创建一组提示词嵌入向量（即提示 token），但这些向量是随机初始化的，没有特定的含义。 2. **提示词和输入拼接**： - 将这些嵌入向量与实际输入文本拼接，形成输入序列。例如，对于句子 &#34;I love this product!&#34;，模型接收的输入会是： ``` [提示1] [提示2] ... [提示N] I love this product!" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/chatbot_ptuning/" /><meta property="article:section" content="post" />
+
+
+
+  
+  <meta itemprop="name" content="">
+<meta itemprop="description" content="--- title: &#34;Transformer 学习之路 - P-tuning 技术深入解析&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析 P-tuning 技术，探讨其核心思想、工作原理、优点及应用场景，并结合代码示例进行讲解。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - P-tuning 技术深入解析 P-tuning 是 Prompt Tuning 的一种增强版本，最早由清华大学提出，设计初衷是通过优化提示词来提升预训练模型在下游任务上的表现。P-tuning 不仅仅是简单的 Prompt Tuning，而是进一步利用**可学习的嵌入向量**来模拟提示词，以适应特定任务需求。P-tuning 特别适合语言模型微调，不仅适用于小规模的下游任务，也适用于需要更高灵活性的大模型。 ## P-tuning 的核心思想 与普通的 Prompt Tuning 通过固定的提示词嵌入来引导模型不同，P-tuning 使用一组可训练的嵌入向量作为提示词，这些嵌入向量会在训练过程中自动调整，生成特定任务的嵌入表示。相比普通的 Prompt Tuning，P-tuning 的灵活性和适应性更高。 ## P-tuning 的工作原理 1. **初始化嵌入向量**： - 与普通 Prompt Tuning 类似，P-tuning 初始化时也会创建一组提示词嵌入向量（即提示 token），但这些向量是随机初始化的，没有特定的含义。 2. **提示词和输入拼接**： - 将这些嵌入向量与实际输入文本拼接，形成输入序列。例如，对于句子 &#34;I love this product!&#34;，模型接收的输入会是： ``` [提示1] [提示2] ... [提示N] I love this product!">
+
+<meta itemprop="wordCount" content="321">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="--- title: &#34;Transformer 学习之路 - P-tuning 技术深入解析&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析 P-tuning 技术，探讨其核心思想、工作原理、优点及应用场景，并结合代码示例进行讲解。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - P-tuning 技术深入解析 P-tuning 是 Prompt Tuning 的一种增强版本，最早由清华大学提出，设计初衷是通过优化提示词来提升预训练模型在下游任务上的表现。P-tuning 不仅仅是简单的 Prompt Tuning，而是进一步利用**可学习的嵌入向量**来模拟提示词，以适应特定任务需求。P-tuning 特别适合语言模型微调，不仅适用于小规模的下游任务，也适用于需要更高灵活性的大模型。 ## P-tuning 的核心思想 与普通的 Prompt Tuning 通过固定的提示词嵌入来引导模型不同，P-tuning 使用一组可训练的嵌入向量作为提示词，这些嵌入向量会在训练过程中自动调整，生成特定任务的嵌入表示。相比普通的 Prompt Tuning，P-tuning 的灵活性和适应性更高。 ## P-tuning 的工作原理 1. **初始化嵌入向量**： - 与普通 Prompt Tuning 类似，P-tuning 初始化时也会创建一组提示词嵌入向量（即提示 token），但这些向量是随机初始化的，没有特定的含义。 2. **提示词和输入拼接**： - 将这些嵌入向量与实际输入文本拼接，形成输入序列。例如，对于句子 &#34;I love this product!&#34;，模型接收的输入会是： ``` [提示1] [提示2] ... [提示N] I love this product!"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5"></h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      
+    </div>
+    
+  </header>
+
+  <section><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>title: &#34;Transformer 学习之路 - P-tuning 技术深入解析&#34;
+</span></span><span style="display:flex;"><span>date: 2024-04-19T17:35:18+08:00
+</span></span><span style="display:flex;"><span>draft: false
+</span></span><span style="display:flex;"><span>description: &#34;深入解析 P-tuning 技术，探讨其核心思想、工作原理、优点及应用场景，并结合代码示例进行讲解。&#34;
+</span></span><span style="display:flex;"><span>categories: [&#34;Python&#34;, &#34;Transformer&#34;]
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># Transformer 学习之路 - P-tuning 技术深入解析
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>P-tuning 是 Prompt Tuning 的一种增强版本，最早由清华大学提出，设计初衷是通过优化提示词来提升预训练模型在下游任务上的表现。P-tuning 不仅仅是简单的 Prompt Tuning，而是进一步利用**可学习的嵌入向量**来模拟提示词，以适应特定任务需求。P-tuning 特别适合语言模型微调，不仅适用于小规模的下游任务，也适用于需要更高灵活性的大模型。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## P-tuning 的核心思想
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>与普通的 Prompt Tuning 通过固定的提示词嵌入来引导模型不同，P-tuning 使用一组可训练的嵌入向量作为提示词，这些嵌入向量会在训练过程中自动调整，生成特定任务的嵌入表示。相比普通的 Prompt Tuning，P-tuning 的灵活性和适应性更高。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## P-tuning 的工作原理
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">1.</span> <span style="font-style:italic">**</span>初始化嵌入向量**：
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">-</span> 与普通 Prompt Tuning 类似，P-tuning 初始化时也会创建一组提示词嵌入向量（即提示 token），但这些向量是随机初始化的，没有特定的含义。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">2.</span> <span style="font-style:italic">**</span>提示词和输入拼接**：
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">-</span> 将这些嵌入向量与实际输入文本拼接，形成输入序列。例如，对于句子 &#34;I love this product!&#34;，模型接收的输入会是：
+</span></span><span style="display:flex;"><span>     ```
+</span></span><span style="display:flex;"><span>     [提示1] [提示2] ... [提示N] I love this product!
+</span></span><span style="display:flex;"><span>     ```
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">3.</span> <span style="font-style:italic">**</span>训练过程**：
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">-</span> 在训练过程中，提示嵌入会自动调整以适应任务需求。模型通过反向传播更新提示词的嵌入向量，以便它们能有效引导模型生成或理解特定任务的输出。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">4.</span> <span style="font-style:italic">**</span>动态适应性**：
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">-</span> P-tuning 提供了动态适应能力。提示词嵌入的值会随着任务的不同而变化，从而让模型更加灵活地适应各类任务。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">5.</span> <span style="font-style:italic">**</span>冻结模型参数**：
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">-</span> P-tuning 通常会冻结模型的其他参数，仅更新提示词嵌入。这种方法显著减少了计算需求，使其能够更高效地在大规模预训练模型上微调。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## P-tuning 的优点
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> **高效性**：只优化少量的提示词嵌入，减少了训练时的计算开销。
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> **灵活性**：适合适应多种下游任务，对输入内容和任务需求的变化具有较强适应性。
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> **适合多种模型**：P-tuning 能有效应用在大规模预训练语言模型上，尤其在使用如 GPT、BERT 之类的模型时效果显著。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## P-tuning 的应用场景
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>P-tuning 通常用于以下场景：
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> **文本分类**：例如情感分析、意图检测等任务。
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> **生成式任务**：例如文本生成、摘要生成等任务。
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> **信息抽取**：如命名实体识别、关系抽取等任务。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 举个例子
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>假设有一个情感分类任务，输入是 “This movie was fantastic!”。通过 P-tuning，可以将输入的内容和可学习的提示词嵌入向量拼接在一起：
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>```plaintext
+</span></span><span style="display:flex;"><span>[Prompt1] [Prompt2] ... [PromptN] This movie was fantastic!
+</span></span></code></pre></div><p>在训练过程中，模型会自动调整提示词的嵌入向量，使其能够引导模型更准确地预测情感类别。</p>
+<h2 id="总结">总结</h2>
+<p>P-tuning 是 Prompt Tuning 的一种改进方法，利用了可训练的嵌入向量作为提示，使得模型可以更有效地适应特定的下游任务。这种方法能够提高模型的灵活性，同时降低训练成本，非常适合大规模预训练模型在多任务上的高效微调。</p>
+<h2 id="代码示例">代码示例</h2>
+<h3 id="step1-导入相关包">Step1 导入相关包</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> datasets <span style="color:#f92672">import</span> Dataset
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoTokenizer, AutoModelForCausalLM, DataCollatorForSeq2Seq, TrainingArguments, Trainer
+</span></span></code></pre></div><h3 id="step2-加载数据集">Step2 加载数据集</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>ds <span style="color:#f92672">=</span> Dataset<span style="color:#f92672">.</span>load_from_disk(<span style="color:#e6db74">&#34;/content/drive/MyDrive/ai-learning/3-PEFT/data/alpaca_data_zh/&#34;</span>)
+</span></span><span style="display:flex;"><span>ds[:<span style="color:#ae81ff">3</span>]
+</span></span></code></pre></div><h3 id="step3-数据集预处理">Step3 数据集预处理</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;Langboat/bloom-1b4-zh&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">process_func</span>(example):
+</span></span><span style="display:flex;"><span>    MAX_LENGTH <span style="color:#f92672">=</span> <span style="color:#ae81ff">256</span>
+</span></span><span style="display:flex;"><span>    input_ids, attention_mask, labels <span style="color:#f92672">=</span> [], [], []
+</span></span><span style="display:flex;"><span>    instruction <span style="color:#f92672">=</span> tokenizer(<span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>join([<span style="color:#e6db74">&#34;Human: &#34;</span> <span style="color:#f92672">+</span> example[<span style="color:#e6db74">&#34;instruction&#34;</span>], example[<span style="color:#e6db74">&#34;input&#34;</span>]])<span style="color:#f92672">.</span>strip() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n\n</span><span style="color:#e6db74">Assistant: &#34;</span>)
+</span></span><span style="display:flex;"><span>    response <span style="color:#f92672">=</span> tokenizer(example[<span style="color:#e6db74">&#34;output&#34;</span>] <span style="color:#f92672">+</span> tokenizer<span style="color:#f92672">.</span>eos_token)
+</span></span><span style="display:flex;"><span>    input_ids <span style="color:#f92672">=</span> instruction[<span style="color:#e6db74">&#34;input_ids&#34;</span>] <span style="color:#f92672">+</span> response[<span style="color:#e6db74">&#34;input_ids&#34;</span>]
+</span></span><span style="display:flex;"><span>    attention_mask <span style="color:#f92672">=</span> instruction[<span style="color:#e6db74">&#34;attention_mask&#34;</span>] <span style="color:#f92672">+</span> response[<span style="color:#e6db74">&#34;attention_mask&#34;</span>]
+</span></span><span style="display:flex;"><span>    labels <span style="color:#f92672">=</span> [<span style="color:#f92672">-</span><span style="color:#ae81ff">100</span>] <span style="color:#f92672">*</span> len(instruction[<span style="color:#e6db74">&#34;input_ids&#34;</span>]) <span style="color:#f92672">+</span> response[<span style="color:#e6db74">&#34;input_ids&#34;</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> len(input_ids) <span style="color:#f92672">&gt;</span> MAX_LENGTH:
+</span></span><span style="display:flex;"><span>        input_ids <span style="color:#f92672">=</span> input_ids[:MAX_LENGTH]
+</span></span><span style="display:flex;"><span>        attention_mask <span style="color:#f92672">=</span> attention_mask[:MAX_LENGTH]
+</span></span><span style="display:flex;"><span>        labels <span style="color:#f92672">=</span> labels[:MAX_LENGTH]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;input_ids&#34;</span>: input_ids,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;attention_mask&#34;</span>: attention_mask,
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;labels&#34;</span>: labels
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tokenized_ds <span style="color:#f92672">=</span> ds<span style="color:#f92672">.</span>map(process_func, remove_columns<span style="color:#f92672">=</span>ds<span style="color:#f92672">.</span>column_names)
+</span></span><span style="display:flex;"><span>tokenizer<span style="color:#f92672">.</span>decode(tokenized_ds[<span style="color:#ae81ff">1</span>][<span style="color:#e6db74">&#34;input_ids&#34;</span>])
+</span></span><span style="display:flex;"><span>tokenizer<span style="color:#f92672">.</span>decode(list(filter(<span style="color:#66d9ef">lambda</span> x: x <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">100</span>, tokenized_ds[<span style="color:#ae81ff">1</span>][<span style="color:#e6db74">&#34;labels&#34;</span>])))
+</span></span></code></pre></div><h3 id="step4-创建模型">Step4 创建模型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModelForCausalLM<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;Langboat/bloom-1b4-zh&#34;</span>)
+</span></span></code></pre></div><h3 id="p-tuning">P-tuning</h3>
+<h4 id="peft-step1-配置文件">PEFT Step1 配置文件</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> peft <span style="color:#f92672">import</span> PromptEncoderConfig, TaskType, get_peft_model, PromptEncoderReparameterizationType
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>config <span style="color:#f92672">=</span> PromptEncoderConfig(task_type<span style="color:#f92672">=</span>TaskType<span style="color:#f92672">.</span>CAUSAL_LM, num_virtual_tokens<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>,
+</span></span><span style="display:flex;"><span>                             encoder_reparameterization_type<span style="color:#f92672">=</span>PromptEncoderReparameterizationType<span style="color:#f92672">.</span>MLP,
+</span></span><span style="display:flex;"><span>                             encoder_dropout<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>, encoder_num_layers<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>, encoder_hidden_size<span style="color:#f92672">=</span><span style="color:#ae81ff">1024</span>)
+</span></span><span style="display:flex;"><span>config
+</span></span></code></pre></div><h4 id="peft-step2-创建模型">PEFT Step2 创建模型</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> get_peft_model(model, config)
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>print_trainable_parameters()
+</span></span></code></pre></div><h3 id="step5-配置训练参数">Step5 配置训练参数</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>args <span style="color:#f92672">=</span> TrainingArguments(
+</span></span><span style="display:flex;"><span>    output_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./chatbot&#34;</span>,
+</span></span><span style="display:flex;"><span>    per_device_train_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    gradient_accumulation_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>,
+</span></span><span style="display:flex;"><span>    logging_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>,
+</span></span><span style="display:flex;"><span>    num_train_epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h3 id="step6-创建训练器">Step6 创建训练器</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>trainer <span style="color:#f92672">=</span> Trainer(
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">=</span>model,
+</span></span><span style="display:flex;"><span>    args<span style="color:#f92672">=</span>args,
+</span></span><span style="display:flex;"><span>    tokenizer<span style="color:#f92672">=</span>tokenizer,
+</span></span><span style="display:flex;"><span>    train_dataset<span style="color:#f92672">=</span>tokenized_ds,
+</span></span><span style="display:flex;"><span>    data_collator<span style="color:#f92672">=</span>DataCollatorForSeq2Seq(tokenizer<span style="color:#f92672">=</span>tokenizer, padding<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>),
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h3 id="step7-模型训练">Step7 模型训练</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>trainer<span style="color:#f92672">.</span>train()
+</span></span></code></pre></div><h3 id="step8-模型推理">Step8 模型推理</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>cuda()
+</span></span><span style="display:flex;"><span>ipt <span style="color:#f92672">=</span> tokenizer(<span style="color:#e6db74">&#34;Human: </span><span style="color:#e6db74">{}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">{}</span><span style="color:#e6db74">&#34;</span><span style="color:#f92672">.</span>format(<span style="color:#e6db74">&#34;数学考试有哪些技巧？&#34;</span>, <span style="color:#e6db74">&#34;&#34;</span>)<span style="color:#f92672">.</span>strip() <span style="color:#f92672">+</span> <span style="color:#e6db74">&#34;</span><span style="color:#ae81ff">\n\n</span><span style="color:#e6db74">Assistant: &#34;</span>, return_tensors<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pt&#34;</span>)<span style="color:#f92672">.</span>to(model<span style="color:#f92672">.</span>device)
+</span></span><span style="display:flex;"><span>print(tokenizer<span style="color:#f92672">.</span>decode(model<span style="color:#f92672">.</span>generate(<span style="color:#f92672">**</span>ipt, max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">256</span>, do_sample<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)[<span style="color:#ae81ff">0</span>], skip_special_tokens<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>))
+</span></span></code></pre></div><p>通过以上步骤，我们深入了解了 P-tuning 技术的核心思想、工作原理及其在实际应用中的优势。希望这篇文章能帮助你在 Transformer 的学习之路上更进一步！</p>
+<pre tabindex="0"><code></code></pre></section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/causal_lm/"
+      ><span class="mr-1.5">←</span><span></span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/classification/"
+      ><span></span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

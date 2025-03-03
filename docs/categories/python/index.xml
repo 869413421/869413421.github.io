@@ -8,6 +8,303 @@
     <language>en-zh</language>
     <lastBuildDate>Fri, 19 Apr 2024 17:35:18 +0800</lastBuildDate><atom:link href="https://869413421.github.io/categories/python/index.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>Transformer 学习之路 - BitFit 实战与深入解析</title>
+      <link>https://869413421.github.io/post/transformer/chatbot_bitfit/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/chatbot_bitfit/</guid>
+      <description>BitFit 实战与深入解析 BitFit 是一种参数高效微调（PEFT, Parameter-Efficient Fine-Tuning）方法，特别适用于大型语言模型的微调。它的核心思想是只微调模型的偏置项（bias），而冻结其他参数。这样可以减少微调所需的参数数量和存储成本，同时保持较高的性能。
+BitFit 方法的基本概念 在深度学习模型中，每一层都有权重参数（weights）和偏置参数（biases）。在 BitFit 中：
+只更新偏置参数：冻结模型的权重（weights），只调整偏置（biases）。 减少存储和计算需求：由于偏置项的数量远少于权重，这种方法大大降低了训练过程中的计算量和存储需求。 BitFit 的优缺点 优点 节省存储空间和计算资源：只更新偏置项，节省了大量的计算和存储成本。 迁移性强：由于权重参数不变，可以将微调后的偏置项应用到不同模型实例上，便于模型部署和版本管理。 适用于少量数据的任务：BitFit 在数据量较少的任务上表现尤为出色，能显著提高效率。 减少过拟合风险：只微调少量参数（偏置），可以避免模型在小数据集上过度拟合。 缺点 性能上限：BitFit 仅调整偏置参数，限制了模型的微调能力，因此在高复杂度或需要更深层次调整的任务中效果可能不及全面微调。 任务依赖性较高：BitFit 对某些任务（如高复杂度分类）可能不如全参数微调效果好。 局限性：BitFit 对需要大幅度知识迁移的任务（如极度不同的领域任务）效果有限，适合与预训练任务较相似的场景。 示例：使用 BitFit 微调情感分析模型 假设我们有一个预训练的 BERT 模型，并希望用少量的计算资源微调它来完成情感分类任务。以下是 BitFit 的实现步骤示例：
+加载预训练模型，并将所有权重冻结。 解冻偏置项：只解冻每一层的偏置（bias），权重保持冻结。 训练模型：在情感分类数据集上训练，但只更新偏置项。 具体代码（使用 PyTorch 和 Hugging Face 的 Transformers 库）如下：
+import torch from transformers import BertTokenizer, BertForSequenceClassification # 加载预训练模型和分词器 model = BertForSequenceClassification.from_pretrained(&amp;#34;bert-base-uncased&amp;#34;, num_labels=2) tokenizer = BertTokenizer.from_pretrained(&amp;#34;bert-base-uncased&amp;#34;) # 冻结模型的所有权重 for param in model.parameters(): param.requires_grad = False # 解冻偏置项（仅对偏置项设置 requires_grad 为 True） for name, param in model.</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - Prefix-Tuning 实战</title>
+      <link>https://869413421.github.io/post/transformer/chatbot_prefix_tuning/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/chatbot_prefix_tuning/</guid>
+      <description>Transformer 学习之路 - Prefix-Tuning 实战 在深度学习领域，Transformer 模型因其强大的表现力而广受欢迎。然而，随着模型规模的增大，如何高效地微调这些模型以适应特定任务成为了一个挑战。本文将深入探讨一种高效的微调方法——Prefix-Tuning，并展示其在实际应用中的操作步骤。
+什么是 Prefix-Tuning？ Prefix-Tuning 是一种针对大型预训练语言模型的高效微调方法。它通过优化特定任务的“前缀”嵌入而不是调整整个模型的参数来实现模型的自适应。在 Prefix-Tuning 中，前缀并不是传统意义上的文本提示词，而是可学习的嵌入向量序列。这些前缀嵌入会与输入文本拼接在一起，引导模型在生成或预测时倾向于某种任务特性。
+Prefix-Tuning 的核心思想 与 Prompt Tuning 和 P-tuning 类似，Prefix-Tuning 通过在模型的输入前加入可训练的前缀嵌入来引导模型完成特定任务。然而，Prefix-Tuning 的设计更关注条件生成（例如对话生成、摘要生成等）任务，通过仅优化前缀来保留模型的原始能力，同时减少训练成本。
+Prefix-Tuning 的工作流程 初始化前缀嵌入：
+Prefix-Tuning 会初始化一组前缀嵌入向量，这些向量的维度与模型的输入嵌入维度相同。 前缀嵌入与输入拼接：
+这些前缀嵌入与输入文本的嵌入表示拼接在一起，构成模型的输入序列。例如，对于输入 “I love this product!” 以及前缀嵌入 [Prefix1]、[Prefix2] 等，最终的输入会是： [Prefix1] [Prefix2] ... [PrefixN] I love this product! 冻结模型参数：
+为了减少训练开销，Prefix-Tuning 通常会冻结模型原本的参数，仅优化前缀嵌入向量的权重。 训练与优化前缀嵌入：
+在训练过程中，前缀嵌入会逐步更新，以便适应特定的任务需求。通过这种方式，Prefix-Tuning 能引导模型生成或预测时，更加符合目标任务的上下文和期望输出。 Prefix-Tuning 的优势 参数高效：Prefix-Tuning 仅优化前缀嵌入而不修改模型的主体参数，这极大地降低了存储和计算成本。 任务迁移方便：只需为每个任务训练和保存相应的前缀嵌入，因此适合需要多任务切换的场景。 保留模型原始能力：由于不微调整个模型的权重，Prefix-Tuning 在执行特定任务时能保留模型原始的生成能力。 应用场景 Prefix-Tuning 特别适合条件生成任务，如：
+对话生成：通过前缀嵌入向量引导模型生成具有特定风格或语境的对话。 摘要生成：在摘要生成任务中使用前缀嵌入来帮助模型生成简洁准确的摘要。 机器翻译：帮助模型适应特定的语言或语境转换需求。 示例 假设有一个对话生成任务，用户输入 “What is the weather like today?</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - Prompt Tuning 实战</title>
+      <link>https://869413421.github.io/post/transformer/chatbot_prompt_tuning/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/chatbot_prompt_tuning/</guid>
+      <description>Transformer 学习之路 - Prompt Tuning 实战 在深度学习的浩瀚宇宙中，Transformer 模型以其强大的表现力和广泛的应用场景，成为了自然语言处理（NLP）领域的明星。然而，随着模型规模的不断膨胀，如何高效地微调这些庞然大物以适应特定任务，成为了一个亟待解决的问题。今天，我们就来聊聊一种名为 Prompt Tuning 的参数高效微调方法，它如何在大型语言模型（如 GPT、BERT 等）中大显身手。
+Prompt Tuning 的基本原理 传统的微调方法通常需要调整整个模型的参数，这不仅计算资源消耗巨大，而且在大规模模型上实施起来颇为困难。Prompt Tuning 则另辟蹊径，它通过在输入前面加入一组可学习的提示（prompt）来引导模型产生期望的输出，而不是微调模型的全部参数。
+关键点 仅调整提示部分的参数：Prompt Tuning 引入了一组可训练的嵌入向量，作为输入的提示词，将它们放置在输入文本的前面，以调整模型的输出行为。 冻结模型权重：模型的主干参数保持不变，只有提示词的嵌入参数在训练中被优化。 Prompt Tuning 的优点 减少计算资源和存储需求：相比调整整个模型，Prompt Tuning 只更新提示词的嵌入向量，因而需要的计算和存储资源少得多。 迁移性好：在不同的任务上可以快速部署。尤其适合在大型模型上快速进行多任务适应。 提升少样本学习能力：Prompt Tuning 通过定制化提示引导模型，使得模型在少量样本任务中表现更为优异。 Prompt Tuning 与微调的对比 特性 传统微调 Prompt Tuning 调整的参数范围 整个模型参数 仅提示嵌入参数 计算资源需求 高 低 适用场景 大数据、复杂任务 少样本、特定任务 适用的模型大小 中小型模型 大型模型效果尤为显著 示例：Prompt Tuning 的应用场景 例如，如果我们要用 Prompt Tuning 来训练一个大型语言模型完成情感分类任务，可以采用以下步骤：
+定义提示向量：给定一个输入句子“这个电影真棒！”，可以在前面加上一组初始的提示词，生成输入格式为： [提示词1] [提示词2] ... [提示词n] 这个电影真棒！ 训练提示词：冻结模型参数，仅更新这些提示词，使得模型能够从中识别出情感信息。 微调优化：在情感分类数据集上优化这些提示词，以便在推理时引导模型准确地输出“正面”或“负面”情感分类。 Soft Prompt 和 Hard Prompt 的对比 在 Prompt Tuning 中，Soft Prompt 和 Hard Prompt 是两种不同的提示方式，用于引导模型执行特定任务。</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 从零开始理解文本分类</title>
+      <link>https://869413421.github.io/post/transformer/pipe/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/pipe/</guid>
+      <description>Transformer 学习之路 - 从零开始理解文本分类 Transformer 模型自 2017 年问世以来，彻底改变了自然语言处理（NLP）领域的格局。它不仅在机器翻译、文本生成等任务中表现出色，还在文本分类、情感分析等任务中展现了强大的能力。本文将带你从零开始理解 Transformer 在文本分类中的应用，并通过代码示例帮助你掌握如何使用 Hugging Face 的 transformers 库构建一个文本分类模型。
+1. Transformer 的核心思想 Transformer 模型的核心思想是自注意力机制（Self-Attention）。与传统的循环神经网络（RNN）和卷积神经网络（CNN）不同，Transformer 通过自注意力机制捕捉输入序列中各个位置之间的依赖关系，从而避免了 RNN 在处理长序列时的梯度消失问题。
+自注意力机制的计算过程可以简单描述为：对于输入序列中的每个位置，模型计算它与其他位置的关联程度，然后根据这些关联程度加权求和，得到该位置的表示。这种机制使得 Transformer 能够并行处理整个序列，大大提高了计算效率。
+2. 文本分类中的 Transformer 文本分类是 NLP 中的一项基础任务，目标是将一段文本分配到预定义的类别中。Transformer 模型在文本分类中的应用通常包括以下几个步骤：
+文本预处理：将原始文本转换为模型可以理解的输入格式。 模型加载：加载预训练的 Transformer 模型。 特征提取：通过模型提取文本的特征表示。 分类：将特征表示输入到分类器中进行分类。 3. 代码示例：使用 Hugging Face 进行文本分类 下面我们通过代码示例来详细讲解如何使用 Hugging Face 的 transformers 库进行文本分类。
+3.1 加载预训练模型和分词器 首先，我们需要加载一个预训练的 Transformer 模型和对应的分词器。Hugging Face 提供了丰富的预训练模型，我们可以根据需要选择合适的模型。
+from transformers import AutoModelForSequenceClassification, AutoTokenizer # 加载预训练的分词器 tokenizer = AutoTokenizer.from_pretrained(&amp;#34;hfl/chinese-macbert-base&amp;#34;) # 保存分词器到本地 tokenizer.save_pretrained(&amp;#34;tokenizer&amp;#34;) # 加载预训练的模型 model = AutoModelForSequenceClassification.</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 使用 evaluate 库进行模型评估</title>
+      <link>https://869413421.github.io/post/transformer/evaluate/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/evaluate/</guid>
+      <description>Transformer 学习之路 - 使用 evaluate 库进行模型评估 在深度学习和自然语言处理（NLP）领域，模型的评估是至关重要的一环。无论是训练过程中的监控，还是最终模型的性能对比，评估指标都能帮助我们更好地理解模型的表现。本文将详细介绍如何使用 evaluate 库进行模型评估，并结合代码示例进行讲解。
+1. 安装与导入 首先，我们需要安装 evaluate 库。可以通过以下命令进行安装：
+!pip install evaluate 安装完成后，导入库：
+import evaluate 2. 查看支持的评估函数 evaluate 库提供了丰富的评估函数，涵盖了分类、回归、文本生成等多个领域。我们可以通过以下命令查看支持的评估函数：
+evaluate.list_evaluation_modules() 如果你只想查看特定类型的评估函数，比如比较类的评估函数，可以使用以下命令：
+evaluate.list_evaluation_modules( module_type=&amp;#34;comparison&amp;#34;, include_community=False, with_details=True) 3. 加载评估函数 接下来，我们可以加载具体的评估函数。以准确率（accuracy）为例：
+accuracy = evaluate.load(&amp;#34;accuracy&amp;#34;) 加载完成后，我们可以查看该函数的详细信息：
+print(accuracy.description) 4. 评估指标计算 4.1 全局计算 全局计算是指一次性评估所有数据。我们可以通过以下代码计算准确率：
+accuracy = evaluate.load(&amp;#34;accuracy&amp;#34;) results = accuracy.compute(references=[0, 1, 2, 0, 1, 2], predictions=[0, 1, 1, 2, 1, 0]) results 4.2 迭代计算 迭代计算是指在数据流中逐步计算评估指标。以下代码展示了如何逐步计算准确率：
+accuracy = evaluate.load(&amp;#34;accuracy&amp;#34;) for ref, pred in zip([0,1,0,1], [1,0,0,1]): accuracy.</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 向量召回与排序实战</title>
+      <link>https://869413421.github.io/post/transformer/retrieval_chatbot2/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/retrieval_chatbot2/</guid>
+      <description>Transformer 学习之路 - 向量召回与排序实战 在自然语言处理（NLP）领域，Transformer 模型已经成为一种革命性的技术。它不仅广泛应用于机器翻译、文本生成等任务，还在信息检索、问答系统等领域展现了强大的能力。本文将结合代码示例，深入探讨 Transformer 在向量召回与排序中的应用，帮助你理解其技术原理并实际应用。
+1. 背景与问题 在问答系统中，如何快速准确地找到与用户问题最相关的答案是一个核心挑战。传统的基于关键词匹配的方法往往无法捕捉语义信息，导致召回效果不佳。而 Transformer 模型通过将文本转化为高维向量，能够更好地表达语义信息，从而实现更精准的召回与排序。
+2. 技术原理 2.1 向量召回 向量召回的核心思想是将文本（如问题与答案）映射到高维向量空间，然后通过计算向量之间的相似度来找到最相关的结果。具体步骤如下：
+文本向量化：使用预训练的 Transformer 模型（如 Sentence-BERT）将文本转化为固定长度的向量。 向量存储：将生成的向量存储到向量数据库（如 PostgreSQL 的 vector 扩展）。 相似度计算：通过计算查询向量与存储向量的余弦相似度，找到最相关的结果。 2.2 向量排序 在召回的结果中，可能存在多个相关但质量不同的答案。为了进一步提升结果质量，可以使用排序模型对召回结果进行二次排序。排序模型通过计算查询与候选答案的匹配分数，选择最合适的答案。
+3. 代码实现 3.1 读取数据集 首先，我们加载一个法律问答数据集（law_faq.csv），其中包含问题（title）和答案（reply）。
+import pandas as pd data = pd.read_csv(&amp;#39;law_faq.csv&amp;#39;, encoding=&amp;#39;utf-8&amp;#39;) documents = data[&amp;#39;title&amp;#39;].tolist() print(documents[0:5]) # 打印前5个问题 3.2 加载向量模型 使用 sentence-transformers 库加载预训练的向量模型，并将文本转化为向量。
+from sentence_transformers import SentenceTransformer model = SentenceTransformer(&amp;#34;TencentBAC/Conan-embedding-v1&amp;#34;, cache_folder=&amp;#34;cache&amp;#34;) document_vectors = model.encode(documents[0:5], convert_to_numpy=True) print(document_vectors.shape) # 打印向量维度 3.</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 基于 T5 的文本摘要</title>
+      <link>https://869413421.github.io/post/transformer/summarizatioin/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/summarizatioin/</guid>
+      <description>Transformer 学习之路 - 基于 T5 的文本摘要 文本摘要是一种自然语言处理（NLP）任务，旨在将长文本信息提炼为简洁的摘要，同时保留关键内容和语义。本文将深入探讨基于 T5 模型的文本摘要技术，涵盖其原理、实现步骤以及实际应用。
+文本摘要的分类 文本摘要主要分为两类：
+抽取式摘要：直接从原文中挑选出关键句子或短语，并组合成摘要。这种方法不会生成新内容，但效果依赖于原文的句子组织。
+生成式摘要：使用生成算法基于原文创建新的句子和段落，可以进行词语重组和总结，适合灵活、内容丰富的摘要任务。生成式摘要往往能提供更自然、流畅的摘要。
+序列到序列（Seq2Seq）模型 序列到序列（Seq2Seq）模型是解决生成式摘要任务的一种常用架构，适用于输入和输出都是序列的数据，例如机器翻译、文本摘要、对话生成等。
+Seq2Seq 基本结构 Seq2Seq模型一般由编码器（Encoder）和解码器（Decoder）组成：
+编码器：接收输入文本的序列，将其转换成隐含状态表示。
+解码器：根据编码器的输出和自身生成的上一步输出，逐步生成目标序列。
+Attention机制 在处理长文本摘要时，Seq2Seq模型的注意力机制（Attention）非常关键。Attention允许解码器在生成摘要的过程中动态关注输入文本中的重要部分，使摘要更精准，内容的连贯性更好。
+常见的Seq2Seq模型 RNN-based Seq2Seq：早期的Seq2Seq模型多基于循环神经网络（RNN）或长短期记忆（LSTM）网络，但这些模型在长序列文本处理中性能不足。
+Transformer-based Seq2Seq：目前最主流的是基于Transformer架构的Seq2Seq模型，如BERT、GPT等模型的变种。Transformer使用自注意力机制，可以在训练中更有效地捕获全局上下文，效果显著优于传统RNN模型。
+经典文本摘要模型 BERTSUM：基于BERT的抽取式模型，设计了适合摘要任务的文本表示方式，适合抽取式摘要。
+T5（Text-to-Text Transfer Transformer）：生成式Seq2Seq模型，能将各种文本处理任务（包括摘要）转换为统一的输入-输出格式。
+BART：一种变换编码-解码的模型结构，可以针对文本摘要任务进行微调，擅长处理不规则的输入文本。
+基于 T5 的文本摘要实现 安装依赖 !pip install datasets rouge_chinese 导入相关包 import torch from datasets import Dataset from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq, Seq2SeqTrainer, Seq2SeqTrainingArguments 加载数据集 ds = Dataset.load_from_disk(&amp;#34;/content/drive/MyDrive/ai-learning/2.NLP Task/08-text_summarization/nlpcc_2017/&amp;#34;) ds = ds.train_test_split(100, seed=42) 数据预处理 tokenizer = AutoTokenizer.from_pretrained(&amp;#34;Langboat/mengzi-t5-base&amp;#34;) def process_func(examples): contents = [&amp;#34;摘要生成: \n&amp;#34; + e for e in examples[&amp;#34;content&amp;#34;]] inputs = tokenizer(contents, max_length=384, truncation=True) labels = tokenizer(text_target=examples[&amp;#34;title&amp;#34;], max_length=64, truncation=True) inputs[&amp;#34;labels&amp;#34;] = labels[&amp;#34;input_ids&amp;#34;] return inputs tokenized_ds = ds.</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 基于滑动窗口策略的机器阅读理解任务实现</title>
+      <link>https://869413421.github.io/post/transformer/mrc_slide_version/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/mrc_slide_version/</guid>
+      <description>Transformer 学习之路 - 基于滑动窗口策略的机器阅读理解任务实现 在自然语言处理（NLP）领域，机器阅读理解（Machine Reading Comprehension, MRC）是一个重要的任务，其目标是通过理解给定的上下文文本，回答用户提出的问题。本文将深入探讨如何利用 Transformer 模型，并结合滑动窗口策略来实现这一任务。
+1. 背景与问题 机器阅读理解任务的核心挑战在于如何有效地处理长文本。传统的 Transformer 模型由于输入长度的限制，往往无法直接处理过长的上下文文本。为了解决这一问题，滑动窗口策略应运而生。通过将长文本分割成多个片段，并逐步滑动窗口进行处理，模型能够在不损失信息的情况下处理长文本。
+2. 滑动窗口策略的实现 滑动窗口策略的核心思想是将长文本分割成多个重叠的片段，每个片段都包含一部分上下文信息。这样，模型可以在每个片段上独立地进行处理，最终将所有片段的结果进行整合。
+2.1 数据预处理 首先，我们需要对数据进行预处理。以下代码展示了如何加载数据集，并使用滑动窗口策略对数据进行编码：
+from datasets import load_dataset from transformers import AutoTokenizer # 加载数据集 datasets = load_dataset(&amp;#34;cmrc2018&amp;#34;, cache_dir=&amp;#34;data&amp;#34;) # 加载预训练的 tokenizer tokenizer = AutoTokenizer.from_pretrained(&amp;#34;hfl/chinese-macbert-base&amp;#34;) # 对数据进行编码，使用滑动窗口策略 tokenized_examples = tokenizer( text=sample_dataset[&amp;#34;context&amp;#34;], text_pair=sample_dataset[&amp;#34;question&amp;#34;], return_offsets_mapping=True, max_length=384, return_overflowing_tokens=True, # 设置滑动窗口策略 stride=128, # 覆盖策略，每次移动128个字符 truncation_strategy=&amp;#34;only_second&amp;#34;, ) 2.2 滑动窗口的处理 在处理滑动窗口时，我们需要确保每个片段都能够正确地定位答案的位置。以下代码展示了如何在滑动窗口的每个片段中定位答案的起始和结束位置：
+for idx, _ in enumerate(sample_mapping): answer = sample_dataset[&amp;#34;answers&amp;#34;][sample_mapping[idx]] start_char = answer[&amp;#34;answer_start&amp;#34;][0] end_char = start_char + len(answer[&amp;#34;text&amp;#34;][0]) # 定位答案在token中的起始位置和结束位置 context_start = tokenized_examples.</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 掩码语言模型训练与实战</title>
+      <link>https://869413421.github.io/post/transformer/masked_lm/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/masked_lm/</guid>
+      <description>Transformer 学习之路 - 掩码语言模型训练与实战 掩码语言模型（Masked Language Model，MLM）是自然语言处理（NLP）领域中的一项重要技术，广泛应用于文本生成、文本分类、问答系统等任务。本文将从原理、应用及实战训练三个方面，深入解析 MLM 技术，并结合代码示例帮助读者理解并应用。
+掩码语言模型的工作原理 1. 输入处理 MLM 的核心思想是通过随机掩盖句子中的部分单词，训练模型来预测这些被掩盖的单词。例如，给定句子 &amp;ldquo;The cat sat on the mat.&amp;quot;，模型可能会将其处理为 &amp;ldquo;The cat [MASK] on the mat.&amp;quot;，然后尝试预测被掩盖的单词 &amp;ldquo;sat&amp;rdquo;。
+2. 模型训练 模型接收包含掩码的句子作为输入，并输出预测的单词。通过这种方式，模型能够学习到单词之间的上下文关系和语义。
+3. 损失计算 模型的预测结果与实际被掩盖的单词进行比较，计算损失函数，并通过反向传播优化模型参数。
+掩码语言模型的应用 MLM 在许多 NLP 任务中都有广泛应用：
+文本生成：生成缺失的文本部分。 文本分类：为文本赋予标签。 问答系统：根据上下文回答问题。 最著名的 MLM 模型是 BERT（Bidirectional Encoder Representations from Transformers），它通过 MLM 技术进行训练，能够有效捕捉语言的上下文信息。
+实战训练：从数据到模型 接下来，我们将通过代码示例，一步步实现一个 MLM 模型的训练过程。
+Step1 导入相关包 from datasets import load_dataset, Dataset from transformers import AutoTokenizer, AutoModelForMaskedLM, DataCollatorForLanguageModeling, TrainingArguments, Trainer Step2 加载数据集 ds = Dataset.</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 数据处理与加载实战</title>
+      <link>https://869413421.github.io/post/transformer/datasets/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/datasets/</guid>
+      <description>Transformer 学习之路 - 数据处理与加载实战 在 Transformer 的学习过程中，数据处理是一个至关重要的环节。为了高效地加载和处理数据，我们通常会使用 datasets 库。本文将深入探讨如何使用 datasets 库进行数据加载、处理、映射和保存，并结合代码示例进行详细讲解。
+1. datasets 库的基本使用 datasets 库是 Hugging Face 提供的一个强大工具，专门用于加载和处理各种数据集。它可以轻松地从线上或线下加载数据集，并提供了丰富的数据处理功能。
+1.1 安装与导入 首先，我们需要安装 datasets 库：
+!pip install datasets 然后导入库：
+from datasets import * 1.2 加载线上数据集 使用 load_dataset 函数可以轻松加载线上数据集。例如，加载一个中文新闻标题数据集：
+datasets = load_dataset(&amp;#34;madao33/new-title-chinese&amp;#34;) datasets 1.3 加载特定任务的数据集 有时我们只需要加载数据集中的某一项任务数据。例如，加载 super_glue 数据集中的 boolq 任务：
+boolq_dataset = load_dataset(&amp;#34;super_glue&amp;#34;, &amp;#34;boolq&amp;#34;) boolq_dataset 2. 数据集的切分与查看 在数据处理过程中，我们经常需要对数据集进行切分和查看。datasets 库提供了多种方式来实现这些操作。
+2.1 切分数据集 我们可以通过 split 参数来切分数据集。例如，只加载训练数据：
+dataset = load_dataset(&amp;#34;madao33/new-title-chinese&amp;#34;, split=&amp;#34;train&amp;#34;) dataset 还可以加载训练数据的特定部分，例如下标为 10 到 100 的数据：</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 数据集加载与预处理</title>
+      <link>https://869413421.github.io/post/transformer/datasets-checkpoint/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/datasets-checkpoint/</guid>
+      <description>Transformer 学习之路 - 数据集加载与预处理 在 Transformer 模型的训练过程中，数据集的加载和预处理是至关重要的一步。本文将详细介绍如何使用 datasets 库来加载、处理和管理数据集，确保数据能够高效地输入到模型中。
+1. 安装与导入 datasets 库 首先，我们需要安装并导入 datasets 库。这个库提供了丰富的功能，可以轻松地加载和处理各种数据集。
+!pip install datasets from datasets import * 2. 加载数据集 datasets 库支持从线上和线下加载数据集。无论是公开的数据集还是自定义的数据集，都可以通过简单的代码实现加载。
+2.1 加载线上数据集 datasets = load_dataset(&amp;#34;madao33/new-title-chinese&amp;#34;) datasets 2.2 加载特定任务的数据集 boolq_dataset = load_dataset(&amp;#34;super_glue&amp;#34;, &amp;#34;boolq&amp;#34;) boolq_dataset 3. 数据集切分 在实际应用中，我们通常需要将数据集划分为训练集、验证集和测试集。datasets 库提供了多种切分方式，满足不同的需求。
+3.1 加载部分数据 # 只加载训练数据 dataset = load_dataset(&amp;#34;madao33/new-title-chinese&amp;#34;, split=&amp;#34;train&amp;#34;) dataset # 只加载训练数据的10到100下标的数据 dataset = load_dataset(&amp;#34;madao33/new-title-chinese&amp;#34;, split=&amp;#34;train[10:100]&amp;#34;) dataset # 取训练集中后50%数据 dataset = load_dataset(&amp;#34;madao33/new-title-chinese&amp;#34;, split=&amp;#34;train[:50%]&amp;#34;) dataset # 先取后50%再取前50% dataset = load_dataset(&amp;#34;madao33/new-title-chinese&amp;#34;, split=[&amp;#34;train[:50%]&amp;#34;, &amp;#34;train[50%:]&amp;#34;]) dataset 4.</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 文本分类实战</title>
+      <link>https://869413421.github.io/post/transformer/classification_demo/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/classification_demo/</guid>
+      <description>Transformer 学习之路 - 文本分类实战 在这篇文章中，我们将通过一个完整的文本分类任务，深入解析 Transformer 技术的应用。我们将从数据集的准备开始，逐步完成模型的训练、评估和预测，并结合代码示例详细讲解每一步的实现细节。
+1. 准备数据集 1.1 下载并保存数据集 首先，我们需要一个用于训练和测试的数据集。这里我们使用 ChnSentiCorp_htl_all.csv 数据集，它包含了酒店评论及其对应的情感标签（正面或负面）。
+import os import requests # 创建 &amp;#39;dataset&amp;#39; 文件夹（如果不存在） os.makedirs(&amp;#34;dataset&amp;#34;, exist_ok=True) # 文件 URL url = &amp;#34;https://github.com/SophonPlus/ChineseNlpCorpus/raw/master/datasets/ChnSentiCorp_htl_all/ChnSentiCorp_htl_all.csv&amp;#34; # 发出 GET 请求获取文件内容 response = requests.get(url) # 文件保存路径 file_path = os.path.join(&amp;#34;dataset&amp;#34;, &amp;#34;ChnSentiCorp_htl_all.csv&amp;#34;) # 将内容保存到指定目录的文件中 with open(file_path, &amp;#34;wb&amp;#34;) as file: file.write(response.content) 1.2 查看数据集 下载完成后，我们可以使用 pandas 来查看数据集的基本信息。
+import pandas as pd # 读取保存在 &amp;#39;dataset&amp;#39; 文件夹中的 CSV 文件 df = pd.read_csv(file_path) # 查看表头（列名） print(&amp;#34;表头（列名）：&amp;#34;) print(df.</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 文本相似度实例</title>
+      <link>https://869413421.github.io/post/transformer/cross_model/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/cross_model/</guid>
+      <description>Transformer 学习之路 - 文本相似度实例 Transformer 模型自 2017 年提出以来，已经成为了自然语言处理（NLP）领域的核心技术之一。它不仅改变了机器翻译、文本生成等任务的处理方式，还在文本相似度计算、情感分析等任务中展现了强大的能力。本文将基于 Transformer 技术，详细讲解如何实现文本相似度计算，并结合代码示例进行深入解析。
+1. 背景与问题 文本相似度计算是 NLP 中的一个重要任务，它旨在衡量两段文本在语义上的相似程度。传统的文本相似度计算方法通常基于词袋模型或 TF-IDF，但这些方法无法捕捉到文本的深层语义信息。Transformer 模型通过自注意力机制（Self-Attention）和多层编码器，能够更好地理解文本的上下文关系，从而在文本相似度计算中取得了显著的效果提升。
+2. 环境准备 在开始之前，我们需要安装一些必要的 Python 库，包括 transformers、datasets 和 evaluate。这些库将帮助我们加载预训练模型、处理数据集以及评估模型性能。
+!pip install evaluate datasets 3. 加载数据集 我们使用 datasets 库加载一个 JSON 格式的文本相似度数据集。该数据集包含两段文本及其相似度标签。
+from datasets import load_dataset dataset = load_dataset(&amp;#34;json&amp;#34;, data_files=&amp;#34;/content/drive/MyDrive/ai-learning/2.NLP Task/05-sentence_similarity/train_pair_1w.json&amp;#34;, split=&amp;#34;train&amp;#34;) 为了训练和评估模型，我们将数据集划分为训练集和测试集。
+datasets = dataset.train_test_split(test_size=0.2) 4. 数据预处理 在将数据输入模型之前，我们需要对文本进行预处理。这里我们使用 AutoTokenizer 加载一个中文预训练模型的分词器，并对文本进行分词和截断。
+from transformers import AutoTokenizer tokenizer = AutoTokenizer.from_pretrained(&amp;#34;hfl/chinese-macbert-base&amp;#34;) def preprocess_function(examples): tokenized_examples = tokenizer(examples[&amp;#34;sentence1&amp;#34;], examples[&amp;#34;sentence2&amp;#34;], truncation=True, max_length=128) tokenized_examples[&amp;#34;labels&amp;#34;] = [float(example) for example in examples[&amp;#34;label&amp;#34;]] return tokenized_examples tokenized_datasets = datasets.</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 文本相似度实战</title>
+      <link>https://869413421.github.io/post/transformer/dual_model/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/dual_model/</guid>
+      <description>Transformer 学习之路 - 文本相似度实战 Transformer 模型在自然语言处理（NLP）领域取得了巨大的成功，尤其是在文本相似度任务中表现尤为突出。本文将结合代码示例，深入解析如何利用 Transformer 技术实现文本相似度计算，并详细分析其背后的技术原理。
+1. 背景与问题 文本相似度任务是 NLP 中的一项基础任务，旨在衡量两段文本在语义上的相似程度。常见的应用场景包括问答系统、信息检索、文本匹配等。传统的文本相似度计算方法（如 TF-IDF、余弦相似度等）往往难以捕捉文本的深层语义信息，而 Transformer 模型通过自注意力机制（Self-Attention）能够更好地理解文本的上下文关系，从而提升相似度计算的准确性。
+2. 技术原理 2.1 Transformer 模型 Transformer 模型的核心是自注意力机制，它能够动态地计算输入序列中每个词与其他词的相关性，从而捕捉长距离依赖关系。Transformer 模型由编码器（Encoder）和解码器（Decoder）两部分组成，但在文本相似度任务中，我们通常只使用编码器部分。
+2.2 文本相似度计算 在文本相似度任务中，我们需要将两段文本分别输入到 Transformer 模型中，获取它们的向量表示，然后通过余弦相似度等方法来衡量它们的相似程度。为了实现这一目标，我们可以使用预训练的 Transformer 模型（如 BERT）作为基础模型，并在其基础上进行微调。
+3. 代码实现 3.1 环境准备 首先，我们需要安装必要的库，并加载数据集。
+!pip install evaluate datasets import sys from google.colab import drive drive.mount(&amp;#39;/content/drive&amp;#39;) sys.path.append(&amp;#39;/content/drive/MyDrive/ai-learning/2.NLP Task/05-sentence_similarity&amp;#39;) 3.2 加载数据集 我们使用 datasets 库加载一个包含句子对和标签的数据集。
+from datasets import load_dataset dataset = load_dataset(&amp;#34;json&amp;#34;, data_files=&amp;#34;/content/drive/MyDrive/ai-learning/2.NLP Task/05-sentence_similarity/train_pair_1w.json&amp;#34;, split=&amp;#34;train&amp;#34;) datasets = dataset.train_test_split(test_size=0.2) 3.3 数据预处理 使用预训练的 hfl/chinese-macbert-base 分词器对文本进行预处理。</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 机器阅读理解任务实现</title>
+      <link>https://869413421.github.io/post/transformer/mrc_simple_version-checkpoint/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/mrc_simple_version-checkpoint/</guid>
+      <description>Transformer 学习之路 - 机器阅读理解任务实现 在自然语言处理（NLP）领域，机器阅读理解（MRC）是一个核心任务，它要求模型能够理解文本内容并回答相关问题。近年来，基于 Transformer 的模型在这一任务上取得了显著进展。本文将深入解析如何利用 Transformer 技术实现机器阅读理解任务，并结合代码示例详细讲解技术原理及其应用。
+1. 导入相关包 首先，我们需要导入必要的 Python 包。这些包包括 datasets 用于加载数据集，transformers 用于加载预训练模型和分词器，以及 Trainer 和 TrainingArguments 用于训练模型。
+from datasets import load_dataset from transformers import AutoTokenizer, AutoModelForQuestionAnswering, Trainer, TrainingArguments, DefaultDataCollator 2. 加载数据集 接下来，我们加载一个公开的中文机器阅读理解数据集 cmrc2018。这个数据集包含了大量的上下文、问题以及对应的答案。
+datasets = load_dataset(&amp;#34;cmrc2018&amp;#34;, cache_dir=&amp;#34;data&amp;#34;) datasets 我们可以查看数据集中的第一个样本，了解数据的结构。
+datasets[&amp;#34;train&amp;#34;][0] 3. 数据预处理 在将数据输入模型之前，我们需要对数据进行预处理。首先，我们加载一个预训练的分词器 hfl/chinese-macbert-base，用于将文本转换为模型可以理解的 token。
+tokenizer = AutoTokenizer.from_pretrained(&amp;#34;hfl/chinese-macbert-base&amp;#34;) tokenizer 然后，我们对数据进行编码。编码后的数据将包含 input_ids、attention_mask、token_type_ids 等信息。
+tokenized_examples = tokenizer( text=sample_dataset[&amp;#34;context&amp;#34;], text_pair=sample_dataset[&amp;#34;question&amp;#34;], return_offsets_mapping=True, truncation=True, max_length=512, padding=&amp;#34;max_length&amp;#34;, truncation_strategy=&amp;#34;only_second&amp;#34;, ) tokenized_examples.keys() offset_mapping 是一个重要的字段，它记录了每个 token 在原始文本中的位置。我们可以通过这个字段来定位答案在 token 中的起始和结束位置。</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 检索机器人实战</title>
+      <link>https://869413421.github.io/post/transformer/retrieval_chatbot/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/retrieval_chatbot/</guid>
+      <description>Transformer 学习之路 - 检索机器人实战 在自然语言处理（NLP）领域，Transformer 模型已经成为许多任务的核心工具。今天，我们将通过一个实际案例——构建一个检索机器人，来深入探讨 Transformer 的应用。这个机器人能够根据用户的问题，从 FAQ 数据集中检索出最相关的答案。
+1. 读取 FAQ 数据 首先，我们需要准备好 FAQ 数据集。这里我们使用了一个法律相关的 FAQ 数据集 law_faq.csv。
+import pandas as pd data = pd.read_csv(&amp;#34;/content/drive/MyDrive/ai-learning/2.NLP Task/06-retrieval_chatbot/law_faq.csv&amp;#34;) data.head() 为什么需要这一步？ FAQ 数据集是我们机器人的“知识库”，它包含了常见问题及其对应的答案。读取数据后，我们才能进行后续的处理和检索。
+2. 加载预训练模型 接下来，我们需要加载预训练的 Transformer 模型。这里我们使用了 DualModel 和 AutoTokenizer。
+from dual_model import DualModel from transformers import AutoTokenizer dual_model = DualModel.from_pretrained(dual_model_path) dual_model.cuda() dual_model.eval() tokenizer = AutoTokenizer.from_pretrained(&amp;#34;hfl/chinese-macbert-base&amp;#34;) 为什么需要这一步？ 预训练模型已经在大规模数据上进行了训练，能够捕捉到丰富的语言特征。加载这些模型后，我们可以直接使用它们来对文本进行编码，而不需要从头开始训练。
+3. 将问题编码转换为向量 为了进行检索，我们需要将 FAQ 中的问题转换为向量表示。这里我们使用了 DualModel 的 BERT 模型来生成向量。
+import torch from tqdm import tqdm questions = data[&amp;#34;title&amp;#34;].</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 深入解析 Pipeline 的实现与应用</title>
+      <link>https://869413421.github.io/post/transformer/1/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/1/</guid>
+      <description>Transformer 学习之路 - 深入解析 Pipeline 的实现与应用 在自然语言处理（NLP）领域，Transformer 模型已经成为了主流。而 Hugging Face 的 transformers 库为我们提供了简单易用的工具，尤其是 Pipeline，它让我们能够轻松地完成各种 NLP 任务。本文将深入探讨 Pipeline 的实现原理及其应用，并结合代码示例进行详细讲解。
+什么是 Pipeline？ Pipeline 是 Hugging Face transformers 库中的一个高级 API，它封装了模型加载、数据预处理、模型推理和结果后处理等步骤，使得我们能够通过简单的几行代码完成复杂的 NLP 任务。无论是文本分类、问答系统，还是零样本图片检测，Pipeline 都能轻松应对。
+Pipeline 支持的任务类型 首先，我们可以通过以下代码查看 Pipeline 支持的任务类型：
+from transformers.pipelines import SUPPORTED_TASKS from pprint import pprint pprint(SUPPORTED_TASKS.keys()) 这些任务包括但不限于文本分类、问答、文本生成、翻译等。每个任务类型都有对应的预训练模型和数据处理流程。
+Pipeline 的创建与使用 创建默认的 Pipeline 我们可以通过指定任务类型来创建一个默认的 Pipeline。例如，创建一个文本分类的 Pipeline：
+from transformers import pipeline pipe = pipeline(&amp;#34;text-classification&amp;#34;) 这个 Pipeline 默认使用的是英文模型，我们可以直接对文本进行分类：
+pipe([&amp;#34;very good!&amp;#34;, &amp;#34;vary bad!&amp;#34;]) 使用中文模型 如果我们想使用中文模型，可以指定模型名称：
+pipe = pipeline(&amp;#34;text-classification&amp;#34;, model=&amp;#34;uer/roberta-base-finetuned-dianping-chinese&amp;#34;) 然后对中文文本进行分类：</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 深入解析模型架构与应用</title>
+      <link>https://869413421.github.io/post/transformer/model/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/model/</guid>
+      <description>Transformer 学习之路 - 深入解析模型架构与应用 Transformer 模型自 2017 年提出以来，已经成为自然语言处理（NLP）领域的基石。它通过注意力机制（Attention Mechanism）实现了对序列数据的强大建模能力。本文将从模型类型、模型头（Model Head）的作用以及模型的加载与调用等方面，深入解析 Transformer 技术。
+1. 模型的类型 1.1 Encoder-only 模型（如 BERT） 原理：
+Encoder-only 模型使用双向注意力机制，能够同时关注句子中每个词的前后文，从而理解词语在不同上下文中的含义。它就像在读句子时，同时关注所有词，理解它们彼此的关系。
+工作方式：
+输入的句子会被编码为数字表示，模型通过“关注”句子中的所有词，理解它们的全局语境，最后输出一个表示每个词含义的向量。这些向量可以用于各种任务，比如分类、命名实体识别（NER）。
+应用场景：
+文本分类、命名实体识别（NER）、问答系统中的句子匹配。
+总结：
+Encoder-only 模型擅长理解句子的意思，因为它能“看两边”（上下文）。
+1.2 Decoder-only 模型（如 GPT） 原理：
+Decoder-only 模型使用单向注意力机制，只能从前往后看，就像我们逐字写文章一样。模型根据前面出现的词来生成下一个词。这种“自回归”方式让它在生成新词时，只能依赖之前生成的内容。
+工作方式：
+输入的文本被编码为向量，然后模型每次根据前面的词生成下一个词，直到生成完整句子或段落。每生成一个词，它就会把这个词加入到上下文中，继续生成下一个。
+应用场景：
+文本生成、对话生成、语言建模。
+总结：
+Decoder-only 模型擅长生成句子，通过“接龙”方式，每次只看前面的词，生成后续内容。
+1.3 Encoder-Decoder 模型（如 T5, BART） 原理：
+Encoder-Decoder 模型结合了 Encoder 和 Decoder 的优点，先用编码器理解输入文本，再用解码器生成输出文本。它像是翻译任务：先理解原文，再生成目标语言的翻译。
+工作方式：
+编码器负责理解输入文本，把它转化为一系列向量表示。 解码器根据编码器的输出，逐步生成新的句子，比如翻译、摘要或生成其他序列。 应用场景：
+机器翻译、文本摘要、自动问答系统。
+总结：
+Encoder-Decoder 模型擅长转换序列，比如把英文翻译成中文，因为它既能理解又能生成。
+1.4 多模态模型（如 CLIP） 原理：
+多模态模型能同时处理文本和图像。它把图像和文本都转化为向量，然后通过比较这些向量的相似度，来判断文本和图像是否匹配。
+工作方式：
+图像部分：模型把图像分成小块，分别处理这些小块的信息，再把它们组合成一个整体表示。 文本部分：模型用类似 BERT 的编码器来处理文本，生成文本的表示。 最后，它比较图像和文本的表示，判断它们是否相关。 应用场景：</description>
+    </item>
+    
+    <item>
       <title>基于关联规则实现的智能推荐算法</title>
       <link>https://869413421.github.io/post/%E5%9F%BA%E4%BA%8E%E5%85%B3%E8%81%94%E8%A7%84%E5%88%99%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95/%E5%9F%BA%E4%BA%8E%E5%85%B3%E8%81%94%E8%A7%84%E5%88%99%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95/</link>
       <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>

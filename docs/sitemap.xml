@@ -17,6 +17,63 @@
     <loc>https://869413421.github.io/tags/</loc>
     <lastmod>2024-04-19T17:35:18+08:00</lastmod>
   </url><url>
+    <loc>https://869413421.github.io/categories/transformer/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/chatbot_bitfit/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/chatbot_prefix_tuning/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/chatbot_prompt_tuning/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/pipe/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/evaluate/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/retrieval_chatbot2/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/summarizatioin/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/mrc_slide_version/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/masked_lm/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/datasets/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/datasets-checkpoint/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/classification_demo/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/cross_model/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/dual_model/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/mrc_simple_version-checkpoint/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/retrieval_chatbot/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/1/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/model/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
     <loc>https://869413421.github.io/post/%E5%9F%BA%E4%BA%8E%E5%85%B3%E8%81%94%E8%A7%84%E5%88%99%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95/%E5%9F%BA%E4%BA%8E%E5%85%B3%E8%81%94%E8%A7%84%E5%88%99%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95/</loc>
     <lastmod>2024-04-19T17:35:18+08:00</lastmod>
   </url><url>
@@ -417,6 +474,22 @@
     <lastmod>2023-02-02T14:57:24+08:00</lastmod>
   </url><url>
     <loc>https://869413421.github.io/post/docker-%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%90%84%E7%A7%8D%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4/</loc>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/causal_lm/</loc>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/chatbot_ptuning/</loc>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/classification/</loc>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/mrc_simple_version/</loc>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/multiple_choice/</loc>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/ner/</loc>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/summarizatioin_glm/</loc>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/tokenizer/</loc>
   </url><url>
     <loc>https://869413421.github.io/series/</loc>
   </url>

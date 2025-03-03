@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title> - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="--- title: &#34;Transformer 学习之路 - 因果语言模型训练实例&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 因果语言模型训练实例 在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。 --- ## 什么是因果语言模型？ 因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。 --- ## 自回归模型的工作原理 自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。 例如，生成句子 `&#34;今天天气不错，我想去公园。&#34;` 的过程如下： 1. 初始输入：`&#34;今天天气&#34;` 2. 模型生成下一个单词：`&#34;不错&#34;` 3. 当前输入变为：`&#34;今天天气不错&#34;` 4. 模型再次生成下一个单词：`&#34;我想去公园。&#34;` 在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。 --- ## 结合因果与自回归 因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。 --- ## 代码实现：训练一个因果语言模型 接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。 ### Step 1: 导入相关包 ```python from datasets import Dataset from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments Step 2: 加载数据集 ds = Dataset." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="" />
+<meta property="og:description" content="--- title: &#34;Transformer 学习之路 - 因果语言模型训练实例&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 因果语言模型训练实例 在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。 --- ## 什么是因果语言模型？ 因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。 --- ## 自回归模型的工作原理 自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。 例如，生成句子 `&#34;今天天气不错，我想去公园。&#34;` 的过程如下： 1. 初始输入：`&#34;今天天气&#34;` 2. 模型生成下一个单词：`&#34;不错&#34;` 3. 当前输入变为：`&#34;今天天气不错&#34;` 4. 模型再次生成下一个单词：`&#34;我想去公园。&#34;` 在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。 --- ## 结合因果与自回归 因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。 --- ## 代码实现：训练一个因果语言模型 接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。 ### Step 1: 导入相关包 ```python from datasets import Dataset from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments Step 2: 加载数据集 ds = Dataset." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/causal_lm/" /><meta property="article:section" content="post" />
+
+
+
+  
+  <meta itemprop="name" content="">
+<meta itemprop="description" content="--- title: &#34;Transformer 学习之路 - 因果语言模型训练实例&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 因果语言模型训练实例 在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。 --- ## 什么是因果语言模型？ 因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。 --- ## 自回归模型的工作原理 自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。 例如，生成句子 `&#34;今天天气不错，我想去公园。&#34;` 的过程如下： 1. 初始输入：`&#34;今天天气&#34;` 2. 模型生成下一个单词：`&#34;不错&#34;` 3. 当前输入变为：`&#34;今天天气不错&#34;` 4. 模型再次生成下一个单词：`&#34;我想去公园。&#34;` 在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。 --- ## 结合因果与自回归 因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。 --- ## 代码实现：训练一个因果语言模型 接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。 ### Step 1: 导入相关包 ```python from datasets import Dataset from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments Step 2: 加载数据集 ds = Dataset.">
+
+<meta itemprop="wordCount" content="209">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="--- title: &#34;Transformer 学习之路 - 因果语言模型训练实例&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 因果语言模型训练实例 在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。 --- ## 什么是因果语言模型？ 因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。 --- ## 自回归模型的工作原理 自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。 例如，生成句子 `&#34;今天天气不错，我想去公园。&#34;` 的过程如下： 1. 初始输入：`&#34;今天天气&#34;` 2. 模型生成下一个单词：`&#34;不错&#34;` 3. 当前输入变为：`&#34;今天天气不错&#34;` 4. 模型再次生成下一个单词：`&#34;我想去公园。&#34;` 在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。 --- ## 结合因果与自回归 因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。 --- ## 代码实现：训练一个因果语言模型 接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。 ### Step 1: 导入相关包 ```python from datasets import Dataset from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments Step 2: 加载数据集 ds = Dataset."/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5"></h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      
+    </div>
+    
+  </header>
+
+  <section><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>title: &#34;Transformer 学习之路 - 因果语言模型训练实例&#34;
+</span></span><span style="display:flex;"><span>date: 2024-04-19T17:35:18+08:00
+</span></span><span style="display:flex;"><span>draft: false
+</span></span><span style="display:flex;"><span>description: &#34;深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现&#34;
+</span></span><span style="display:flex;"><span>categories: [&#34;Python&#34;, &#34;Transformer&#34;]
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># Transformer 学习之路 - 因果语言模型训练实例
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 什么是因果语言模型？
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 自回归模型的工作原理
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>例如，生成句子 <span style="color:#e6db74">`&#34;今天天气不错，我想去公园。&#34;`</span> 的过程如下：
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">1.</span> 初始输入：`&#34;今天天气&#34;`
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">2.</span> 模型生成下一个单词：`&#34;不错&#34;`
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">3.</span> 当前输入变为：`&#34;今天天气不错&#34;`
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">4.</span> 模型再次生成下一个单词：`&#34;我想去公园。&#34;`
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 结合因果与自回归
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 代码实现：训练一个因果语言模型
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">### Step 1: 导入相关包
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>```python
+</span></span><span style="display:flex;"><span>from datasets import Dataset
+</span></span><span style="display:flex;"><span>from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments
+</span></span></code></pre></div><h3 id="step-2-加载数据集">Step 2: 加载数据集</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>ds <span style="color:#f92672">=</span> Dataset<span style="color:#f92672">.</span>load_from_disk(<span style="color:#e6db74">&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/07-language_model/wiki_cn_filtered/&#34;</span>)
+</span></span></code></pre></div><h3 id="step-3-数据预处理">Step 3: 数据预处理</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;Langboat/bloom-389m-zh&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">process_func</span>(examples):
+</span></span><span style="display:flex;"><span>    contents <span style="color:#f92672">=</span> [e <span style="color:#f92672">+</span> tokenizer<span style="color:#f92672">.</span>eos_token <span style="color:#66d9ef">for</span> e <span style="color:#f92672">in</span> examples[<span style="color:#e6db74">&#34;completion&#34;</span>]]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> tokenizer(contents, max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">384</span>, truncation<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tokenized_ds <span style="color:#f92672">=</span> ds<span style="color:#f92672">.</span>map(process_func, batched<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, remove_columns<span style="color:#f92672">=</span>ds<span style="color:#f92672">.</span>column_names)
+</span></span></code></pre></div><h3 id="step-4-创建数据加载器">Step 4: 创建数据加载器</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> torch.utils.data <span style="color:#f92672">import</span> DataLoader
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dl <span style="color:#f92672">=</span> DataLoader(tokenized_ds, batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>, collate_fn<span style="color:#f92672">=</span>DataCollatorForLanguageModeling(tokenizer, mlm<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>))
+</span></span></code></pre></div><h3 id="step-5-创建模型">Step 5: 创建模型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModelForCausalLM<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;Langboat/bloom-389m-zh&#34;</span>)
+</span></span></code></pre></div><h3 id="step-6-配置训练参数">Step 6: 配置训练参数</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>environ[<span style="color:#e6db74">&#34;WANDB_DISABLED&#34;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>args <span style="color:#f92672">=</span> TrainingArguments(
+</span></span><span style="display:flex;"><span>    per_device_train_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span>,
+</span></span><span style="display:flex;"><span>    gradient_accumulation_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">16</span>,
+</span></span><span style="display:flex;"><span>    logging_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>,
+</span></span><span style="display:flex;"><span>    num_train_epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>,
+</span></span><span style="display:flex;"><span>    fp16<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>    output_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./output&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h3 id="step-7-创建-trainer">Step 7: 创建 Trainer</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>trainer <span style="color:#f92672">=</span> Trainer(
+</span></span><span style="display:flex;"><span>    args<span style="color:#f92672">=</span>args,
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">=</span>model,
+</span></span><span style="display:flex;"><span>    tokenizer<span style="color:#f92672">=</span>tokenizer,
+</span></span><span style="display:flex;"><span>    train_dataset<span style="color:#f92672">=</span>tokenized_ds,
+</span></span><span style="display:flex;"><span>    data_collator<span style="color:#f92672">=</span>DataCollatorForLanguageModeling(tokenizer, mlm<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h3 id="step-8-训练模型">Step 8: 训练模型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> param <span style="color:#f92672">in</span> model<span style="color:#f92672">.</span>parameters():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> param<span style="color:#f92672">.</span>is_contiguous():
+</span></span><span style="display:flex;"><span>        param<span style="color:#f92672">.</span>data <span style="color:#f92672">=</span> param<span style="color:#f92672">.</span>contiguous()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>trainer<span style="color:#f92672">.</span>train()
+</span></span></code></pre></div><h3 id="step-9-评估模型">Step 9: 评估模型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> pipeline
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>pipe <span style="color:#f92672">=</span> pipeline(<span style="color:#e6db74">&#34;text-generation&#34;</span>, model<span style="color:#f92672">=</span>model, tokenizer<span style="color:#f92672">=</span>tokenizer, device<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>pipe(<span style="color:#e6db74">&#34;西安交通大学博物馆（Xi&#39;an Jiaotong University Museum）是一座位于西安&#34;</span>, max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">128</span>, do_sample<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span></code></pre></div><h3 id="step-10-保存模型">Step 10: 保存模型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model_save_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/07-language_model/causal_lm&#34;</span>
+</span></span><span style="display:flex;"><span>tokenizer<span style="color:#f92672">.</span>save_pretrained(model_save_path)
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>save_pretrained(model_save_path)
+</span></span></code></pre></div><hr>
+<h2 id="总结">总结</h2>
+<p>因果自回归模型通过利用已生成的内容来预测下一个单词，实现连贯的文本输出。本文详细解析了其技术原理，并结合代码示例，展示了如何训练一个因果语言模型。希望这篇文章能帮助你更好地理解 Transformer 技术，并将其应用到实际项目中。</p>
+<pre tabindex="0"><code></code></pre></section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/docker-%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%90%84%E7%A7%8D%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4/"
+      ><span class="mr-1.5">←</span><span></span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/chatbot_ptuning/"
+      ><span></span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

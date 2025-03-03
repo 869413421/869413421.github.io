@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>Transformer 学习之路 - 数据集加载与预处理 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="Transformer 学习之路 - 数据集加载与预处理 在 Transformer 模型的训练过程中，数据集的加载和预处理是至关重要的一步。本文将详细介绍如何使用 datasets 库来加载、处理和管理数据集，确保数据能够高效地输入到模型中。
+1. 安装与导入 datasets 库 首先，我们需要安装并导入 datasets 库。这个库提供了丰富的功能，可以轻松地加载和处理各种数据集。
+!pip install datasets from datasets import * 2. 加载数据集 datasets 库支持从线上和线下加载数据集。无论是公开的数据集还是自定义的数据集，都可以通过简单的代码实现加载。
+2.1 加载线上数据集 datasets = load_dataset(&#34;madao33/new-title-chinese&#34;) datasets 2.2 加载特定任务的数据集 boolq_dataset = load_dataset(&#34;super_glue&#34;, &#34;boolq&#34;) boolq_dataset 3. 数据集切分 在实际应用中，我们通常需要将数据集划分为训练集、验证集和测试集。datasets 库提供了多种切分方式，满足不同的需求。
+3.1 加载部分数据 # 只加载训练数据 dataset = load_dataset(&#34;madao33/new-title-chinese&#34;, split=&#34;train&#34;) dataset # 只加载训练数据的10到100下标的数据 dataset = load_dataset(&#34;madao33/new-title-chinese&#34;, split=&#34;train[10:100]&#34;) dataset # 取训练集中后50%数据 dataset = load_dataset(&#34;madao33/new-title-chinese&#34;, split=&#34;train[:50%]&#34;) dataset # 先取后50%再取前50% dataset = load_dataset(&#34;madao33/new-title-chinese&#34;, split=[&#34;train[:50%]&#34;, &#34;train[50%:]&#34;]) dataset 4." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="Transformer 学习之路 - 数据集加载与预处理" />
+<meta property="og:description" content="深入解析如何使用 datasets 库加载和预处理数据，为 Transformer 模型训练做好准备" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/datasets-checkpoint/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-19T17:35:18+08:00" />
+<meta property="article:modified_time" content="2024-04-19T17:35:18+08:00" />
+
+  
+  <meta itemprop="name" content="Transformer 学习之路 - 数据集加载与预处理">
+<meta itemprop="description" content="深入解析如何使用 datasets 库加载和预处理数据，为 Transformer 模型训练做好准备"><meta itemprop="datePublished" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="dateModified" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="wordCount" content="354">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Transformer 学习之路 - 数据集加载与预处理"/>
+<meta name="twitter:description" content="深入解析如何使用 datasets 库加载和预处理数据，为 Transformer 模型训练做好准备"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">Transformer 学习之路 - 数据集加载与预处理</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Apr 19, 2024</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h1 id="transformer-学习之路---数据集加载与预处理">Transformer 学习之路 - 数据集加载与预处理</h1>
+<p>在 Transformer 模型的训练过程中，数据集的加载和预处理是至关重要的一步。本文将详细介绍如何使用 <code>datasets</code> 库来加载、处理和管理数据集，确保数据能够高效地输入到模型中。</p>
+<h2 id="1-安装与导入-datasets-库">1. 安装与导入 <code>datasets</code> 库</h2>
+<p>首先，我们需要安装并导入 <code>datasets</code> 库。这个库提供了丰富的功能，可以轻松地加载和处理各种数据集。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">!</span>pip install datasets
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> datasets <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+</span></span></code></pre></div><h2 id="2-加载数据集">2. 加载数据集</h2>
+<p><code>datasets</code> 库支持从线上和线下加载数据集。无论是公开的数据集还是自定义的数据集，都可以通过简单的代码实现加载。</p>
+<h3 id="21-加载线上数据集">2.1 加载线上数据集</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>datasets <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;madao33/new-title-chinese&#34;</span>)
+</span></span><span style="display:flex;"><span>datasets
+</span></span></code></pre></div><h3 id="22-加载特定任务的数据集">2.2 加载特定任务的数据集</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>boolq_dataset <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;super_glue&#34;</span>, <span style="color:#e6db74">&#34;boolq&#34;</span>)
+</span></span><span style="display:flex;"><span>boolq_dataset
+</span></span></code></pre></div><h2 id="3-数据集切分">3. 数据集切分</h2>
+<p>在实际应用中，我们通常需要将数据集划分为训练集、验证集和测试集。<code>datasets</code> 库提供了多种切分方式，满足不同的需求。</p>
+<h3 id="31-加载部分数据">3.1 加载部分数据</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 只加载训练数据</span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;madao33/new-title-chinese&#34;</span>, split<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;train&#34;</span>)
+</span></span><span style="display:flex;"><span>dataset
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 只加载训练数据的10到100下标的数据</span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;madao33/new-title-chinese&#34;</span>, split<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;train[10:100]&#34;</span>)
+</span></span><span style="display:flex;"><span>dataset
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 取训练集中后50%数据</span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;madao33/new-title-chinese&#34;</span>, split<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;train[:50%]&#34;</span>)
+</span></span><span style="display:flex;"><span>dataset
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 先取后50%再取前50%</span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;madao33/new-title-chinese&#34;</span>, split<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;train[:50%]&#34;</span>, <span style="color:#e6db74">&#34;train[50%:]&#34;</span>])
+</span></span><span style="display:flex;"><span>dataset
+</span></span></code></pre></div><h2 id="4-查看数据集">4. 查看数据集</h2>
+<p>在加载数据集后，我们通常需要查看数据的结构和内容，以便更好地理解数据。</p>
+<h3 id="41-查看数据集中的具体样本">4.1 查看数据集中的具体样本</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 查看训练集第0个样本</span>
+</span></span><span style="display:flex;"><span>datasets[<span style="color:#e6db74">&#34;train&#34;</span>][<span style="color:#ae81ff">0</span>]
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 查看训练集前两个样本</span>
+</span></span><span style="display:flex;"><span>datasets[<span style="color:#e6db74">&#34;train&#34;</span>][:<span style="color:#ae81ff">2</span>]
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 获取前五个标题字段</span>
+</span></span><span style="display:flex;"><span>datasets[<span style="color:#e6db74">&#34;train&#34;</span>][<span style="color:#e6db74">&#34;title&#34;</span>][:<span style="color:#ae81ff">5</span>]
+</span></span></code></pre></div><h3 id="42-查看数据集的列信息">4.2 查看数据集的列信息</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 查看列名</span>
+</span></span><span style="display:flex;"><span>datasets[<span style="color:#e6db74">&#34;train&#34;</span>]<span style="color:#f92672">.</span>column_names
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 查看列详情</span>
+</span></span><span style="display:flex;"><span>datasets[<span style="color:#e6db74">&#34;train&#34;</span>]<span style="color:#f92672">.</span>features
+</span></span></code></pre></div><h2 id="5-数据集划分">5. 数据集划分</h2>
+<p>为了评估模型的性能，我们通常需要将数据集划分为训练集和测试集。</p>
+<h3 id="51-随机划分数据集">5.1 随机划分数据集</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 划分数据集</span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> datasets[<span style="color:#e6db74">&#39;train&#39;</span>]
+</span></span><span style="display:flex;"><span>dataset<span style="color:#f92672">.</span>train_test_split(test_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>)
+</span></span></code></pre></div><h3 id="52-按字段均衡划分数据集">5.2 按字段均衡划分数据集</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 按数据中的字段来均衡划分</span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> boolq_dataset[<span style="color:#e6db74">&#34;train&#34;</span>]
+</span></span><span style="display:flex;"><span>dataset<span style="color:#f92672">.</span>train_test_split(test_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0.1</span>, stratify_by_column<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;label&#34;</span>)
+</span></span></code></pre></div><h2 id="6-数据选取和过滤">6. 数据选取和过滤</h2>
+<p>在处理数据集时，我们可能需要根据特定条件选取或过滤数据。</p>
+<h3 id="61-选取数据">6.1 选取数据</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 选取</span>
+</span></span><span style="display:flex;"><span>datasets[<span style="color:#e6db74">&#34;train&#34;</span>]<span style="color:#f92672">.</span>select([<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>])
+</span></span></code></pre></div><h3 id="62-过滤数据">6.2 过滤数据</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 过滤</span>
+</span></span><span style="display:flex;"><span>filter_dataset <span style="color:#f92672">=</span> datasets[<span style="color:#e6db74">&#34;train&#34;</span>]<span style="color:#f92672">.</span>filter(<span style="color:#66d9ef">lambda</span> example: <span style="color:#e6db74">&#34;中国&#34;</span> <span style="color:#f92672">in</span> example[<span style="color:#e6db74">&#34;title&#34;</span>])
+</span></span><span style="display:flex;"><span>filter_dataset[<span style="color:#e6db74">&#34;title&#34;</span>][:<span style="color:#ae81ff">5</span>]
+</span></span></code></pre></div><h2 id="7-数据映射">7. 数据映射</h2>
+<p>数据映射是指对数据集中的每个样本进行某种操作，例如添加前缀或进行编码。</p>
+<h3 id="71-添加前缀">7.1 添加前缀</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">add_prefix</span>(example):
+</span></span><span style="display:flex;"><span>    example[<span style="color:#e6db74">&#34;title&#34;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;Prefix: &#39;</span> <span style="color:#f92672">+</span> example[<span style="color:#e6db74">&#34;title&#34;</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> example
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 经过映射方法处理的数据集</span>
+</span></span><span style="display:flex;"><span>prefix_dataset <span style="color:#f92672">=</span> datasets<span style="color:#f92672">.</span>map(add_prefix)
+</span></span><span style="display:flex;"><span>prefix_dataset[<span style="color:#e6db74">&#34;train&#34;</span>][:<span style="color:#ae81ff">10</span>][<span style="color:#e6db74">&#34;title&#34;</span>]
+</span></span></code></pre></div><h3 id="72-使用-tokenizer-进行编码">7.2 使用 Tokenizer 进行编码</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoTokenizer
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;bert-base-chinese&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">preprocess_function</span>(example, tokenizer<span style="color:#f92672">=</span>tokenizer):
+</span></span><span style="display:flex;"><span>    model_inputs <span style="color:#f92672">=</span> tokenizer(example[<span style="color:#e6db74">&#34;content&#34;</span>], max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">512</span>, truncation<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    labels <span style="color:#f92672">=</span> tokenizer(example[<span style="color:#e6db74">&#34;title&#34;</span>], max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">32</span>, truncation<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    model_inputs[<span style="color:#e6db74">&#34;labels&#34;</span>] <span style="color:#f92672">=</span> labels[<span style="color:#e6db74">&#34;input_ids&#34;</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> model_inputs
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>processed_datasets <span style="color:#f92672">=</span> datasets<span style="color:#f92672">.</span>map(preprocess_function)
+</span></span><span style="display:flex;"><span>processed_datasets
+</span></span></code></pre></div><h3 id="73-多进程处理数据">7.3 多进程处理数据</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 开启多进程处理数据，提高处理速度</span>
+</span></span><span style="display:flex;"><span>processed_datasets <span style="color:#f92672">=</span> datasets<span style="color:#f92672">.</span>map(preprocess_function, num_proc<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span>)
+</span></span><span style="display:flex;"><span>processed_datasets
+</span></span></code></pre></div><h3 id="74-批量处理数据">7.4 批量处理数据</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 批量处理数据，去除多余的列</span>
+</span></span><span style="display:flex;"><span>processed_datasets <span style="color:#f92672">=</span> datasets<span style="color:#f92672">.</span>map(preprocess_function, batched<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, remove_columns<span style="color:#f92672">=</span>datasets[<span style="color:#e6db74">&#34;train&#34;</span>]<span style="color:#f92672">.</span>column_names)
+</span></span><span style="display:flex;"><span>processed_datasets
+</span></span></code></pre></div><h2 id="8-保存和加载数据集">8. 保存和加载数据集</h2>
+<p>处理后的数据集可以保存到磁盘，以便后续使用。</p>
+<h3 id="81-保存数据集">8.1 保存数据集</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>processed_datasets<span style="color:#f92672">.</span>save_to_disk(<span style="color:#e6db74">&#34;./processed_data&#34;</span>)
+</span></span></code></pre></div><h3 id="82-加载数据集">8.2 加载数据集</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>processed_datasets <span style="color:#f92672">=</span> load_from_disk(<span style="color:#e6db74">&#34;./processed_data&#34;</span>)
+</span></span><span style="display:flex;"><span>processed_datasets
+</span></span></code></pre></div><h2 id="9-加载本地文件作为数据集">9. 加载本地文件作为数据集</h2>
+<p><code>datasets</code> 库还支持加载本地文件作为数据集，例如 CSV、JSON 等格式。</p>
+<h3 id="91-加载-csv-文件">9.1 加载 CSV 文件</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>csv_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/content/drive/MyDrive/Colab Notebooks/transformers-code/01-Getting Started/05-datasets/ChnSentiCorp_htl_all.csv&#34;</span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;csv&#34;</span>, data_files<span style="color:#f92672">=</span>csv_path, split<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;train&#34;</span>)
+</span></span><span style="display:flex;"><span>dataset
+</span></span></code></pre></div><h3 id="92-加载文件夹内全部文件">9.2 加载文件夹内全部文件</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;csv&#34;</span>, data_files<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;/content/drive/MyDrive/Colab Notebooks/transformers-code/01-Getting Started/05-datasets/all_data/ChnSentiCorp_htl_all copy 2.csv&#34;</span>, <span style="color:#e6db74">&#34;/content/drive/MyDrive/Colab Notebooks/transformers-code/01-Getting Started/05-datasets/all_data/ChnSentiCorp_htl_all copy 2.csv&#34;</span>], split<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;train&#39;</span>)
+</span></span><span style="display:flex;"><span>dataset
+</span></span></code></pre></div><h2 id="10-通过自定义脚本加载数据集">10. 通过自定义脚本加载数据集</h2>
+<p>对于特殊格式的数据集，我们可以通过自定义脚本来加载和处理。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>dir_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/content/drive/MyDrive/Colab Notebooks/transformers-code/01-Getting Started/05-datasets/&#34;</span>
+</span></span><span style="display:flex;"><span>script_path <span style="color:#f92672">=</span> dir_path<span style="color:#f92672">+</span><span style="color:#e6db74">&#34;load_script.py&#34;</span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> load_dataset(script_path, split<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;train&#34;</span>)
+</span></span><span style="display:flex;"><span>dataset
+</span></span></code></pre></div><h2 id="11-使用-datacollator-进行数据批处理">11. 使用 DataCollator 进行数据批处理</h2>
+<p>在训练模型时，我们通常需要将数据批处理为固定大小的张量。<code>DataCollator</code> 可以帮助我们实现这一目标。</p>
+<h3 id="111-使用-datacollatorwithpadding">11.1 使用 DataCollatorWithPadding</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> DataCollatorWithPadding
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;csv&#34;</span>, data_files<span style="color:#f92672">=</span>csv_path, split<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;train&#39;</span>)
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> dataset<span style="color:#f92672">.</span>filter(<span style="color:#66d9ef">lambda</span> x: x[<span style="color:#e6db74">&#34;review&#34;</span>] <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> <span style="color:#66d9ef">None</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">process_function</span>(examples):
+</span></span><span style="display:flex;"><span>    tokenized_examples <span style="color:#f92672">=</span> tokenizer(examples[<span style="color:#e6db74">&#34;review&#34;</span>], max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">128</span>, truncation<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    tokenized_examples[<span style="color:#e6db74">&#34;labels&#34;</span>] <span style="color:#f92672">=</span> examples[<span style="color:#e6db74">&#34;label&#34;</span>]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> tokenized_examples
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tokenized_dataset <span style="color:#f92672">=</span> dataset<span style="color:#f92672">.</span>map(process_function, batched<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, remove_columns<span style="color:#f92672">=</span>dataset<span style="color:#f92672">.</span>column_names)
+</span></span><span style="display:flex;"><span>collator <span style="color:#f92672">=</span> DataCollatorWithPadding(tokenizer<span style="color:#f92672">=</span>tokenizer)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> torch.utils.data <span style="color:#f92672">import</span> DataLoader
+</span></span><span style="display:flex;"><span>dl <span style="color:#f92672">=</span> DataLoader(tokenized_dataset, batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span>, collate_fn<span style="color:#f92672">=</span>collator, shuffle<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>num <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> batch <span style="color:#f92672">in</span> dl:
+</span></span><span style="display:flex;"><span>    print(batch[<span style="color:#e6db74">&#34;input_ids&#34;</span>]<span style="color:#f92672">.</span>size())
+</span></span><span style="display:flex;"><span>    num <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> num <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">10</span>:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">break</span>
+</span></span></code></pre></div><h2 id="12-总结">12. 总结</h2>
+<p>通过 <code>datasets</code> 库，我们可以轻松地加载、处理和</p>
+</section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/datasets/"
+      ><span class="mr-1.5">←</span><span>Transformer 学习之路 - 数据处理与加载实战</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/classification_demo/"
+      ><span>Transformer 学习之路 - 文本分类实战</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

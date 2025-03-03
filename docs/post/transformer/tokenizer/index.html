@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title> - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="--- title: &#34;Transformer 学习之路 - Tokenizer 处理流程详解&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析 Transformer 中的 Tokenizer 处理流程，包括分词、词典构建、数据转换、填充与截断等关键步骤，并结合代码示例进行详细讲解。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Tokenizer 处理流程详解 在 Transformer 模型中，Tokenizer（分词器）是将原始文本数据转换为模型可接受的输入格式的关键组件。本文将详细解析 Tokenizer 的处理流程，并结合代码示例帮助读者深入理解其工作原理。 ## 1. 分词与词典构建 ### Step1 分词 Tokenizer 的第一步是将文本数据进行分词。分词的方式可以是按字、按词或按子词（subword）进行。分词的目的是将连续的文本分割成离散的单元，以便后续处理。 ```python from transformers import AutoTokenizer sen = &#34;往者不可谏,来者犹可追&#34; tokenizer = AutoTokenizer.from_pretrained(&#34;uer/roberta-base-finetuned-dianping-chinese&#34;) tokens = tokenizer.tokenize(sen) print(tokens) Step2 构建词典 分词后，Tokenizer 会根据分词结果构建一个词典，将每个词或子词映射到一个唯一的 ID。词典的构建方式取决于是否使用预训练的词向量。如果使用预训练词向量，词典会根据词向量文件进行处理。
+# 查看词典详情 print(tokenizer.vocab) print(tokenizer.vocab_size) 2. 数据转换与填充截断 Step3 数据转换 Tokenizer 将分词后的文本序列转换为数字序列，因为神经网络只接受数字序列作为输入。
+# 将分词结果转换为 ID 序列 ids = tokenizer." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="" />
+<meta property="og:description" content="--- title: &#34;Transformer 学习之路 - Tokenizer 处理流程详解&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析 Transformer 中的 Tokenizer 处理流程，包括分词、词典构建、数据转换、填充与截断等关键步骤，并结合代码示例进行详细讲解。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Tokenizer 处理流程详解 在 Transformer 模型中，Tokenizer（分词器）是将原始文本数据转换为模型可接受的输入格式的关键组件。本文将详细解析 Tokenizer 的处理流程，并结合代码示例帮助读者深入理解其工作原理。 ## 1. 分词与词典构建 ### Step1 分词 Tokenizer 的第一步是将文本数据进行分词。分词的方式可以是按字、按词或按子词（subword）进行。分词的目的是将连续的文本分割成离散的单元，以便后续处理。 ```python from transformers import AutoTokenizer sen = &#34;往者不可谏,来者犹可追&#34; tokenizer = AutoTokenizer.from_pretrained(&#34;uer/roberta-base-finetuned-dianping-chinese&#34;) tokens = tokenizer.tokenize(sen) print(tokens) Step2 构建词典 分词后，Tokenizer 会根据分词结果构建一个词典，将每个词或子词映射到一个唯一的 ID。词典的构建方式取决于是否使用预训练的词向量。如果使用预训练词向量，词典会根据词向量文件进行处理。
+# 查看词典详情 print(tokenizer.vocab) print(tokenizer.vocab_size) 2. 数据转换与填充截断 Step3 数据转换 Tokenizer 将分词后的文本序列转换为数字序列，因为神经网络只接受数字序列作为输入。
+# 将分词结果转换为 ID 序列 ids = tokenizer." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/tokenizer/" /><meta property="article:section" content="post" />
+
+
+
+  
+  <meta itemprop="name" content="">
+<meta itemprop="description" content="--- title: &#34;Transformer 学习之路 - Tokenizer 处理流程详解&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析 Transformer 中的 Tokenizer 处理流程，包括分词、词典构建、数据转换、填充与截断等关键步骤，并结合代码示例进行详细讲解。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Tokenizer 处理流程详解 在 Transformer 模型中，Tokenizer（分词器）是将原始文本数据转换为模型可接受的输入格式的关键组件。本文将详细解析 Tokenizer 的处理流程，并结合代码示例帮助读者深入理解其工作原理。 ## 1. 分词与词典构建 ### Step1 分词 Tokenizer 的第一步是将文本数据进行分词。分词的方式可以是按字、按词或按子词（subword）进行。分词的目的是将连续的文本分割成离散的单元，以便后续处理。 ```python from transformers import AutoTokenizer sen = &#34;往者不可谏,来者犹可追&#34; tokenizer = AutoTokenizer.from_pretrained(&#34;uer/roberta-base-finetuned-dianping-chinese&#34;) tokens = tokenizer.tokenize(sen) print(tokens) Step2 构建词典 分词后，Tokenizer 会根据分词结果构建一个词典，将每个词或子词映射到一个唯一的 ID。词典的构建方式取决于是否使用预训练的词向量。如果使用预训练词向量，词典会根据词向量文件进行处理。
+# 查看词典详情 print(tokenizer.vocab) print(tokenizer.vocab_size) 2. 数据转换与填充截断 Step3 数据转换 Tokenizer 将分词后的文本序列转换为数字序列，因为神经网络只接受数字序列作为输入。
+# 将分词结果转换为 ID 序列 ids = tokenizer.">
+
+<meta itemprop="wordCount" content="236">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="--- title: &#34;Transformer 学习之路 - Tokenizer 处理流程详解&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析 Transformer 中的 Tokenizer 处理流程，包括分词、词典构建、数据转换、填充与截断等关键步骤，并结合代码示例进行详细讲解。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Tokenizer 处理流程详解 在 Transformer 模型中，Tokenizer（分词器）是将原始文本数据转换为模型可接受的输入格式的关键组件。本文将详细解析 Tokenizer 的处理流程，并结合代码示例帮助读者深入理解其工作原理。 ## 1. 分词与词典构建 ### Step1 分词 Tokenizer 的第一步是将文本数据进行分词。分词的方式可以是按字、按词或按子词（subword）进行。分词的目的是将连续的文本分割成离散的单元，以便后续处理。 ```python from transformers import AutoTokenizer sen = &#34;往者不可谏,来者犹可追&#34; tokenizer = AutoTokenizer.from_pretrained(&#34;uer/roberta-base-finetuned-dianping-chinese&#34;) tokens = tokenizer.tokenize(sen) print(tokens) Step2 构建词典 分词后，Tokenizer 会根据分词结果构建一个词典，将每个词或子词映射到一个唯一的 ID。词典的构建方式取决于是否使用预训练的词向量。如果使用预训练词向量，词典会根据词向量文件进行处理。
+# 查看词典详情 print(tokenizer.vocab) print(tokenizer.vocab_size) 2. 数据转换与填充截断 Step3 数据转换 Tokenizer 将分词后的文本序列转换为数字序列，因为神经网络只接受数字序列作为输入。
+# 将分词结果转换为 ID 序列 ids = tokenizer."/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5"></h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      
+    </div>
+    
+  </header>
+
+  <section><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>title: &#34;Transformer 学习之路 - Tokenizer 处理流程详解&#34;
+</span></span><span style="display:flex;"><span>date: 2024-04-19T17:35:18+08:00
+</span></span><span style="display:flex;"><span>draft: false
+</span></span><span style="display:flex;"><span>description: &#34;深入解析 Transformer 中的 Tokenizer 处理流程，包括分词、词典构建、数据转换、填充与截断等关键步骤，并结合代码示例进行详细讲解。&#34;
+</span></span><span style="display:flex;"><span>categories: [&#34;Python&#34;, &#34;Transformer&#34;]
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># Tokenizer 处理流程详解
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>在 Transformer 模型中，Tokenizer（分词器）是将原始文本数据转换为模型可接受的输入格式的关键组件。本文将详细解析 Tokenizer 的处理流程，并结合代码示例帮助读者深入理解其工作原理。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 1. 分词与词典构建
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">### Step1 分词
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>Tokenizer 的第一步是将文本数据进行分词。分词的方式可以是按字、按词或按子词（subword）进行。分词的目的是将连续的文本分割成离散的单元，以便后续处理。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>```python
+</span></span><span style="display:flex;"><span>from transformers import AutoTokenizer
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sen = &#34;往者不可谏,来者犹可追&#34;
+</span></span><span style="display:flex;"><span>tokenizer = AutoTokenizer.from_pretrained(&#34;uer/roberta-base-finetuned-dianping-chinese&#34;)
+</span></span><span style="display:flex;"><span>tokens = tokenizer.tokenize(sen)
+</span></span><span style="display:flex;"><span>print(tokens)
+</span></span></code></pre></div><h3 id="step2-构建词典">Step2 构建词典</h3>
+<p>分词后，Tokenizer 会根据分词结果构建一个词典，将每个词或子词映射到一个唯一的 ID。词典的构建方式取决于是否使用预训练的词向量。如果使用预训练词向量，词典会根据词向量文件进行处理。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 查看词典详情</span>
+</span></span><span style="display:flex;"><span>print(tokenizer<span style="color:#f92672">.</span>vocab)
+</span></span><span style="display:flex;"><span>print(tokenizer<span style="color:#f92672">.</span>vocab_size)
+</span></span></code></pre></div><h2 id="2-数据转换与填充截断">2. 数据转换与填充截断</h2>
+<h3 id="step3-数据转换">Step3 数据转换</h3>
+<p>Tokenizer 将分词后的文本序列转换为数字序列，因为神经网络只接受数字序列作为输入。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 将分词结果转换为 ID 序列</span>
+</span></span><span style="display:flex;"><span>ids <span style="color:#f92672">=</span> tokenizer<span style="color:#f92672">.</span>convert_tokens_to_ids(tokens)
+</span></span><span style="display:flex;"><span>print(ids)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 将 ID 序列转换回分词结果</span>
+</span></span><span style="display:flex;"><span>tokens <span style="color:#f92672">=</span> tokenizer<span style="color:#f92672">.</span>convert_ids_to_tokens(ids)
+</span></span><span style="display:flex;"><span>print(tokens)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 将分词序列转换为原始字符串</span>
+</span></span><span style="display:flex;"><span>str_sen <span style="color:#f92672">=</span> tokenizer<span style="color:#f92672">.</span>convert_tokens_to_string(tokens)
+</span></span><span style="display:flex;"><span>print(str_sen)
+</span></span></code></pre></div><h3 id="step4-数据填充与截断">Step4 数据填充与截断</h3>
+<p>在以 batch 方式输入模型时，需要对过短的数据进行填充，对过长的数据进行截断，以确保所有数据的长度一致。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 填充，不足 15 个字会自动填充 0</span>
+</span></span><span style="display:flex;"><span>ids <span style="color:#f92672">=</span> tokenizer<span style="color:#f92672">.</span>encode(sen, padding<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;max_length&#34;</span>, max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">15</span>)
+</span></span><span style="display:flex;"><span>print(ids)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 截断，超出 5 个字会被截断</span>
+</span></span><span style="display:flex;"><span>ids <span style="color:#f92672">=</span> tokenizer<span style="color:#f92672">.</span>encode(sen, max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">5</span>, truncation<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>print(ids)
+</span></span></code></pre></div><h2 id="3-特殊标记与批量处理">3. 特殊标记与批量处理</h2>
+<h3 id="step5-特殊标记">Step5 特殊标记</h3>
+<p>Tokenizer 会自动在句子前后添加特殊标记（如 <code>[CLS]</code> 和 <code>[SEP]</code>），以便模型识别句子的开始和结束。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 编码时添加特殊标记</span>
+</span></span><span style="display:flex;"><span>ids <span style="color:#f92672">=</span> tokenizer<span style="color:#f92672">.</span>encode(sen, add_special_tokens<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>print(ids)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 解码时保留特殊标记</span>
+</span></span><span style="display:flex;"><span>str_sen <span style="color:#f92672">=</span> tokenizer<span style="color:#f92672">.</span>decode(ids, skip_special_tokens<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>print(str_sen)
+</span></span></code></pre></div><h3 id="step6-批量处理">Step6 批量处理</h3>
+<p>Tokenizer 支持批量处理数据，只需传入一个句子列表即可。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>sens <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;弱小的我也有大梦想&#34;</span>, <span style="color:#e6db74">&#34;有梦想谁都了不起&#34;</span>, <span style="color:#e6db74">&#34;追逐梦想的心，比梦想本身，更可贵&#34;</span>]
+</span></span><span style="display:flex;"><span>res <span style="color:#f92672">=</span> tokenizer(sens)
+</span></span><span style="display:flex;"><span>print(res)
+</span></span></code></pre></div><h2 id="4-fastslow-tokenizer">4. Fast/Slow Tokenizer</h2>
+<h3 id="fast-tokenizer">Fast Tokenizer</h3>
+<p>Fast Tokenizer 基于 Rust 实现，速度更快，支持更多功能，如 <code>offset_mapping</code> 和 <code>word_id</code>。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 加载 Fast Tokenizer</span>
+</span></span><span style="display:flex;"><span>fast_tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;uer/roberta-base-finetuned-dianping-chinese&#34;</span>)
+</span></span><span style="display:flex;"><span>inputs <span style="color:#f92672">=</span> fast_tokenizer(sen, return_offsets_mapping<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>print(inputs)
+</span></span></code></pre></div><h3 id="slow-tokenizer">Slow Tokenizer</h3>
+<p>Slow Tokenizer 基于 Python 实现，速度较慢，功能相对较少。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 加载 Slow Tokenizer</span>
+</span></span><span style="display:flex;"><span>slow_tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;uer/roberta-base-finetuned-dianping-chinese&#34;</span>, use_fast<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>inputs <span style="color:#f92672">=</span> slow_tokenizer(sen)
+</span></span><span style="display:flex;"><span>print(inputs)
+</span></span></code></pre></div><h2 id="5-远程加载与保存">5. 远程加载与保存</h2>
+<h3 id="远程加载-tokenizer">远程加载 Tokenizer</h3>
+<p>Tokenizer 可以从 Hugging Face 远程加载，支持多种预训练模型。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 远程加载 Tokenizer</span>
+</span></span><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;Skywork/Skywork-13B-base&#34;</span>, trust_remote_code<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>print(tokenizer)
+</span></span></code></pre></div><h3 id="保存与加载-tokenizer">保存与加载 Tokenizer</h3>
+<p>Tokenizer 可以保存到本地，以便后续使用。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 保存 Tokenizer 到本地</span>
+</span></span><span style="display:flex;"><span>tokenizer<span style="color:#f92672">.</span>save_pretrained(<span style="color:#e6db74">&#34;skywork_tokenizer&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 从本地加载 Tokenizer</span>
+</span></span><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;skywork_tokenizer&#34;</span>, trust_remote_code<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>print(tokenizer)
+</span></span></code></pre></div><h2 id="总结">总结</h2>
+<p>Tokenizer 是 Transformer 模型中不可或缺的一部分，它负责将原始文本转换为模型可接受的输入格式。通过本文的详细解析和代码示例，读者可以更好地理解 Tokenizer 的工作原理，并在实际项目中灵活应用。</p>
+<pre tabindex="0"><code></code></pre></section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/summarizatioin_glm/"
+      ><span class="mr-1.5">←</span><span></span></a
+    >
+    
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

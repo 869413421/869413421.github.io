@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>Transformer 学习之路 - 文本相似度实战 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="Transformer 学习之路 - 文本相似度实战 Transformer 模型在自然语言处理（NLP）领域取得了巨大的成功，尤其是在文本相似度任务中表现尤为突出。本文将结合代码示例，深入解析如何利用 Transformer 技术实现文本相似度计算，并详细分析其背后的技术原理。
+1. 背景与问题 文本相似度任务是 NLP 中的一项基础任务，旨在衡量两段文本在语义上的相似程度。常见的应用场景包括问答系统、信息检索、文本匹配等。传统的文本相似度计算方法（如 TF-IDF、余弦相似度等）往往难以捕捉文本的深层语义信息，而 Transformer 模型通过自注意力机制（Self-Attention）能够更好地理解文本的上下文关系，从而提升相似度计算的准确性。
+2. 技术原理 2.1 Transformer 模型 Transformer 模型的核心是自注意力机制，它能够动态地计算输入序列中每个词与其他词的相关性，从而捕捉长距离依赖关系。Transformer 模型由编码器（Encoder）和解码器（Decoder）两部分组成，但在文本相似度任务中，我们通常只使用编码器部分。
+2.2 文本相似度计算 在文本相似度任务中，我们需要将两段文本分别输入到 Transformer 模型中，获取它们的向量表示，然后通过余弦相似度等方法来衡量它们的相似程度。为了实现这一目标，我们可以使用预训练的 Transformer 模型（如 BERT）作为基础模型，并在其基础上进行微调。
+3. 代码实现 3.1 环境准备 首先，我们需要安装必要的库，并加载数据集。
+!pip install evaluate datasets import sys from google.colab import drive drive.mount(&#39;/content/drive&#39;) sys.path.append(&#39;/content/drive/MyDrive/ai-learning/2.NLP Task/05-sentence_similarity&#39;) 3.2 加载数据集 我们使用 datasets 库加载一个包含句子对和标签的数据集。
+from datasets import load_dataset dataset = load_dataset(&#34;json&#34;, data_files=&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/05-sentence_similarity/train_pair_1w.json&#34;, split=&#34;train&#34;) datasets = dataset.train_test_split(test_size=0.2) 3.3 数据预处理 使用预训练的 hfl/chinese-macbert-base 分词器对文本进行预处理。" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="Transformer 学习之路 - 文本相似度实战" />
+<meta property="og:description" content="深入解析 Transformer 技术在文本相似度任务中的应用，结合代码示例详细讲解技术原理与实现。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/dual_model/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-19T17:35:18+08:00" />
+<meta property="article:modified_time" content="2024-04-19T17:35:18+08:00" />
+
+  
+  <meta itemprop="name" content="Transformer 学习之路 - 文本相似度实战">
+<meta itemprop="description" content="深入解析 Transformer 技术在文本相似度任务中的应用，结合代码示例详细讲解技术原理与实现。"><meta itemprop="datePublished" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="dateModified" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="wordCount" content="437">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Transformer 学习之路 - 文本相似度实战"/>
+<meta name="twitter:description" content="深入解析 Transformer 技术在文本相似度任务中的应用，结合代码示例详细讲解技术原理与实现。"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">Transformer 学习之路 - 文本相似度实战</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Apr 19, 2024</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h1 id="transformer-学习之路---文本相似度实战">Transformer 学习之路 - 文本相似度实战</h1>
+<p>Transformer 模型在自然语言处理（NLP）领域取得了巨大的成功，尤其是在文本相似度任务中表现尤为突出。本文将结合代码示例，深入解析如何利用 Transformer 技术实现文本相似度计算，并详细分析其背后的技术原理。</p>
+<h2 id="1-背景与问题">1. 背景与问题</h2>
+<p>文本相似度任务是 NLP 中的一项基础任务，旨在衡量两段文本在语义上的相似程度。常见的应用场景包括问答系统、信息检索、文本匹配等。传统的文本相似度计算方法（如 TF-IDF、余弦相似度等）往往难以捕捉文本的深层语义信息，而 Transformer 模型通过自注意力机制（Self-Attention）能够更好地理解文本的上下文关系，从而提升相似度计算的准确性。</p>
+<h2 id="2-技术原理">2. 技术原理</h2>
+<h3 id="21-transformer-模型">2.1 Transformer 模型</h3>
+<p>Transformer 模型的核心是自注意力机制，它能够动态地计算输入序列中每个词与其他词的相关性，从而捕捉长距离依赖关系。Transformer 模型由编码器（Encoder）和解码器（Decoder）两部分组成，但在文本相似度任务中，我们通常只使用编码器部分。</p>
+<h3 id="22-文本相似度计算">2.2 文本相似度计算</h3>
+<p>在文本相似度任务中，我们需要将两段文本分别输入到 Transformer 模型中，获取它们的向量表示，然后通过余弦相似度等方法来衡量它们的相似程度。为了实现这一目标，我们可以使用预训练的 Transformer 模型（如 BERT）作为基础模型，并在其基础上进行微调。</p>
+<h2 id="3-代码实现">3. 代码实现</h2>
+<h3 id="31-环境准备">3.1 环境准备</h3>
+<p>首先，我们需要安装必要的库，并加载数据集。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">!</span>pip install evaluate datasets
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> sys
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> google.colab <span style="color:#f92672">import</span> drive
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>drive<span style="color:#f92672">.</span>mount(<span style="color:#e6db74">&#39;/content/drive&#39;</span>)
+</span></span><span style="display:flex;"><span>sys<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>append(<span style="color:#e6db74">&#39;/content/drive/MyDrive/ai-learning/2.NLP Task/05-sentence_similarity&#39;</span>)
+</span></span></code></pre></div><h3 id="32-加载数据集">3.2 加载数据集</h3>
+<p>我们使用 <code>datasets</code> 库加载一个包含句子对和标签的数据集。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> datasets <span style="color:#f92672">import</span> load_dataset
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;json&#34;</span>, data_files<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/05-sentence_similarity/train_pair_1w.json&#34;</span>, split<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;train&#34;</span>)
+</span></span><span style="display:flex;"><span>datasets <span style="color:#f92672">=</span> dataset<span style="color:#f92672">.</span>train_test_split(test_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0.2</span>)
+</span></span></code></pre></div><h3 id="33-数据预处理">3.3 数据预处理</h3>
+<p>使用预训练的 <code>hfl/chinese-macbert-base</code> 分词器对文本进行预处理。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoTokenizer
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/chinese-macbert-base&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">preprocess_function</span>(examples):
+</span></span><span style="display:flex;"><span>    sentences <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    labels <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> sentence1, sentence2, label <span style="color:#f92672">in</span> zip(examples[<span style="color:#e6db74">&#34;sentence1&#34;</span>], examples[<span style="color:#e6db74">&#34;sentence2&#34;</span>], examples[<span style="color:#e6db74">&#34;label&#34;</span>]):
+</span></span><span style="display:flex;"><span>        sentences<span style="color:#f92672">.</span>append(sentence1)
+</span></span><span style="display:flex;"><span>        sentences<span style="color:#f92672">.</span>append(sentence2)
+</span></span><span style="display:flex;"><span>        labels<span style="color:#f92672">.</span>append(<span style="color:#ae81ff">1</span> <span style="color:#66d9ef">if</span> label <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#66d9ef">else</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    tokenized_examples <span style="color:#f92672">=</span> tokenizer(
+</span></span><span style="display:flex;"><span>        sentences,
+</span></span><span style="display:flex;"><span>        max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">128</span>,
+</span></span><span style="display:flex;"><span>        padding<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;max_length&#34;</span>,
+</span></span><span style="display:flex;"><span>        truncation<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    tokenized_examples <span style="color:#f92672">=</span> {k: [v[i:i <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>] <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, len(v), <span style="color:#ae81ff">2</span>)] <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> tokenized_examples<span style="color:#f92672">.</span>items()}
+</span></span><span style="display:flex;"><span>    tokenized_examples[<span style="color:#e6db74">&#34;labels&#34;</span>] <span style="color:#f92672">=</span> labels
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> tokenized_examples
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tokenized_datasets <span style="color:#f92672">=</span> datasets<span style="color:#f92672">.</span>map(preprocess_function, batched<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, remove_columns<span style="color:#f92672">=</span>datasets[<span style="color:#e6db74">&#34;train&#34;</span>]<span style="color:#f92672">.</span>column_names)
+</span></span></code></pre></div><h3 id="34-创建模型">3.4 创建模型</h3>
+<p>我们定义了一个 <code>DualModel</code> 类，用于处理句子对的相似度计算。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> torch
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> BertPreTrainedModel, BertModel
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> torch.nn <span style="color:#f92672">import</span> CosineSimilarity, CosineEmbeddingLoss
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">DualModel</span>(BertPreTrainedModel):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, config: PretrainedConfig, <span style="color:#f92672">*</span>inputs, <span style="color:#f92672">**</span>kwargs):
+</span></span><span style="display:flex;"><span>        super()<span style="color:#f92672">.</span>__init__(config, <span style="color:#f92672">*</span>inputs, <span style="color:#f92672">**</span>kwargs)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>bert <span style="color:#f92672">=</span> BertModel(config)
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>post_init()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">forward</span>(self, input_ids, attention_mask, token_type_ids, labels<span style="color:#f92672">=</span><span style="color:#66d9ef">None</span>):
+</span></span><span style="display:flex;"><span>        senA_input_ids, senB_input_ids <span style="color:#f92672">=</span> input_ids[:, <span style="color:#ae81ff">0</span>], input_ids[:, <span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>        senA_attention_mask, senB_attention_mask <span style="color:#f92672">=</span> attention_mask[:, <span style="color:#ae81ff">0</span>], attention_mask[:, <span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>        senA_token_type_ids, senB_token_type_ids <span style="color:#f92672">=</span> token_type_ids[:, <span style="color:#ae81ff">0</span>], token_type_ids[:, <span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        senA_outputs <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>bert(senA_input_ids, attention_mask<span style="color:#f92672">=</span>senA_attention_mask, token_type_ids<span style="color:#f92672">=</span>senA_token_type_ids)
+</span></span><span style="display:flex;"><span>        senA_pooled_output <span style="color:#f92672">=</span> senA_outputs[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        senB_outputs <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>bert(senB_input_ids, attention_mask<span style="color:#f92672">=</span>senB_attention_mask, token_type_ids<span style="color:#f92672">=</span>senB_token_type_ids)
+</span></span><span style="display:flex;"><span>        senB_pooled_output <span style="color:#f92672">=</span> senB_outputs[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        cos <span style="color:#f92672">=</span> CosineSimilarity()(senA_pooled_output, senB_pooled_output)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        loss <span style="color:#f92672">=</span> <span style="color:#66d9ef">None</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> labels <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>            loss_fct <span style="color:#f92672">=</span> CosineEmbeddingLoss(<span style="color:#ae81ff">0.3</span>)
+</span></span><span style="display:flex;"><span>            loss <span style="color:#f92672">=</span> loss_fct(senA_pooled_output, senB_pooled_output, labels)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        output <span style="color:#f92672">=</span> (cos,)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ((loss,) <span style="color:#f92672">+</span> output) <span style="color:#66d9ef">if</span> loss <span style="color:#f92672">is</span> <span style="color:#f92672">not</span> <span style="color:#66d9ef">None</span> <span style="color:#66d9ef">else</span> output
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> DualModel<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/chinese-macbert-base&#34;</span>)
+</span></span></code></pre></div><h3 id="35-模型训练与评估">3.5 模型训练与评估</h3>
+<p>我们使用 <code>Trainer</code> 类来训练模型，并定义评估函数来计算准确率和 F1 分数。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> Trainer, TrainingArguments
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> evaluate
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>acc_metric <span style="color:#f92672">=</span> evaluate<span style="color:#f92672">.</span>load(<span style="color:#e6db74">&#34;accuracy&#34;</span>)
+</span></span><span style="display:flex;"><span>f1_metric <span style="color:#f92672">=</span> evaluate<span style="color:#f92672">.</span>load(<span style="color:#e6db74">&#34;f1&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">eval_metric</span>(eval_predict):
+</span></span><span style="display:flex;"><span>    predictions, labels <span style="color:#f92672">=</span> eval_predict
+</span></span><span style="display:flex;"><span>    predictions <span style="color:#f92672">=</span> [int(p <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0.7</span>) <span style="color:#66d9ef">for</span> p <span style="color:#f92672">in</span> predictions]
+</span></span><span style="display:flex;"><span>    labels <span style="color:#f92672">=</span> [int(l <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">for</span> l <span style="color:#f92672">in</span> labels]
+</span></span><span style="display:flex;"><span>    acc <span style="color:#f92672">=</span> acc_metric<span style="color:#f92672">.</span>compute(predictions<span style="color:#f92672">=</span>predictions, references<span style="color:#f92672">=</span>labels)
+</span></span><span style="display:flex;"><span>    f1 <span style="color:#f92672">=</span> f1_metric<span style="color:#f92672">.</span>compute(predictions<span style="color:#f92672">=</span>predictions, references<span style="color:#f92672">=</span>labels)
+</span></span><span style="display:flex;"><span>    acc<span style="color:#f92672">.</span>update(f1)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> acc
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_args <span style="color:#f92672">=</span> TrainingArguments(
+</span></span><span style="display:flex;"><span>    output_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./dual_model&#34;</span>,
+</span></span><span style="display:flex;"><span>    per_device_train_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">32</span>,
+</span></span><span style="display:flex;"><span>    per_device_eval_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">32</span>,
+</span></span><span style="display:flex;"><span>    logging_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>,
+</span></span><span style="display:flex;"><span>    eval_strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;epoch&#34;</span>,
+</span></span><span style="display:flex;"><span>    save_strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;epoch&#34;</span>,
+</span></span><span style="display:flex;"><span>    save_total_limit<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>,
+</span></span><span style="display:flex;"><span>    learning_rate<span style="color:#f92672">=</span><span style="color:#ae81ff">2e-5</span>,
+</span></span><span style="display:flex;"><span>    weight_decay<span style="color:#f92672">=</span><span style="color:#ae81ff">0.01</span>,
+</span></span><span style="display:flex;"><span>    metric_for_best_model<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;f1&#34;</span>,
+</span></span><span style="display:flex;"><span>    load_best_model_at_end<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>trainer <span style="color:#f92672">=</span> Trainer(
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">=</span>model,
+</span></span><span style="display:flex;"><span>    args<span style="color:#f92672">=</span>train_args,
+</span></span><span style="display:flex;"><span>    tokenizer<span style="color:#f92672">=</span>tokenizer,
+</span></span><span style="display:flex;"><span>    train_dataset<span style="color:#f92672">=</span>tokenized_datasets[<span style="color:#e6db74">&#34;train&#34;</span>],
+</span></span><span style="display:flex;"><span>    eval_dataset<span style="color:#f92672">=</span>tokenized_datasets[<span style="color:#e6db74">&#34;test&#34;</span>],
+</span></span><span style="display:flex;"><span>    compute_metrics<span style="color:#f92672">=</span>eval_metric
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>trainer<span style="color:#f92672">.</span>train()
+</span></span><span style="display:flex;"><span>trainer<span style="color:#f92672">.</span>evaluate(tokenized_datasets[<span style="color:#e6db74">&#34;test&#34;</span>])
+</span></span></code></pre></div><h3 id="36-模型预测与保存">3.6 模型预测与保存</h3>
+<p>最后，我们定义了一个 <code>SentenceSimilarityPipeline</code> 类来进行模型预测，并将模型保存到指定路径。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">SentenceSimilarityPipeline</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __init__(self, model, tokenizer) <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>model <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>bert
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>tokenizer <span style="color:#f92672">=</span> tokenizer
+</span></span><span style="display:flex;"><span>        self<span style="color:#f92672">.</span>device <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>device
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">preprocess</span>(self, senA, senB):
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>tokenizer([senA, senB], max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">128</span>, truncation<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, return_tensors<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pt&#34;</span>, padding<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">predict</span>(self, inputs):
+</span></span><span style="display:flex;"><span>        inputs <span style="color:#f92672">=</span> {k: v<span style="color:#f92672">.</span>to(self<span style="color:#f92672">.</span>device) <span style="color:#66d9ef">for</span> k, v <span style="color:#f92672">in</span> inputs<span style="color:#f92672">.</span>items()}
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> self<span style="color:#f92672">.</span>model(<span style="color:#f92672">**</span>inputs)[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">postprocess</span>(self, logits):
+</span></span><span style="display:flex;"><span>        cos <span style="color:#f92672">=</span> CosineSimilarity()(logits[<span style="color:#66d9ef">None</span>, <span style="color:#ae81ff">0</span>, :], logits[<span style="color:#66d9ef">None</span>,<span style="color:#ae81ff">1</span>, :])<span style="color:#f92672">.</span>squeeze()<span style="color:#f92672">.</span>cpu()<span style="color:#f92672">.</span>item()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> cos
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __call__(self, senA, senB, return_vector<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>):
+</span></span><span style="display:flex;"><span>        inputs <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>preprocess(senA, senB)
+</span></span><span style="display:flex;"><span>        logits <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>predict(inputs)
+</span></span><span style="display:flex;"><span>        result <span style="color:#f92672">=</span> self<span style="color:#f92672">.</span>postprocess(logits)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> return_vector:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> result, logits
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> result
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>pipe <span style="color:#f92672">=</span> SentenceSimilarityPipeline(model, tokenizer)
+</span></span><span style="display:flex;"><span>print(pipe(<span style="color:#e6db74">&#34;我喜欢北京&#34;</span>, <span style="color:#e6db74">&#34;北京是我喜欢的城市&#34;</span>, return_vector<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model_save_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/05-sentence_similarity/model/dual&#34;</span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>save_pretrained(model_save_path)
+</span></span></code></pre></div><h2 id="4-总结">4. 总结</h2>
+<p>本文详细介绍了如何利用 Transformer 技术实现文本相似度计算，并通过代码示例展示了从数据预处理、模型训练到预测的完整流程。通过使用预训练的 Transformer 模型，我们能够更好地捕捉文本的语义信息，从而提升文本相似度任务的准确性。希望本文能帮助读者深入理解 Transformer 技术，并在实际项目中应用这些技术。</p>
+</section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/cross_model/"
+      ><span class="mr-1.5">←</span><span>Transformer 学习之路 - 文本相似度实例</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/mrc_simple_version-checkpoint/"
+      ><span>Transformer 学习之路 - 机器阅读理解任务实现</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

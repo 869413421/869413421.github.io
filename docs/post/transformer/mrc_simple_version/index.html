@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title> - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="--- title: &#34;Transformer 学习之路 - 机器阅读理解任务实现&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析如何使用 Transformer 实现机器阅读理解任务，涵盖数据预处理、模型训练与预测等关键步骤。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 机器阅读理解任务实现 在自然语言处理（NLP）领域，机器阅读理解（Machine Reading Comprehension, MRC）是一项核心任务，旨在让模型从给定的文本中提取出与问题相关的答案。Transformer 模型的出现极大地推动了这一领域的发展。本文将带你一步步实现一个基于 Transformer 的机器阅读理解任务。 ## 1. 环境准备 首先，我们需要安装必要的库。这里我们使用 `datasets` 库来加载数据集，`transformers` 库来加载预训练模型和分词器。 ```python !pip install datasets 2. 导入相关包 接下来，我们导入所需的包，包括数据集加载、模型加载、分词器、训练参数配置等。
+from datasets import load_dataset from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, Trainer, DefaultDataCollator 3. 加载数据集 我们使用 cmrc2018 数据集，这是一个中文机器阅读理解数据集。通过 load_dataset 函数加载数据集，并查看数据集的结构。
+datasets = load_dataset(&#34;cmrc2018&#34;, cache_dir=&#34;data&#34;) datasets 查看训练集中的第一条数据：
+datasets[&#34;train&#34;][0] 4." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="" />
+<meta property="og:description" content="--- title: &#34;Transformer 学习之路 - 机器阅读理解任务实现&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析如何使用 Transformer 实现机器阅读理解任务，涵盖数据预处理、模型训练与预测等关键步骤。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 机器阅读理解任务实现 在自然语言处理（NLP）领域，机器阅读理解（Machine Reading Comprehension, MRC）是一项核心任务，旨在让模型从给定的文本中提取出与问题相关的答案。Transformer 模型的出现极大地推动了这一领域的发展。本文将带你一步步实现一个基于 Transformer 的机器阅读理解任务。 ## 1. 环境准备 首先，我们需要安装必要的库。这里我们使用 `datasets` 库来加载数据集，`transformers` 库来加载预训练模型和分词器。 ```python !pip install datasets 2. 导入相关包 接下来，我们导入所需的包，包括数据集加载、模型加载、分词器、训练参数配置等。
+from datasets import load_dataset from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, Trainer, DefaultDataCollator 3. 加载数据集 我们使用 cmrc2018 数据集，这是一个中文机器阅读理解数据集。通过 load_dataset 函数加载数据集，并查看数据集的结构。
+datasets = load_dataset(&#34;cmrc2018&#34;, cache_dir=&#34;data&#34;) datasets 查看训练集中的第一条数据：
+datasets[&#34;train&#34;][0] 4." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/mrc_simple_version/" /><meta property="article:section" content="post" />
+
+
+
+  
+  <meta itemprop="name" content="">
+<meta itemprop="description" content="--- title: &#34;Transformer 学习之路 - 机器阅读理解任务实现&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析如何使用 Transformer 实现机器阅读理解任务，涵盖数据预处理、模型训练与预测等关键步骤。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 机器阅读理解任务实现 在自然语言处理（NLP）领域，机器阅读理解（Machine Reading Comprehension, MRC）是一项核心任务，旨在让模型从给定的文本中提取出与问题相关的答案。Transformer 模型的出现极大地推动了这一领域的发展。本文将带你一步步实现一个基于 Transformer 的机器阅读理解任务。 ## 1. 环境准备 首先，我们需要安装必要的库。这里我们使用 `datasets` 库来加载数据集，`transformers` 库来加载预训练模型和分词器。 ```python !pip install datasets 2. 导入相关包 接下来，我们导入所需的包，包括数据集加载、模型加载、分词器、训练参数配置等。
+from datasets import load_dataset from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, Trainer, DefaultDataCollator 3. 加载数据集 我们使用 cmrc2018 数据集，这是一个中文机器阅读理解数据集。通过 load_dataset 函数加载数据集，并查看数据集的结构。
+datasets = load_dataset(&#34;cmrc2018&#34;, cache_dir=&#34;data&#34;) datasets 查看训练集中的第一条数据：
+datasets[&#34;train&#34;][0] 4.">
+
+<meta itemprop="wordCount" content="415">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="--- title: &#34;Transformer 学习之路 - 机器阅读理解任务实现&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析如何使用 Transformer 实现机器阅读理解任务，涵盖数据预处理、模型训练与预测等关键步骤。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 机器阅读理解任务实现 在自然语言处理（NLP）领域，机器阅读理解（Machine Reading Comprehension, MRC）是一项核心任务，旨在让模型从给定的文本中提取出与问题相关的答案。Transformer 模型的出现极大地推动了这一领域的发展。本文将带你一步步实现一个基于 Transformer 的机器阅读理解任务。 ## 1. 环境准备 首先，我们需要安装必要的库。这里我们使用 `datasets` 库来加载数据集，`transformers` 库来加载预训练模型和分词器。 ```python !pip install datasets 2. 导入相关包 接下来，我们导入所需的包，包括数据集加载、模型加载、分词器、训练参数配置等。
+from datasets import load_dataset from transformers import AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, Trainer, DefaultDataCollator 3. 加载数据集 我们使用 cmrc2018 数据集，这是一个中文机器阅读理解数据集。通过 load_dataset 函数加载数据集，并查看数据集的结构。
+datasets = load_dataset(&#34;cmrc2018&#34;, cache_dir=&#34;data&#34;) datasets 查看训练集中的第一条数据：
+datasets[&#34;train&#34;][0] 4."/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5"></h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      
+    </div>
+    
+  </header>
+
+  <section><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>title: &#34;Transformer 学习之路 - 机器阅读理解任务实现&#34;
+</span></span><span style="display:flex;"><span>date: 2024-04-19T17:35:18+08:00
+</span></span><span style="display:flex;"><span>draft: false
+</span></span><span style="display:flex;"><span>description: &#34;深入解析如何使用 Transformer 实现机器阅读理解任务，涵盖数据预处理、模型训练与预测等关键步骤。&#34;
+</span></span><span style="display:flex;"><span>categories: [&#34;Python&#34;, &#34;Transformer&#34;]
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># Transformer 学习之路 - 机器阅读理解任务实现
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>在自然语言处理（NLP）领域，机器阅读理解（Machine Reading Comprehension, MRC）是一项核心任务，旨在让模型从给定的文本中提取出与问题相关的答案。Transformer 模型的出现极大地推动了这一领域的发展。本文将带你一步步实现一个基于 Transformer 的机器阅读理解任务。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 1. 环境准备
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>首先，我们需要安装必要的库。这里我们使用 <span style="color:#e6db74">`datasets`</span> 库来加载数据集，`transformers` 库来加载预训练模型和分词器。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>```python
+</span></span><span style="display:flex;"><span>!pip install datasets
+</span></span></code></pre></div><h2 id="2-导入相关包">2. 导入相关包</h2>
+<p>接下来，我们导入所需的包，包括数据集加载、模型加载、分词器、训练参数配置等。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> datasets <span style="color:#f92672">import</span> load_dataset
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoModelForQuestionAnswering, AutoTokenizer, TrainingArguments, Trainer, DefaultDataCollator
+</span></span></code></pre></div><h2 id="3-加载数据集">3. 加载数据集</h2>
+<p>我们使用 <code>cmrc2018</code> 数据集，这是一个中文机器阅读理解数据集。通过 <code>load_dataset</code> 函数加载数据集，并查看数据集的结构。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>datasets <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;cmrc2018&#34;</span>, cache_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;data&#34;</span>)
+</span></span><span style="display:flex;"><span>datasets
+</span></span></code></pre></div><p>查看训练集中的第一条数据：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>datasets[<span style="color:#e6db74">&#34;train&#34;</span>][<span style="color:#ae81ff">0</span>]
+</span></span></code></pre></div><h2 id="4-数据预处理">4. 数据预处理</h2>
+<p>数据预处理是机器阅读理解任务中非常关键的一步。我们需要将文本数据转换为模型可以接受的输入格式。这里我们使用 <code>AutoTokenizer</code> 加载预训练的分词器，并对数据进行编码。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/chinese-macbert-base&#34;</span>)
+</span></span><span style="display:flex;"><span>tokenizer
+</span></span></code></pre></div><p>为了便于理解，我们从训练集中随机选择 10 条数据进行处理。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>sample_dataset <span style="color:#f92672">=</span> datasets[<span style="color:#e6db74">&#34;train&#34;</span>]<span style="color:#f92672">.</span>select(range(<span style="color:#ae81ff">10</span>))
+</span></span><span style="display:flex;"><span>sample_dataset[<span style="color:#ae81ff">0</span>]
+</span></span></code></pre></div><p>对数据进行编码，返回的 <code>tokenized_examples</code> 是一个字典，包含 <code>input_ids</code>、<code>attention_mask</code>、<code>token_type_ids</code> 等。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>tokenized_examples <span style="color:#f92672">=</span> tokenizer(
+</span></span><span style="display:flex;"><span>    text<span style="color:#f92672">=</span>sample_dataset[<span style="color:#e6db74">&#34;context&#34;</span>],
+</span></span><span style="display:flex;"><span>    text_pair<span style="color:#f92672">=</span>sample_dataset[<span style="color:#e6db74">&#34;question&#34;</span>],
+</span></span><span style="display:flex;"><span>    return_offsets_mapping<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>    truncation<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>    max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">512</span>,
+</span></span><span style="display:flex;"><span>    padding<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;max_length&#34;</span>,
+</span></span><span style="display:flex;"><span>    truncation_strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;only_second&#34;</span>,
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>tokenized_examples<span style="color:#f92672">.</span>keys()
+</span></span></code></pre></div><h2 id="5-答案位置定位">5. 答案位置定位</h2>
+<p>在机器阅读理解任务中，我们需要找到答案在文本中的起始和结束位置。这里我们通过 <code>offset_mapping</code> 来定位答案在 token 中的位置。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>offset_mapping <span style="color:#f92672">=</span> tokenized_examples<span style="color:#f92672">.</span>pop(<span style="color:#e6db74">&#34;offset_mapping&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> idx, offset <span style="color:#f92672">in</span> enumerate(offset_mapping):
+</span></span><span style="display:flex;"><span>    answer <span style="color:#f92672">=</span> sample_dataset[idx][<span style="color:#e6db74">&#34;answers&#34;</span>]
+</span></span><span style="display:flex;"><span>    start_char <span style="color:#f92672">=</span> answer[<span style="color:#e6db74">&#34;answer_start&#34;</span>][<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>    end_char <span style="color:#f92672">=</span> start_char <span style="color:#f92672">+</span> len(answer[<span style="color:#e6db74">&#34;text&#34;</span>][<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 定位答案在token中的起始位置和结束位置</span>
+</span></span><span style="display:flex;"><span>    context_start <span style="color:#f92672">=</span> tokenized_examples<span style="color:#f92672">.</span>sequence_ids(idx)<span style="color:#f92672">.</span>index(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    context_end <span style="color:#f92672">=</span> tokenized_examples<span style="color:#f92672">.</span>sequence_ids(idx)<span style="color:#f92672">.</span>index(<span style="color:#66d9ef">None</span>, context_start) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># 判断答案是否在context中</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> offset[context_end][<span style="color:#ae81ff">1</span>] <span style="color:#f92672">&lt;</span> start_char <span style="color:#f92672">or</span> offset[context_start][<span style="color:#ae81ff">0</span>] <span style="color:#f92672">&gt;</span> end_char:
+</span></span><span style="display:flex;"><span>        start_token_pos <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        end_token_pos <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>        token_id <span style="color:#f92672">=</span> context_start
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> token_id <span style="color:#f92672">&lt;=</span> context_end <span style="color:#f92672">and</span> offset[token_id][<span style="color:#ae81ff">0</span>] <span style="color:#f92672">&lt;</span> start_char:
+</span></span><span style="display:flex;"><span>            token_id <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        start_token_pos <span style="color:#f92672">=</span> token_id
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        token_id <span style="color:#f92672">=</span> context_end
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> token_id <span style="color:#f92672">&gt;=</span> context_start <span style="color:#f92672">and</span> offset[token_id][<span style="color:#ae81ff">1</span>] <span style="color:#f92672">&gt;</span> end_char:
+</span></span><span style="display:flex;"><span>            token_id <span style="color:#f92672">-=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        end_token_pos <span style="color:#f92672">=</span> token_id
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    print(answer, start_char, end_char, context_start, context_end, start_token_pos, end_token_pos)
+</span></span><span style="display:flex;"><span>    print(<span style="color:#e6db74">&#34;token answer decode:&#34;</span>, tokenizer<span style="color:#f92672">.</span>decode(tokenized_examples[<span style="color:#e6db74">&#34;input_ids&#34;</span>][idx][start_token_pos: end_token_pos <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>]))
+</span></span></code></pre></div><h2 id="6-数据处理函数">6. 数据处理函数</h2>
+<p>为了方便后续的训练，我们将上述过程封装成一个数据处理函数 <code>process_func</code>。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">process_func</span>(examples):
+</span></span><span style="display:flex;"><span>    tokenized_examples <span style="color:#f92672">=</span> tokenizer(
+</span></span><span style="display:flex;"><span>        text<span style="color:#f92672">=</span>examples[<span style="color:#e6db74">&#34;question&#34;</span>],
+</span></span><span style="display:flex;"><span>        text_pair<span style="color:#f92672">=</span>examples[<span style="color:#e6db74">&#34;context&#34;</span>],
+</span></span><span style="display:flex;"><span>        return_offsets_mapping<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>,
+</span></span><span style="display:flex;"><span>        max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">384</span>,
+</span></span><span style="display:flex;"><span>        truncation<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;only_second&#34;</span>,
+</span></span><span style="display:flex;"><span>        padding<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;max_length&#34;</span>
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    offset_mapping <span style="color:#f92672">=</span> tokenized_examples<span style="color:#f92672">.</span>pop(<span style="color:#e6db74">&#34;offset_mapping&#34;</span>)
+</span></span><span style="display:flex;"><span>    start_positions <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>    end_positions <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> idx, offset <span style="color:#f92672">in</span> enumerate(offset_mapping):
+</span></span><span style="display:flex;"><span>        answer <span style="color:#f92672">=</span> examples[<span style="color:#e6db74">&#34;answers&#34;</span>][idx]
+</span></span><span style="display:flex;"><span>        start_char <span style="color:#f92672">=</span> answer[<span style="color:#e6db74">&#34;answer_start&#34;</span>][<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>        end_char <span style="color:#f92672">=</span> start_char <span style="color:#f92672">+</span> len(answer[<span style="color:#e6db74">&#34;text&#34;</span>][<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        context_start <span style="color:#f92672">=</span> tokenized_examples<span style="color:#f92672">.</span>sequence_ids(idx)<span style="color:#f92672">.</span>index(<span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        context_end <span style="color:#f92672">=</span> tokenized_examples<span style="color:#f92672">.</span>sequence_ids(idx)<span style="color:#f92672">.</span>index(<span style="color:#66d9ef">None</span>, context_start) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> offset[context_end][<span style="color:#ae81ff">1</span>] <span style="color:#f92672">&lt;</span> start_char <span style="color:#f92672">or</span> offset[context_start][<span style="color:#ae81ff">0</span>] <span style="color:#f92672">&gt;</span> end_char:
+</span></span><span style="display:flex;"><span>            start_token_pos <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>            end_token_pos <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>            token_id <span style="color:#f92672">=</span> context_start
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> token_id <span style="color:#f92672">&lt;=</span> context_end <span style="color:#f92672">and</span> offset[token_id][<span style="color:#ae81ff">0</span>] <span style="color:#f92672">&lt;</span> start_char:
+</span></span><span style="display:flex;"><span>                token_id <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            start_token_pos <span style="color:#f92672">=</span> token_id
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>            token_id <span style="color:#f92672">=</span> context_end
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> token_id <span style="color:#f92672">&gt;=</span> context_start <span style="color:#f92672">and</span> offset[token_id][<span style="color:#ae81ff">1</span>] <span style="color:#f92672">&gt;</span> end_char:
+</span></span><span style="display:flex;"><span>                token_id <span style="color:#f92672">-=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            end_token_pos <span style="color:#f92672">=</span> token_id
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        start_positions<span style="color:#f92672">.</span>append(start_token_pos)
+</span></span><span style="display:flex;"><span>        end_positions<span style="color:#f92672">.</span>append(end_token_pos)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    tokenized_examples[<span style="color:#e6db74">&#34;start_positions&#34;</span>] <span style="color:#f92672">=</span> start_positions
+</span></span><span style="display:flex;"><span>    tokenized_examples[<span style="color:#e6db74">&#34;end_positions&#34;</span>] <span style="color:#f92672">=</span> end_positions
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> tokenized_examples
+</span></span></code></pre></div><h2 id="7-数据集处理">7. 数据集处理</h2>
+<p>使用 <code>map</code> 函数对整个数据集进行处理，并移除原始列。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>tokenized_datasets <span style="color:#f92672">=</span> datasets<span style="color:#f92672">.</span>map(process_func, batched<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, remove_columns<span style="color:#f92672">=</span>datasets[<span style="color:#e6db74">&#34;train&#34;</span>]<span style="color:#f92672">.</span>column_names)
+</span></span><span style="display:flex;"><span>tokenized_datasets
+</span></span></code></pre></div><h2 id="8-加载模型">8. 加载模型</h2>
+<p>接下来，我们加载预训练的问答模型 <code>AutoModelForQuestionAnswering</code>。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModelForQuestionAnswering<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/chinese-macbert-base&#34;</span>)
+</span></span></code></pre></div><h2 id="9-配置训练参数">9. 配置训练参数</h2>
+<p>我们使用 <code>TrainingArguments</code> 来配置训练参数，包括输出目录、批量大小、评估策略等。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>args <span style="color:#f92672">=</span> TrainingArguments(
+</span></span><span style="display:flex;"><span>    output_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;models_for_qa&#34;</span>,
+</span></span><span style="display:flex;"><span>    per_device_train_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>,
+</span></span><span style="display:flex;"><span>    per_device_eval_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>,
+</span></span><span style="display:flex;"><span>    eval_strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;epoch&#34;</span>,
+</span></span><span style="display:flex;"><span>    save_strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;epoch&#34;</span>,
+</span></span><span style="display:flex;"><span>    logging_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">50</span>,
+</span></span><span style="display:flex;"><span>    num_train_epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h2 id="10-创建-trainer">10. 创建 Trainer</h2>
+<p>使用 <code>Trainer</code> 类来管理训练过程，包括模型、训练参数、数据集等。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>trainer <span style="color:#f92672">=</span> Trainer(
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">=</span>model,
+</span></span><span style="display:flex;"><span>    args<span style="color:#f92672">=</span>args,
+</span></span><span style="display:flex;"><span>    train_dataset<span style="color:#f92672">=</span>tokenized_datasets[<span style="color:#e6db74">&#34;train&#34;</span>],
+</span></span><span style="display:flex;"><span>    eval_dataset<span style="color:#f92672">=</span>tokenized_datasets[<span style="color:#e6db74">&#34;validation&#34;</span>],
+</span></span><span style="display:flex;"><span>    data_collator<span style="color:#f92672">=</span>DefaultDataCollator(),
+</span></span><span style="display:flex;"><span>    tokenizer<span style="color:#f92672">=</span>tokenizer
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h2 id="11-训练模型">11. 训练模型</h2>
+<p>开始训练模型，确保模型参数是连续的。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">for</span> param <span style="color:#f92672">in</span> model<span style="color:#f92672">.</span>parameters():
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> param<span style="color:#f92672">.</span>is_contiguous():
+</span></span><span style="display:flex;"><span>        param<span style="color:#f92672">.</span>data <span style="color:#f92672">=</span> param<span style="color:#f92672">.</span>contiguous()
+</span></span><span style="display:flex;"><span>trainer<span style="color:#f92672">.</span>train()
+</span></span></code></pre></div><h2 id="12-模型预测">12. 模型预测</h2>
+<p>训练完成后，我们可以使用模型进行预测。这里我们使用 <code>pipeline</code> 来简化预测过程。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> pipeline
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>qa <span style="color:#f92672">=</span> pipeline(<span style="color:#e6db74">&#34;question-answering&#34;</span>, model<span style="color:#f92672">=</span>model, tokenizer<span style="color:#f92672">=</span>tokenizer)
+</span></span><span style="display:flex;"><span>qa(question<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;信宜在哪里&#34;</span>, context<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;广东茂名信宜的特色是三华李炒猪大肠。&#34;</span>)
+</span></span></code></pre></div><h2 id="13-模型保存">13. 模型保存</h2>
+<p>最后，我们将训练好的模型保存到 Google Drive 中，以便后续使用。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> google.colab <span style="color:#f92672">import</span> drive
+</span></span><span style="display:flex;"><span>drive<span style="color:#f92672">.</span>mount(<span style="color:#e6db74">&#39;/content/drive&#39;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model_save_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/content/drive/MyDrive/datasets/mrc&#34;</span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>save_pretrained(model_save_path)
+</span></span></code></pre></div><h2 id="总结">总结</h2>
+<p>通过本文的步骤，我们实现了一个基于 Transformer 的机器阅读理解任务。从数据预处理到模型训练与预测，每一步都至关重要。希望这篇文章能帮助你更好地理解 Transformer 在机器阅读理解任务中的应用。</p>
+<pre tabindex="0"><code></code></pre></section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/classification/"
+      ><span class="mr-1.5">←</span><span></span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/multiple_choice/"
+      ><span></span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

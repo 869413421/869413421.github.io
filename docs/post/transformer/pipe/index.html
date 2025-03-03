@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>Transformer 学习之路 - 从零开始理解文本分类 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="Transformer 学习之路 - 从零开始理解文本分类 Transformer 模型自 2017 年问世以来，彻底改变了自然语言处理（NLP）领域的格局。它不仅在机器翻译、文本生成等任务中表现出色，还在文本分类、情感分析等任务中展现了强大的能力。本文将带你从零开始理解 Transformer 在文本分类中的应用，并通过代码示例帮助你掌握如何使用 Hugging Face 的 transformers 库构建一个文本分类模型。
+1. Transformer 的核心思想 Transformer 模型的核心思想是自注意力机制（Self-Attention）。与传统的循环神经网络（RNN）和卷积神经网络（CNN）不同，Transformer 通过自注意力机制捕捉输入序列中各个位置之间的依赖关系，从而避免了 RNN 在处理长序列时的梯度消失问题。
+自注意力机制的计算过程可以简单描述为：对于输入序列中的每个位置，模型计算它与其他位置的关联程度，然后根据这些关联程度加权求和，得到该位置的表示。这种机制使得 Transformer 能够并行处理整个序列，大大提高了计算效率。
+2. 文本分类中的 Transformer 文本分类是 NLP 中的一项基础任务，目标是将一段文本分配到预定义的类别中。Transformer 模型在文本分类中的应用通常包括以下几个步骤：
+文本预处理：将原始文本转换为模型可以理解的输入格式。 模型加载：加载预训练的 Transformer 模型。 特征提取：通过模型提取文本的特征表示。 分类：将特征表示输入到分类器中进行分类。 3. 代码示例：使用 Hugging Face 进行文本分类 下面我们通过代码示例来详细讲解如何使用 Hugging Face 的 transformers 库进行文本分类。
+3.1 加载预训练模型和分词器 首先，我们需要加载一个预训练的 Transformer 模型和对应的分词器。Hugging Face 提供了丰富的预训练模型，我们可以根据需要选择合适的模型。
+from transformers import AutoModelForSequenceClassification, AutoTokenizer # 加载预训练的分词器 tokenizer = AutoTokenizer.from_pretrained(&#34;hfl/chinese-macbert-base&#34;) # 保存分词器到本地 tokenizer.save_pretrained(&#34;tokenizer&#34;) # 加载预训练的模型 model = AutoModelForSequenceClassification." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="Transformer 学习之路 - 从零开始理解文本分类" />
+<meta property="og:description" content="本文深入解析 Transformer 技术在文本分类中的应用，结合代码示例讲解如何从零开始构建一个文本分类模型。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/pipe/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-19T17:35:18+08:00" />
+<meta property="article:modified_time" content="2024-04-19T17:35:18+08:00" />
+
+  
+  <meta itemprop="name" content="Transformer 学习之路 - 从零开始理解文本分类">
+<meta itemprop="description" content="本文深入解析 Transformer 技术在文本分类中的应用，结合代码示例讲解如何从零开始构建一个文本分类模型。"><meta itemprop="datePublished" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="dateModified" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="wordCount" content="180">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Transformer 学习之路 - 从零开始理解文本分类"/>
+<meta name="twitter:description" content="本文深入解析 Transformer 技术在文本分类中的应用，结合代码示例讲解如何从零开始构建一个文本分类模型。"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">Transformer 学习之路 - 从零开始理解文本分类</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Apr 19, 2024</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h1 id="transformer-学习之路---从零开始理解文本分类">Transformer 学习之路 - 从零开始理解文本分类</h1>
+<p>Transformer 模型自 2017 年问世以来，彻底改变了自然语言处理（NLP）领域的格局。它不仅在机器翻译、文本生成等任务中表现出色，还在文本分类、情感分析等任务中展现了强大的能力。本文将带你从零开始理解 Transformer 在文本分类中的应用，并通过代码示例帮助你掌握如何使用 Hugging Face 的 <code>transformers</code> 库构建一个文本分类模型。</p>
+<h2 id="1-transformer-的核心思想">1. Transformer 的核心思想</h2>
+<p>Transformer 模型的核心思想是<strong>自注意力机制（Self-Attention）</strong>。与传统的循环神经网络（RNN）和卷积神经网络（CNN）不同，Transformer 通过自注意力机制捕捉输入序列中各个位置之间的依赖关系，从而避免了 RNN 在处理长序列时的梯度消失问题。</p>
+<p>自注意力机制的计算过程可以简单描述为：对于输入序列中的每个位置，模型计算它与其他位置的关联程度，然后根据这些关联程度加权求和，得到该位置的表示。这种机制使得 Transformer 能够并行处理整个序列，大大提高了计算效率。</p>
+<h2 id="2-文本分类中的-transformer">2. 文本分类中的 Transformer</h2>
+<p>文本分类是 NLP 中的一项基础任务，目标是将一段文本分配到预定义的类别中。Transformer 模型在文本分类中的应用通常包括以下几个步骤：</p>
+<ol>
+<li><strong>文本预处理</strong>：将原始文本转换为模型可以理解的输入格式。</li>
+<li><strong>模型加载</strong>：加载预训练的 Transformer 模型。</li>
+<li><strong>特征提取</strong>：通过模型提取文本的特征表示。</li>
+<li><strong>分类</strong>：将特征表示输入到分类器中进行分类。</li>
+</ol>
+<h2 id="3-代码示例使用-hugging-face-进行文本分类">3. 代码示例：使用 Hugging Face 进行文本分类</h2>
+<p>下面我们通过代码示例来详细讲解如何使用 Hugging Face 的 <code>transformers</code> 库进行文本分类。</p>
+<h3 id="31-加载预训练模型和分词器">3.1 加载预训练模型和分词器</h3>
+<p>首先，我们需要加载一个预训练的 Transformer 模型和对应的分词器。Hugging Face 提供了丰富的预训练模型，我们可以根据需要选择合适的模型。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoModelForSequenceClassification, AutoTokenizer
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 加载预训练的分词器</span>
+</span></span><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/chinese-macbert-base&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 保存分词器到本地</span>
+</span></span><span style="display:flex;"><span>tokenizer<span style="color:#f92672">.</span>save_pretrained(<span style="color:#e6db74">&#34;tokenizer&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 加载预训练的模型</span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModelForSequenceClassification<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;./model&#34;</span>)
+</span></span></code></pre></div><p>在这段代码中，我们使用了 <code>hfl/chinese-macbert-base</code> 作为预训练模型。这个模型是基于 BERT 架构的中文预训练模型，适合处理中文文本分类任务。</p>
+<h3 id="32-构建文本分类管道">3.2 构建文本分类管道</h3>
+<p>接下来，我们使用 <code>pipeline</code> 函数构建一个文本分类管道。<code>pipeline</code> 是 Hugging Face 提供的一个高级 API，它封装了模型的加载、文本预处理、推理等步骤，使得我们可以方便地进行文本分类。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> pipeline
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 构建文本分类管道</span>
+</span></span><span style="display:flex;"><span>pipe <span style="color:#f92672">=</span> pipeline(<span style="color:#e6db74">&#34;text-classification&#34;</span>, model<span style="color:#f92672">=</span>model, tokenizer<span style="color:#f92672">=</span>tokenizer)
+</span></span></code></pre></div><p>通过这段代码，我们创建了一个文本分类管道 <code>pipe</code>，它可以直接接受原始文本作为输入，并输出分类结果。</p>
+<h3 id="33-进行文本分类">3.3 进行文本分类</h3>
+<p>现在，我们可以使用 <code>pipe</code> 对文本进行分类了。假设我们有一段中文文本，我们想要对其进行情感分类（正面或负面）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 待分类的文本</span>
+</span></span><span style="display:flex;"><span>text <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;这部电影真是太棒了，演员的表演非常出色！&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 进行分类</span>
+</span></span><span style="display:flex;"><span>result <span style="color:#f92672">=</span> pipe(text)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 输出结果</span>
+</span></span><span style="display:flex;"><span>print(result)
+</span></span></code></pre></div><p>运行这段代码后，<code>result</code> 将包含文本的分类结果，例如：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>[{<span style="color:#e6db74">&#39;label&#39;</span>: <span style="color:#e6db74">&#39;POSITIVE&#39;</span>, <span style="color:#e6db74">&#39;score&#39;</span>: <span style="color:#ae81ff">0.98</span>}]
+</span></span></code></pre></div><p>这表示模型认为这段文本的情感是正面的，置信度为 98%。</p>
+<h2 id="4-技术细节与问题解决">4. 技术细节与问题解决</h2>
+<h3 id="41-分词器的作用">4.1 分词器的作用</h3>
+<p>分词器（Tokenizer）在 Transformer 模型中扮演着至关重要的角色。它将原始文本转换为模型可以理解的输入格式，通常包括以下几个步骤：</p>
+<ol>
+<li><strong>分词</strong>：将文本分割成单词或子词。</li>
+<li><strong>编码</strong>：将分词后的结果转换为对应的 ID。</li>
+<li><strong>填充与截断</strong>：将输入序列的长度统一到模型要求的长度。</li>
+</ol>
+<p>在中文文本处理中，分词器需要特别处理中文的分词问题。<code>hfl/chinese-macbert-base</code> 模型使用了基于字符的分词方式，即将每个汉字作为一个独立的 token，从而避免了中文分词的复杂性。</p>
+<h3 id="42-预训练模型的选择">4.2 预训练模型的选择</h3>
+<p>选择合适的预训练模型是文本分类任务成功的关键。不同的预训练模型在架构、训练数据、任务类型等方面存在差异，因此需要根据具体任务选择合适的模型。</p>
+<p>例如，<code>hfl/chinese-macbert-base</code> 是一个专门针对中文文本的预训练模型，适合处理中文文本分类任务。而如果你需要处理英文文本，可以选择 <code>bert-base-uncased</code> 或 <code>roberta-base</code> 等模型。</p>
+<h3 id="43-模型微调">4.3 模型微调</h3>
+<p>虽然预训练模型已经在大规模数据上进行了训练，但在特定任务上可能表现不佳。因此，我们通常需要对预训练模型进行微调（Fine-tuning），以适应具体的任务需求。</p>
+<p>微调的过程包括以下几个步骤：</p>
+<ol>
+<li><strong>准备数据</strong>：准备与任务相关的标注数据。</li>
+<li><strong>训练模型</strong>：在标注数据上继续训练模型，调整模型参数。</li>
+<li><strong>评估模型</strong>：在验证集上评估模型的性能，调整超参数。</li>
+</ol>
+<p>通过微调，我们可以使模型更好地适应特定任务，提高分类的准确率。</p>
+<h2 id="5-总结">5. 总结</h2>
+<p>本文深入解析了 Transformer 技术在文本分类中的应用，并通过代码示例展示了如何使用 Hugging Face 的 <code>transformers</code> 库构建一个文本分类模型。我们讨论了 Transformer 的核心思想、文本分类的基本流程，以及在实际应用中需要注意的技术细节。</p>
+<p>通过本文的学习，你应该能够理解 Transformer 在文本分类中的工作原理，并能够使用 Hugging Face 的库进行实际的文本分类任务。希望这篇文章能够帮助你在 Transformer 的学习之路上更进一步！</p>
+</section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/chatbot_prompt_tuning/"
+      ><span class="mr-1.5">←</span><span>Transformer 学习之路 - Prompt Tuning 实战</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/evaluate/"
+      ><span>Transformer 学习之路 - 使用 evaluate 库进行模型评估</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

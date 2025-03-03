@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>Transformer 学习之路 - 深入解析模型架构与应用 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="Transformer 学习之路 - 深入解析模型架构与应用 Transformer 模型自 2017 年提出以来，已经成为自然语言处理（NLP）领域的基石。它通过注意力机制（Attention Mechanism）实现了对序列数据的强大建模能力。本文将从模型类型、模型头（Model Head）的作用以及模型的加载与调用等方面，深入解析 Transformer 技术。
+1. 模型的类型 1.1 Encoder-only 模型（如 BERT） 原理：
+Encoder-only 模型使用双向注意力机制，能够同时关注句子中每个词的前后文，从而理解词语在不同上下文中的含义。它就像在读句子时，同时关注所有词，理解它们彼此的关系。
+工作方式：
+输入的句子会被编码为数字表示，模型通过“关注”句子中的所有词，理解它们的全局语境，最后输出一个表示每个词含义的向量。这些向量可以用于各种任务，比如分类、命名实体识别（NER）。
+应用场景：
+文本分类、命名实体识别（NER）、问答系统中的句子匹配。
+总结：
+Encoder-only 模型擅长理解句子的意思，因为它能“看两边”（上下文）。
+1.2 Decoder-only 模型（如 GPT） 原理：
+Decoder-only 模型使用单向注意力机制，只能从前往后看，就像我们逐字写文章一样。模型根据前面出现的词来生成下一个词。这种“自回归”方式让它在生成新词时，只能依赖之前生成的内容。
+工作方式：
+输入的文本被编码为向量，然后模型每次根据前面的词生成下一个词，直到生成完整句子或段落。每生成一个词，它就会把这个词加入到上下文中，继续生成下一个。
+应用场景：
+文本生成、对话生成、语言建模。
+总结：
+Decoder-only 模型擅长生成句子，通过“接龙”方式，每次只看前面的词，生成后续内容。
+1.3 Encoder-Decoder 模型（如 T5, BART） 原理：
+Encoder-Decoder 模型结合了 Encoder 和 Decoder 的优点，先用编码器理解输入文本，再用解码器生成输出文本。它像是翻译任务：先理解原文，再生成目标语言的翻译。
+工作方式：
+编码器负责理解输入文本，把它转化为一系列向量表示。 解码器根据编码器的输出，逐步生成新的句子，比如翻译、摘要或生成其他序列。 应用场景：
+机器翻译、文本摘要、自动问答系统。
+总结：
+Encoder-Decoder 模型擅长转换序列，比如把英文翻译成中文，因为它既能理解又能生成。
+1.4 多模态模型（如 CLIP） 原理：
+多模态模型能同时处理文本和图像。它把图像和文本都转化为向量，然后通过比较这些向量的相似度，来判断文本和图像是否匹配。
+工作方式：
+图像部分：模型把图像分成小块，分别处理这些小块的信息，再把它们组合成一个整体表示。 文本部分：模型用类似 BERT 的编码器来处理文本，生成文本的表示。 最后，它比较图像和文本的表示，判断它们是否相关。 应用场景：" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="Transformer 学习之路 - 深入解析模型架构与应用" />
+<meta property="og:description" content="本文深入解析 Transformer 模型的架构、工作原理及其在不同任务中的应用，结合代码示例帮助读者理解并应用。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/model/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-19T17:35:18+08:00" />
+<meta property="article:modified_time" content="2024-04-19T17:35:18+08:00" />
+
+  
+  <meta itemprop="name" content="Transformer 学习之路 - 深入解析模型架构与应用">
+<meta itemprop="description" content="本文深入解析 Transformer 模型的架构、工作原理及其在不同任务中的应用，结合代码示例帮助读者理解并应用。"><meta itemprop="datePublished" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="dateModified" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="wordCount" content="292">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Transformer 学习之路 - 深入解析模型架构与应用"/>
+<meta name="twitter:description" content="本文深入解析 Transformer 模型的架构、工作原理及其在不同任务中的应用，结合代码示例帮助读者理解并应用。"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">Transformer 学习之路 - 深入解析模型架构与应用</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Apr 19, 2024</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h1 id="transformer-学习之路---深入解析模型架构与应用">Transformer 学习之路 - 深入解析模型架构与应用</h1>
+<p>Transformer 模型自 2017 年提出以来，已经成为自然语言处理（NLP）领域的基石。它通过注意力机制（Attention Mechanism）实现了对序列数据的强大建模能力。本文将从模型类型、模型头（Model Head）的作用以及模型的加载与调用等方面，深入解析 Transformer 技术。</p>
+<h2 id="1-模型的类型">1. 模型的类型</h2>
+<h3 id="11-encoder-only-模型如-bert">1.1 Encoder-only 模型（如 BERT）</h3>
+<p><strong>原理</strong>：<br>
+Encoder-only 模型使用<strong>双向注意力机制</strong>，能够同时关注句子中每个词的前后文，从而理解词语在不同上下文中的含义。它就像在读句子时，同时关注所有词，理解它们彼此的关系。</p>
+<p><strong>工作方式</strong>：<br>
+输入的句子会被编码为数字表示，模型通过“关注”句子中的所有词，理解它们的全局语境，最后输出一个表示每个词含义的向量。这些向量可以用于各种任务，比如分类、命名实体识别（NER）。</p>
+<p><strong>应用场景</strong>：<br>
+文本分类、命名实体识别（NER）、问答系统中的句子匹配。</p>
+<p><strong>总结</strong>：<br>
+Encoder-only 模型擅长<strong>理解句子</strong>的意思，因为它能“看两边”（上下文）。</p>
+<h3 id="12-decoder-only-模型如-gpt">1.2 Decoder-only 模型（如 GPT）</h3>
+<p><strong>原理</strong>：<br>
+Decoder-only 模型使用<strong>单向注意力机制</strong>，只能从前往后看，就像我们逐字写文章一样。模型根据前面出现的词来生成下一个词。这种“自回归”方式让它在生成新词时，只能依赖之前生成的内容。</p>
+<p><strong>工作方式</strong>：<br>
+输入的文本被编码为向量，然后模型每次根据前面的词生成下一个词，直到生成完整句子或段落。每生成一个词，它就会把这个词加入到上下文中，继续生成下一个。</p>
+<p><strong>应用场景</strong>：<br>
+文本生成、对话生成、语言建模。</p>
+<p><strong>总结</strong>：<br>
+Decoder-only 模型擅长<strong>生成句子</strong>，通过“接龙”方式，每次只看前面的词，生成后续内容。</p>
+<h3 id="13-encoder-decoder-模型如-t5-bart">1.3 Encoder-Decoder 模型（如 T5, BART）</h3>
+<p><strong>原理</strong>：<br>
+Encoder-Decoder 模型结合了 Encoder 和 Decoder 的优点，先用编码器<strong>理解</strong>输入文本，再用解码器<strong>生成</strong>输出文本。它像是翻译任务：先理解原文，再生成目标语言的翻译。</p>
+<p><strong>工作方式</strong>：</p>
+<ul>
+<li><strong>编码器</strong>负责理解输入文本，把它转化为一系列向量表示。</li>
+<li><strong>解码器</strong>根据编码器的输出，逐步生成新的句子，比如翻译、摘要或生成其他序列。</li>
+</ul>
+<p><strong>应用场景</strong>：<br>
+机器翻译、文本摘要、自动问答系统。</p>
+<p><strong>总结</strong>：<br>
+Encoder-Decoder 模型擅长<strong>转换序列</strong>，比如把英文翻译成中文，因为它既能理解又能生成。</p>
+<h3 id="14-多模态模型如-clip">1.4 多模态模型（如 CLIP）</h3>
+<p><strong>原理</strong>：<br>
+多模态模型能同时处理<strong>文本和图像</strong>。它把图像和文本都转化为向量，然后通过比较这些向量的相似度，来判断文本和图像是否匹配。</p>
+<p><strong>工作方式</strong>：</p>
+<ul>
+<li><strong>图像部分</strong>：模型把图像分成小块，分别处理这些小块的信息，再把它们组合成一个整体表示。</li>
+<li><strong>文本部分</strong>：模型用类似 BERT 的编码器来处理文本，生成文本的表示。</li>
+<li>最后，它比较图像和文本的表示，判断它们是否相关。</li>
+</ul>
+<p><strong>应用场景</strong>：<br>
+图像分类、图像描述生成、跨模态匹配。</p>
+<p><strong>总结</strong>：<br>
+多模态模型擅长处理<strong>图像和文本</strong>，能理解图片内容并用文字描述。</p>
+<h3 id="15-对话模型如-dialogpt">1.5 对话模型（如 DialoGPT）</h3>
+<p><strong>原理</strong>：<br>
+基于 Decoder-only 架构，通过<strong>单向生成机制</strong>生成对话。它像在模拟人与人对话，一个人说一句，它生成一句相关的回应。</p>
+<p><strong>工作方式</strong>：<br>
+模型通过学习大量对话数据，理解上下文，生成自然的对话内容。它通过“接龙”的方式，生成与前面对话内容相关的新句子。</p>
+<p><strong>应用场景</strong>：<br>
+聊天机器人、对话生成、问答系统。</p>
+<p><strong>总结</strong>：<br>
+对话模型擅长生成与<strong>对话上下文</strong>相关的内容，适合模拟聊天。</p>
+<h3 id="16-处理长文本的模型如-longformer">1.6 处理长文本的模型（如 Longformer）</h3>
+<p><strong>原理</strong>：<br>
+传统的 Transformer 模型只能处理较短文本，因为它们会同时关注所有词（这需要大量计算）。Longformer 使用“<strong>局部注意力机制</strong>”，让模型只关注部分词的关系，从而节省计算资源，能处理更长的文本。</p>
+<p><strong>工作方式</strong>：<br>
+模型不像传统 Transformer 那样每个词都关注整个句子，而是让每个词只关注附近的几个词。这样它可以处理长达几千个词的文档，同时还保留了必要的上下文信息。</p>
+<p><strong>应用场景</strong>：<br>
+长文档分类、文档摘要、长文档中的问答。</p>
+<p><strong>总结</strong>：<br>
+长文本模型擅长处理<strong>长文档</strong>，通过局部注意力机制处理大量文本，同时减少计算量。</p>
+<h3 id="17-总结">1.7 总结</h3>
+<ul>
+<li><strong>BERT</strong>（Encoder-only）：理解句子，能“看两边”（双向），适合文本分类、标注任务。</li>
+<li><strong>GPT</strong>（Decoder-only）：生成句子，像“接龙”一样逐字生成，适合文本生成和对话生成。</li>
+<li><strong>T5/BART</strong>（Encoder-Decoder）：既能理解又能生成，适合翻译和摘要等序列转换任务。</li>
+<li><strong>CLIP</strong>（多模态）：同时理解图像和文本，通过匹配它们的向量表示，适合图像描述和跨模态任务。</li>
+<li><strong>DialoGPT</strong>（对话模型）：生成自然对话，理解上下文，适合聊天机器人。</li>
+<li><strong>Longformer</strong>（长文本处理）：处理长文档，使用局部注意力机制，适合长文本分类和摘要。</li>
+</ul>
+<h2 id="2-模型头model-head是什么">2. 模型头（Model Head）是什么？</h2>
+<p>在 <strong>Transformers</strong> 中，<strong>model head</strong>（模型头）指的是附加在基础模型（通常是 Transformer 编码器或解码器）的最后一部分，用来处理特定任务的部分。它相当于一个专门设计的组件，负责把模型生成的向量转换成具体任务的输出。</p>
+<h3 id="21-模型的结构">2.1 模型的结构</h3>
+<ul>
+<li><strong>主干模型（Backbone）</strong>：这是处理输入的主要部分，通常包括多层的 Transformer 编码器或解码器。它负责理解文本或图像，提取特征，并生成表示（向量）。</li>
+<li><strong>模型头（Head）</strong>：接在主干模型之后，专门用来完成某个任务。不同任务会使用不同的模型头。</li>
+</ul>
+<h3 id="22-常见的模型头及它们的作用">2.2 常见的模型头及它们的作用</h3>
+<ol>
+<li>
+<p><strong>分类头（Classification Head）</strong>：</p>
+<ul>
+<li><strong>作用</strong>：用于分类任务，比如情感分析、新闻分类等。</li>
+<li><strong>工作方式</strong>：模型会输出每个词的表示，分类头只会使用句子中第一个词（通常是 <code>[CLS]</code> 标记）的表示，进行分类。</li>
+<li><strong>例子</strong>：BERT 用于情感分析时，会用分类头输出“正面”或“负面”的分类结果。</li>
+</ul>
+</li>
+<li>
+<p><strong>序列标注头（Token Classification Head）</strong>：</p>
+<ul>
+<li><strong>作用</strong>：用于序列标注任务，比如命名实体识别（NER）或词性标注。</li>
+<li><strong>工作方式</strong>：每个词的表示都会被模型头转换为一个标签，比如“实体名”或“非实体名”。</li>
+<li><strong>例子</strong>：BERT 用于命名实体识别时，序列标注头会为每个词预测其对应的实体类型。</li>
+</ul>
+</li>
+<li>
+<p><strong>生成头（Generation Head）</strong>：</p>
+<ul>
+<li><strong>作用</strong>：用于生成任务，比如文本生成、机器翻译。</li>
+<li><strong>工作方式</strong>：解码器的输出经过生成头，预测下一个词的概率分布，模型根据概率最高的词生成下一步输出。</li>
+<li><strong>例子</strong>：GPT 模型用生成头来预测下一个词，从而生成完整的句子。</li>
+</ul>
+</li>
+<li>
+<p><strong>回归头（Regression Head）</strong>：</p>
+<ul>
+<li><strong>作用</strong>：用于回归任务，比如评分预测或情感强度的打分。</li>
+<li><strong>工作方式</strong>：最后一层的输出会通过回归头转换成一个连续数值，表示某种预测结果。</li>
+<li><strong>例子</strong>：可以用来预测商品的评分（从 1 到 5），而不是分类结果。</li>
+</ul>
+</li>
+<li>
+<p><strong>问答头（Question Answering Head）</strong>：</p>
+<ul>
+<li><strong>作用</strong>：用于问答任务（如 SQuAD 数据集），专门用来找出答案在文本中的位置。</li>
+<li><strong>工作方式</strong>：问答头输出两个向量，一个用于预测答案的起始位置，另一个用于预测答案的结束位置。</li>
+<li><strong>例子</strong>：BERT 用于问答时，会预测答案在文本中的开始和结束位置。</li>
+</ul>
+</li>
+</ol>
+<h3 id="23-总结">2.3 总结</h3>
+<ul>
+<li><strong>model head</strong> 是一个附加在主干模型上的任务专用模块。</li>
+<li>不同的任务（分类、生成、标注、回归等）有不同的模型头。</li>
+<li>主干模型负责理解输入数据，而模型头则把这些理解转化为具体的任务输出。</li>
+</ul>
+<h2 id="3-模型的加载与调用">3. 模型的加载与调用</h2>
+<h3 id="31-在线加载并保存在本地">3.1 在线加载并保存在本地</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoModel
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 加载模型并保存到本地</span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModel<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/rbt3&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 确保所有张量在内存中是连续的</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> name, param <span style="color:#f92672">in</span> model<span style="color:#f92672">.</span>named_parameters():
+</span></span><span style="display:flex;"><span>    param<span style="color:#f92672">.</span>data <span style="color:#f92672">=</span> param<span style="color:#f92672">.</span>data<span style="color:#f92672">.</span>contiguous()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 保存模型</span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>save_pretrained(<span style="color:#e6db74">&#34;./rbt3&#34;</span>)
+</span></span></code></pre></div><h3 id="32-通过-git-下载模型">3.2 通过 Git 下载模型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">!</span>git clone <span style="color:#e6db74">&#34;https://huggingface.co/hfl/rbt3&#34;</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 使用 Git LFS 下载模型文件</span>
+</span></span><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">!</span>git lfs clone <span style="color:#e6db74">&#34;https://huggingface.co/hfl/rbt3&#34;</span> <span style="color:#f92672">--</span>include<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;*.bin&#34;</span>
+</span></span></code></pre></div><h3 id="33-加载已下载的模型">3.3 加载已下载的模型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModel<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;rbt3&#34;</span>)
+</span></span></code></pre></div><h3 id="34-查看模型配置">3.4 查看模型配置</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 查看模型加载时可用的参数</span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>config
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 查看更详细的参数</span>
+</span></span><span style="display:flex;"><span>config <span style="color:#f92672">=</span> AutoConfig<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;./rbt3/&#34;</span>)
+</span></span><span style="display:flex;"><span>config
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 查看是否输出注意力权重</span>
+</span></span><span style="display:flex;"><span>config<span style="color:#f92672">.</span>output_attentions
+</span></span></code></pre></div><h3 id="35-模型的调用">3.5 模型的调用</h3>
+<h4 id="初始化-tokenizer">初始化 Tokenizer</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoTokenizer
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>sen <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;弱小的我也有大梦想！&#34;</span>
+</span></span><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/rbt3&#34;</span>)
+</span></span><span style="display:flex;"><span>inputs <span style="color:#f92672">=</span> tokenizer(sen, return_tensors<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pt&#34;</span>)
+</span></span><span style="display:flex;"><span>inputs
+</span></span></code></pre></div><h4 id="不带-model-head-的调用单纯提取特征">不带 Model Head 的调用，单纯提取特征</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModel<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#39;rbt3&#39;</span>, output_attentions<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>output <span style="color:#f92672">=</span> model(<span style="color:#f92672">**</span>inputs)
+</span></span><span style="display:flex;"><span>output
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 查看特征维度</span>
+</span></span><span style="display:flex;"><span>output<span style="color:#f92672">.</span>last_hidden_state<span style="color:#f92672">.</span>size()
+</span></span></code></pre></div><h4 id="带-model-head-的调用">带 Model Head 的调用</h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoModelForSequenceClassification
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>clz_model <span style="color:#f92672">=</span> AutoModelForSequenceClassification<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;rbt3&#34;</span>, num_labels<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>)
+</span></span><span style="display:flex;"><span>clz_model(<span style="color:#f92672">**</span>inputs)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># 查看分类头的标签数量</span>
+</span></span><span style="display:flex;"><span>clz_model<span style="color:#f92672">.</span>config<span style="color:#f92672">.</span>num_labels
+</span></span></code></pre></div><hr>
+<p>通过本文的详细解析，相信你对 Transformer 模型的架构、工作原理及其在不同任务中的应用有了更深入的理解。结合代码示例，你可以轻松上手并应用这些技术。Transformer 的强大之处在于其灵活性和通用性，通过不同的模型头和架构设计，它可以适应各种复杂的任务场景。</p>
+</section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/1/"
+      ><span class="mr-1.5">←</span><span>Transformer 学习之路 - 深入解析 Pipeline 的实现与应用</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/%E5%9F%BA%E4%BA%8E%E5%85%B3%E8%81%94%E8%A7%84%E5%88%99%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95/%E5%9F%BA%E4%BA%8E%E5%85%B3%E8%81%94%E8%A7%84%E5%88%99%E5%AE%9E%E7%8E%B0%E7%9A%84%E6%99%BA%E8%83%BD%E6%8E%A8%E8%8D%90%E7%AE%97%E6%B3%95/"
+      ><span>基于关联规则实现的智能推荐算法</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

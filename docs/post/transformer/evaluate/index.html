@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>Transformer 学习之路 - 使用 evaluate 库进行模型评估 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="Transformer 学习之路 - 使用 evaluate 库进行模型评估 在深度学习和自然语言处理（NLP）领域，模型的评估是至关重要的一环。无论是训练过程中的监控，还是最终模型的性能对比，评估指标都能帮助我们更好地理解模型的表现。本文将详细介绍如何使用 evaluate 库进行模型评估，并结合代码示例进行讲解。
+1. 安装与导入 首先，我们需要安装 evaluate 库。可以通过以下命令进行安装：
+!pip install evaluate 安装完成后，导入库：
+import evaluate 2. 查看支持的评估函数 evaluate 库提供了丰富的评估函数，涵盖了分类、回归、文本生成等多个领域。我们可以通过以下命令查看支持的评估函数：
+evaluate.list_evaluation_modules() 如果你只想查看特定类型的评估函数，比如比较类的评估函数，可以使用以下命令：
+evaluate.list_evaluation_modules( module_type=&#34;comparison&#34;, include_community=False, with_details=True) 3. 加载评估函数 接下来，我们可以加载具体的评估函数。以准确率（accuracy）为例：
+accuracy = evaluate.load(&#34;accuracy&#34;) 加载完成后，我们可以查看该函数的详细信息：
+print(accuracy.description) 4. 评估指标计算 4.1 全局计算 全局计算是指一次性评估所有数据。我们可以通过以下代码计算准确率：
+accuracy = evaluate.load(&#34;accuracy&#34;) results = accuracy.compute(references=[0, 1, 2, 0, 1, 2], predictions=[0, 1, 1, 2, 1, 0]) results 4.2 迭代计算 迭代计算是指在数据流中逐步计算评估指标。以下代码展示了如何逐步计算准确率：
+accuracy = evaluate.load(&#34;accuracy&#34;) for ref, pred in zip([0,1,0,1], [1,0,0,1]): accuracy." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="Transformer 学习之路 - 使用 evaluate 库进行模型评估" />
+<meta property="og:description" content="深入解析如何使用 evaluate 库进行 Transformer 模型的评估，涵盖多种评估指标及其应用场景。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/evaluate/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-19T17:35:18+08:00" />
+<meta property="article:modified_time" content="2024-04-19T17:35:18+08:00" />
+
+  
+  <meta itemprop="name" content="Transformer 学习之路 - 使用 evaluate 库进行模型评估">
+<meta itemprop="description" content="深入解析如何使用 evaluate 库进行 Transformer 模型的评估，涵盖多种评估指标及其应用场景。"><meta itemprop="datePublished" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="dateModified" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="wordCount" content="176">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Transformer 学习之路 - 使用 evaluate 库进行模型评估"/>
+<meta name="twitter:description" content="深入解析如何使用 evaluate 库进行 Transformer 模型的评估，涵盖多种评估指标及其应用场景。"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">Transformer 学习之路 - 使用 evaluate 库进行模型评估</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Apr 19, 2024</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h1 id="transformer-学习之路---使用-evaluate-库进行模型评估">Transformer 学习之路 - 使用 evaluate 库进行模型评估</h1>
+<p>在深度学习和自然语言处理（NLP）领域，模型的评估是至关重要的一环。无论是训练过程中的监控，还是最终模型的性能对比，评估指标都能帮助我们更好地理解模型的表现。本文将详细介绍如何使用 <code>evaluate</code> 库进行模型评估，并结合代码示例进行讲解。</p>
+<h2 id="1-安装与导入">1. 安装与导入</h2>
+<p>首先，我们需要安装 <code>evaluate</code> 库。可以通过以下命令进行安装：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">!</span>pip install evaluate
+</span></span></code></pre></div><p>安装完成后，导入库：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> evaluate
+</span></span></code></pre></div><h2 id="2-查看支持的评估函数">2. 查看支持的评估函数</h2>
+<p><code>evaluate</code> 库提供了丰富的评估函数，涵盖了分类、回归、文本生成等多个领域。我们可以通过以下命令查看支持的评估函数：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>evaluate<span style="color:#f92672">.</span>list_evaluation_modules()
+</span></span></code></pre></div><p>如果你只想查看特定类型的评估函数，比如比较类的评估函数，可以使用以下命令：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>evaluate<span style="color:#f92672">.</span>list_evaluation_modules(
+</span></span><span style="display:flex;"><span>  module_type<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;comparison&#34;</span>,
+</span></span><span style="display:flex;"><span>  include_community<span style="color:#f92672">=</span><span style="color:#66d9ef">False</span>,
+</span></span><span style="display:flex;"><span>  with_details<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span></code></pre></div><h2 id="3-加载评估函数">3. 加载评估函数</h2>
+<p>接下来，我们可以加载具体的评估函数。以准确率（accuracy）为例：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>accuracy <span style="color:#f92672">=</span> evaluate<span style="color:#f92672">.</span>load(<span style="color:#e6db74">&#34;accuracy&#34;</span>)
+</span></span></code></pre></div><p>加载完成后，我们可以查看该函数的详细信息：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>print(accuracy<span style="color:#f92672">.</span>description)
+</span></span></code></pre></div><h2 id="4-评估指标计算">4. 评估指标计算</h2>
+<h3 id="41-全局计算">4.1 全局计算</h3>
+<p>全局计算是指一次性评估所有数据。我们可以通过以下代码计算准确率：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>accuracy <span style="color:#f92672">=</span> evaluate<span style="color:#f92672">.</span>load(<span style="color:#e6db74">&#34;accuracy&#34;</span>)
+</span></span><span style="display:flex;"><span>results <span style="color:#f92672">=</span> accuracy<span style="color:#f92672">.</span>compute(references<span style="color:#f92672">=</span>[<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>], predictions<span style="color:#f92672">=</span>[<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>results
+</span></span></code></pre></div><h3 id="42-迭代计算">4.2 迭代计算</h3>
+<p>迭代计算是指在数据流中逐步计算评估指标。以下代码展示了如何逐步计算准确率：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>accuracy <span style="color:#f92672">=</span> evaluate<span style="color:#f92672">.</span>load(<span style="color:#e6db74">&#34;accuracy&#34;</span>)
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> ref, pred <span style="color:#f92672">in</span> zip([<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">1</span>], [<span style="color:#ae81ff">1</span>,<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">0</span>,<span style="color:#ae81ff">1</span>]):
+</span></span><span style="display:flex;"><span>    accuracy<span style="color:#f92672">.</span>add(references<span style="color:#f92672">=</span>ref, predictions<span style="color:#f92672">=</span>pred)
+</span></span><span style="display:flex;"><span>accuracy<span style="color:#f92672">.</span>compute()
+</span></span></code></pre></div><h2 id="5-多个指标评估">5. 多个指标评估</h2>
+<p>在实际应用中，我们通常需要同时评估多个指标。<code>evaluate</code> 库提供了 <code>combine</code> 函数，可以方便地组合多个评估指标。以下代码展示了如何组合准确率、F1 分数、召回率和精确率：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>clf_metrics <span style="color:#f92672">=</span> evaluate<span style="color:#f92672">.</span>combine([<span style="color:#e6db74">&#34;accuracy&#34;</span>, <span style="color:#e6db74">&#34;f1&#34;</span>, <span style="color:#e6db74">&#34;recall&#34;</span>, <span style="color:#e6db74">&#34;precision&#34;</span>])
+</span></span><span style="display:flex;"><span>clf_metrics<span style="color:#f92672">.</span>compute(predictions<span style="color:#f92672">=</span>[<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>], references<span style="color:#f92672">=</span>[<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>])
+</span></span></code></pre></div><h2 id="6-评估结果可视化">6. 评估结果可视化</h2>
+<p>评估结果的可视化可以帮助我们更直观地比较不同模型的性能。<code>evaluate</code> 库提供了雷达图（radar plot）来展示多个模型的评估结果。以下代码展示了如何绘制雷达图：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> evaluate.visualization <span style="color:#f92672">import</span> radar_plot
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>data <span style="color:#f92672">=</span> [
+</span></span><span style="display:flex;"><span>   {<span style="color:#e6db74">&#34;accuracy&#34;</span>: <span style="color:#ae81ff">0.99</span>, <span style="color:#e6db74">&#34;precision&#34;</span>: <span style="color:#ae81ff">0.8</span>, <span style="color:#e6db74">&#34;f1&#34;</span>: <span style="color:#ae81ff">0.95</span>, <span style="color:#e6db74">&#34;latency_in_seconds&#34;</span>: <span style="color:#ae81ff">33.6</span>},
+</span></span><span style="display:flex;"><span>   {<span style="color:#e6db74">&#34;accuracy&#34;</span>: <span style="color:#ae81ff">0.98</span>, <span style="color:#e6db74">&#34;precision&#34;</span>: <span style="color:#ae81ff">0.87</span>, <span style="color:#e6db74">&#34;f1&#34;</span>: <span style="color:#ae81ff">0.91</span>, <span style="color:#e6db74">&#34;latency_in_seconds&#34;</span>: <span style="color:#ae81ff">11.2</span>},
+</span></span><span style="display:flex;"><span>   {<span style="color:#e6db74">&#34;accuracy&#34;</span>: <span style="color:#ae81ff">0.98</span>, <span style="color:#e6db74">&#34;precision&#34;</span>: <span style="color:#ae81ff">0.78</span>, <span style="color:#e6db74">&#34;f1&#34;</span>: <span style="color:#ae81ff">0.88</span>, <span style="color:#e6db74">&#34;latency_in_seconds&#34;</span>: <span style="color:#ae81ff">87.6</span>},
+</span></span><span style="display:flex;"><span>   {<span style="color:#e6db74">&#34;accuracy&#34;</span>: <span style="color:#ae81ff">0.88</span>, <span style="color:#e6db74">&#34;precision&#34;</span>: <span style="color:#ae81ff">0.78</span>, <span style="color:#e6db74">&#34;f1&#34;</span>: <span style="color:#ae81ff">0.81</span>, <span style="color:#e6db74">&#34;latency_in_seconds&#34;</span>: <span style="color:#ae81ff">101.6</span>}
+</span></span><span style="display:flex;"><span>]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model_names <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;Model 1&#34;</span>, <span style="color:#e6db74">&#34;Model 2&#34;</span>, <span style="color:#e6db74">&#34;Model 3&#34;</span>, <span style="color:#e6db74">&#34;Model 4&#34;</span>]
+</span></span><span style="display:flex;"><span>plot <span style="color:#f92672">=</span> radar_plot(data<span style="color:#f92672">=</span>data, model_names<span style="color:#f92672">=</span>model_names)
+</span></span></code></pre></div><h2 id="7-总结">7. 总结</h2>
+<p>通过 <code>evaluate</code> 库，我们可以方便地进行模型评估，并且支持多种评估指标的组合和可视化。这为我们在训练和优化 Transformer 模型时提供了极大的便利。希望本文能帮助你更好地理解和应用 <code>evaluate</code> 库，提升模型评估的效率与准确性。</p>
+<hr>
+<p><strong>参考文献：</strong></p>
+<ul>
+<li><a href="https://huggingface.co/docs/evaluate/index">evaluate 官方文档</a></li>
+<li><a href="https://huggingface.co/evaluate-metric">Hugging Face 模型评估指南</a></li>
+</ul>
+<p><strong>相关资源：</strong></p>
+<ul>
+<li><a href="https://github.com/huggingface/evaluate">evaluate GitHub 仓库</a></li>
+<li><a href="https://huggingface.co/community">Hugging Face 社区</a></li>
+</ul>
+</section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/pipe/"
+      ><span class="mr-1.5">←</span><span>Transformer 学习之路 - 从零开始理解文本分类</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/retrieval_chatbot2/"
+      ><span>Transformer 学习之路 - 向量召回与排序实战</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

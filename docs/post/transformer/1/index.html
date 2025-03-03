@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>Transformer 学习之路 - 深入解析 Pipeline 的实现与应用 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="Transformer 学习之路 - 深入解析 Pipeline 的实现与应用 在自然语言处理（NLP）领域，Transformer 模型已经成为了主流。而 Hugging Face 的 transformers 库为我们提供了简单易用的工具，尤其是 Pipeline，它让我们能够轻松地完成各种 NLP 任务。本文将深入探讨 Pipeline 的实现原理及其应用，并结合代码示例进行详细讲解。
+什么是 Pipeline？ Pipeline 是 Hugging Face transformers 库中的一个高级 API，它封装了模型加载、数据预处理、模型推理和结果后处理等步骤，使得我们能够通过简单的几行代码完成复杂的 NLP 任务。无论是文本分类、问答系统，还是零样本图片检测，Pipeline 都能轻松应对。
+Pipeline 支持的任务类型 首先，我们可以通过以下代码查看 Pipeline 支持的任务类型：
+from transformers.pipelines import SUPPORTED_TASKS from pprint import pprint pprint(SUPPORTED_TASKS.keys()) 这些任务包括但不限于文本分类、问答、文本生成、翻译等。每个任务类型都有对应的预训练模型和数据处理流程。
+Pipeline 的创建与使用 创建默认的 Pipeline 我们可以通过指定任务类型来创建一个默认的 Pipeline。例如，创建一个文本分类的 Pipeline：
+from transformers import pipeline pipe = pipeline(&#34;text-classification&#34;) 这个 Pipeline 默认使用的是英文模型，我们可以直接对文本进行分类：
+pipe([&#34;very good!&#34;, &#34;vary bad!&#34;]) 使用中文模型 如果我们想使用中文模型，可以指定模型名称：
+pipe = pipeline(&#34;text-classification&#34;, model=&#34;uer/roberta-base-finetuned-dianping-chinese&#34;) 然后对中文文本进行分类：" />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="Transformer 学习之路 - 深入解析 Pipeline 的实现与应用" />
+<meta property="og:description" content="本文深入解析了 Transformer 中的 Pipeline 技术，探讨其实现原理、应用场景以及如何通过代码实现 NLP 任务。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/1/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-19T17:35:18+08:00" />
+<meta property="article:modified_time" content="2024-04-19T17:35:18+08:00" />
+
+  
+  <meta itemprop="name" content="Transformer 学习之路 - 深入解析 Pipeline 的实现与应用">
+<meta itemprop="description" content="本文深入解析了 Transformer 中的 Pipeline 技术，探讨其实现原理、应用场景以及如何通过代码实现 NLP 任务。"><meta itemprop="datePublished" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="dateModified" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="wordCount" content="310">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Transformer 学习之路 - 深入解析 Pipeline 的实现与应用"/>
+<meta name="twitter:description" content="本文深入解析了 Transformer 中的 Pipeline 技术，探讨其实现原理、应用场景以及如何通过代码实现 NLP 任务。"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">Transformer 学习之路 - 深入解析 Pipeline 的实现与应用</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Apr 19, 2024</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h1 id="transformer-学习之路---深入解析-pipeline-的实现与应用">Transformer 学习之路 - 深入解析 Pipeline 的实现与应用</h1>
+<p>在自然语言处理（NLP）领域，Transformer 模型已经成为了主流。而 Hugging Face 的 <code>transformers</code> 库为我们提供了简单易用的工具，尤其是 <code>Pipeline</code>，它让我们能够轻松地完成各种 NLP 任务。本文将深入探讨 <code>Pipeline</code> 的实现原理及其应用，并结合代码示例进行详细讲解。</p>
+<h2 id="什么是-pipeline">什么是 Pipeline？</h2>
+<p><code>Pipeline</code> 是 Hugging Face <code>transformers</code> 库中的一个高级 API，它封装了模型加载、数据预处理、模型推理和结果后处理等步骤，使得我们能够通过简单的几行代码完成复杂的 NLP 任务。无论是文本分类、问答系统，还是零样本图片检测，<code>Pipeline</code> 都能轻松应对。</p>
+<h3 id="pipeline-支持的任务类型">Pipeline 支持的任务类型</h3>
+<p>首先，我们可以通过以下代码查看 <code>Pipeline</code> 支持的任务类型：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers.pipelines <span style="color:#f92672">import</span> SUPPORTED_TASKS
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> pprint <span style="color:#f92672">import</span> pprint
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>pprint(SUPPORTED_TASKS<span style="color:#f92672">.</span>keys())
+</span></span></code></pre></div><p>这些任务包括但不限于文本分类、问答、文本生成、翻译等。每个任务类型都有对应的预训练模型和数据处理流程。</p>
+<h2 id="pipeline-的创建与使用">Pipeline 的创建与使用</h2>
+<h3 id="创建默认的-pipeline">创建默认的 Pipeline</h3>
+<p>我们可以通过指定任务类型来创建一个默认的 <code>Pipeline</code>。例如，创建一个文本分类的 <code>Pipeline</code>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> pipeline
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>pipe <span style="color:#f92672">=</span> pipeline(<span style="color:#e6db74">&#34;text-classification&#34;</span>)
+</span></span></code></pre></div><p>这个 <code>Pipeline</code> 默认使用的是英文模型，我们可以直接对文本进行分类：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>pipe([<span style="color:#e6db74">&#34;very good!&#34;</span>, <span style="color:#e6db74">&#34;vary bad!&#34;</span>])
+</span></span></code></pre></div><h3 id="使用中文模型">使用中文模型</h3>
+<p>如果我们想使用中文模型，可以指定模型名称：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>pipe <span style="color:#f92672">=</span> pipeline(<span style="color:#e6db74">&#34;text-classification&#34;</span>, model<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;uer/roberta-base-finetuned-dianping-chinese&#34;</span>)
+</span></span></code></pre></div><p>然后对中文文本进行分类：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>pipe(<span style="color:#e6db74">&#34;我觉得不错，非常喜欢&#34;</span>)
+</span></span></code></pre></div><h3 id="手动加载模型和分词器">手动加载模型和分词器</h3>
+<p>有时候，我们可能需要手动加载模型和分词器，然后再创建 <code>Pipeline</code>：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoModelForSequenceClassification, AutoTokenizer
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModelForSequenceClassification<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;uer/roberta-base-finetuned-dianping-chinese&#34;</span>)
+</span></span><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;uer/roberta-base-finetuned-dianping-chinese&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>pipe <span style="color:#f92672">=</span> pipeline(<span style="color:#e6db74">&#34;text-classification&#34;</span>, model<span style="color:#f92672">=</span>model, tokenizer<span style="color:#f92672">=</span>tokenizer)
+</span></span></code></pre></div><p>这种方式的好处是可以更灵活地控制模型和分词器的加载过程。</p>
+<h3 id="使用-gpu-进行推理">使用 GPU 进行推理</h3>
+<p>为了加速推理过程，我们可以将 <code>Pipeline</code> 迁移到 GPU 上：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>pipe <span style="color:#f92672">=</span> pipeline(<span style="color:#e6db74">&#34;text-classification&#34;</span>, model<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;uer/roberta-base-finetuned-dianping-chinese&#34;</span>, device<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span></code></pre></div><p>然后通过以下代码查看 <code>Pipeline</code> 是否在 GPU 上运行：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>pipe<span style="color:#f92672">.</span>model<span style="color:#f92672">.</span>device
+</span></span></code></pre></div><h3 id="性能测试">性能测试</h3>
+<p>我们可以通过以下代码测试 <code>Pipeline</code> 的平均推理时间：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> torch
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> time
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>times <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">100</span>):
+</span></span><span style="display:flex;"><span>    torch<span style="color:#f92672">.</span>cuda<span style="color:#f92672">.</span>synchronize()
+</span></span><span style="display:flex;"><span>    start <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>    pipe(<span style="color:#e6db74">&#34;我觉得不太行！&#34;</span>)
+</span></span><span style="display:flex;"><span>    torch<span style="color:#f92672">.</span>cuda<span style="color:#f92672">.</span>synchronize()
+</span></span><span style="display:flex;"><span>    end <span style="color:#f92672">=</span> time<span style="color:#f92672">.</span>time()
+</span></span><span style="display:flex;"><span>    times<span style="color:#f92672">.</span>append(end <span style="color:#f92672">-</span> start)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(sum(times) <span style="color:#f92672">/</span> <span style="color:#ae81ff">100</span>)
+</span></span></code></pre></div><h2 id="pipeline-的高级应用">Pipeline 的高级应用</h2>
+<h3 id="问答系统">问答系统</h3>
+<p>我们可以使用 <code>Pipeline</code> 来构建一个简单的问答系统：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>qa_pipe <span style="color:#f92672">=</span> pipeline(<span style="color:#e6db74">&#34;question-answering&#34;</span>, model<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;uer/roberta-base-chinese-extractive-qa&#34;</span>)
+</span></span><span style="display:flex;"><span>qa_pipe(question<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;北京的首都是？&#34;</span>, context<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;北京是中国的首都&#34;</span>)
+</span></span></code></pre></div><h3 id="零样本图片检测">零样本图片检测</h3>
+<p><code>Pipeline</code> 还支持零样本图片检测任务。我们可以使用以下代码进行图片检测：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>checkpoint <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;google/owlvit-base-patch32&#34;</span>
+</span></span><span style="display:flex;"><span>detector <span style="color:#f92672">=</span> pipeline(model<span style="color:#f92672">=</span>checkpoint, task<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;zero-shot-object-detection&#34;</span>)
+</span></span></code></pre></div><p>然后下载一张测试图片并进行检测：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> requests
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> Image
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> io <span style="color:#f92672">import</span> BytesIO
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>url <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;https://www.bamix.com.tw/wp-content/uploads/2024/02/image4.png&#34;</span>
+</span></span><span style="display:flex;"><span>im <span style="color:#f92672">=</span> Image<span style="color:#f92672">.</span>open(requests<span style="color:#f92672">.</span>get(url, stream<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)<span style="color:#f92672">.</span>raw)
+</span></span><span style="display:flex;"><span>im
+</span></span></code></pre></div><p>执行检测并绘制结果：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>predictions <span style="color:#f92672">=</span> detector(
+</span></span><span style="display:flex;"><span>    im,
+</span></span><span style="display:flex;"><span>    candidate_labels<span style="color:#f92672">=</span>[<span style="color:#e6db74">&#34;apple&#34;</span>, <span style="color:#e6db74">&#34;bread&#34;</span>],
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> PIL <span style="color:#f92672">import</span> ImageDraw
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>draw <span style="color:#f92672">=</span> ImageDraw<span style="color:#f92672">.</span>Draw(im)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">for</span> prediction <span style="color:#f92672">in</span> predictions:
+</span></span><span style="display:flex;"><span>    box <span style="color:#f92672">=</span> prediction[<span style="color:#e6db74">&#34;box&#34;</span>]
+</span></span><span style="display:flex;"><span>    label <span style="color:#f92672">=</span> prediction[<span style="color:#e6db74">&#34;label&#34;</span>]
+</span></span><span style="display:flex;"><span>    score <span style="color:#f92672">=</span> prediction[<span style="color:#e6db74">&#34;score&#34;</span>]
+</span></span><span style="display:flex;"><span>    xmin, ymin, xmax, ymax <span style="color:#f92672">=</span> box<span style="color:#f92672">.</span>values()
+</span></span><span style="display:flex;"><span>    draw<span style="color:#f92672">.</span>rectangle((xmin, ymin, xmax, ymax), outline<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;red&#34;</span>, width<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    draw<span style="color:#f92672">.</span>text((xmin, ymin), <span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;</span><span style="color:#e6db74">{</span>label<span style="color:#e6db74">}</span><span style="color:#e6db74">: </span><span style="color:#e6db74">{</span>round(score,<span style="color:#ae81ff">2</span>)<span style="color:#e6db74">}</span><span style="color:#e6db74">&#34;</span>, fill<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;red&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>im
+</span></span></code></pre></div><h2 id="pipeline-背后的实现原理">Pipeline 背后的实现原理</h2>
+<p><code>Pipeline</code> 的实现可以分为以下几个步骤：</p>
+<ol>
+<li><strong>初始化 Tokenizer</strong>：加载分词器，将输入文本转换为模型可接受的格式。</li>
+<li><strong>初始化 Model</strong>：加载预训练模型。</li>
+<li><strong>数据预处理</strong>：将输入文本转换为模型输入张量。</li>
+<li><strong>模型预测</strong>：将预处理后的数据输入模型，得到预测结果。</li>
+<li><strong>结果后处理</strong>：将模型的输出转换为可读的结果。</li>
+</ol>
+<h3 id="代码实现">代码实现</h3>
+<p>我们可以通过以下代码手动实现 <code>Pipeline</code> 的各个步骤：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoTokenizer, AutoModelForSequenceClassification
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> torch
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 1. 初始化模型和分词器</span>
+</span></span><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;uer/roberta-base-finetuned-dianping-chinese&#34;</span>)
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModelForSequenceClassification<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;uer/roberta-base-finetuned-dianping-chinese&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 2. 数据预处理</span>
+</span></span><span style="display:flex;"><span>input_text <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;我觉得不太行！&#34;</span>
+</span></span><span style="display:flex;"><span>inputs <span style="color:#f92672">=</span> tokenizer(input_text, return_tensors<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pt&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 3. 模型处理</span>
+</span></span><span style="display:flex;"><span>res <span style="color:#f92672">=</span> model(<span style="color:#f92672">**</span>inputs)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 4. 结果后处理</span>
+</span></span><span style="display:flex;"><span>logits <span style="color:#f92672">=</span> res<span style="color:#f92672">.</span>logits
+</span></span><span style="display:flex;"><span>logits <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>softmax(logits, dim<span style="color:#f92672">=-</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 5. 转换逻辑结果</span>
+</span></span><span style="display:flex;"><span>pred <span style="color:#f92672">=</span> torch<span style="color:#f92672">.</span>argmax(logits)<span style="color:#f92672">.</span>item()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 6. 查看结果映射</span>
+</span></span><span style="display:flex;"><span>result <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>config<span style="color:#f92672">.</span>id2label<span style="color:#f92672">.</span>get(pred)
+</span></span><span style="display:flex;"><span>result
+</span></span></code></pre></div><h2 id="总结">总结</h2>
+<p>通过本文的讲解，我们深入了解了 <code>Pipeline</code> 的实现原理及其在 NLP 任务中的应用。<code>Pipeline</code> 不仅简化了模型的使用流程，还为我们提供了强大的灵活性。无论是文本分类、问答系统，还是零样本图片检测，<code>Pipeline</code> 都能轻松应对。希望本文能够帮助读者更好地理解和应用 Transformer 技术。</p>
+</section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/retrieval_chatbot/"
+      ><span class="mr-1.5">←</span><span>Transformer 学习之路 - 检索机器人实战</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/model/"
+      ><span>Transformer 学习之路 - 深入解析模型架构与应用</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

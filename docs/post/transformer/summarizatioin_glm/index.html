@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title> - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="--- title: &#34;Transformer 学习之路 - 基于前缀模型的文本摘要技术&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析基于前缀模型的文本摘要技术，结合代码示例，详细分析其技术原理与应用场景。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 基于前缀模型的文本摘要技术 在自然语言处理（NLP）领域，文本摘要是一项重要的任务，它旨在从长篇文章中提取出关键信息，生成简洁的摘要。随着 Transformer 模型的兴起，基于前缀模型（Prefix Model）的文本摘要技术逐渐成为研究热点。本文将深入探讨前缀模型的原理、应用场景及其实现细节，并结合代码示例帮助读者理解如何应用这一技术。 ## 前缀模型的基本概念 前缀模型是一种特殊的文本生成模型，通过在输入序列前添加“前缀”来引导模型生成符合特定需求的输出。其核心思想是通过给输入文本添加适当的“前缀”来调整模型的生成方向。例如，如果想要生成一个故事摘要，我们可以添加“摘要:”作为前缀，这样模型会理解它应该输出的是摘要而不是继续讲述故事。 ### 前缀模型的典型应用场景 前缀模型在多种生成式任务中都有广泛应用，包括但不限于： - **文本摘要**：在输入文本前加上“总结：”或“摘要：”这样的前缀，引导模型输出总结性的句子。 - **机器翻译**：在输入前添加特定语言标签，例如在英文文本前添加“[Translate to French]”，模型将生成法语的翻译。 - **对话生成**：在输入前加入角色标签或话题前缀，模型可以生成具有特定风格的对话。 - **代码生成**：添加“生成代码：”等指示语，使模型知道要生成符合指令的代码。 ## 前缀模型的结构和实现 前缀模型通常基于序列到序列（Seq2Seq）架构，前缀信息可以直接添加到输入序列中。以文本摘要为例，其实现步骤如下： 1. **定义前缀**：在输入文章前添加“摘要：”，即构造输入`“摘要：[原文内容]”`。 2. **编码阶段**： - 编码器会处理整个带前缀的输入序列，把“摘要：”这一部分信息编码为隐藏状态。 - 编码器将这个包含“摘要”提示的隐藏状态传递给解码器。 3. **解码阶段**： - 解码器根据编码器的输出，结合“摘要：”前缀的暗示，从而生成一段总结性内容。 ### 实现示例 假设我们使用 Hugging Face 提供的 `transformers` 库的一个预训练模型来实现前缀模型，以下是一个简单的代码示例： ```python from transformers import AutoTokenizer, AutoModelForSeq2SeqLM # 加载模型和分词器，例如BART或T5 tokenizer = AutoTokenizer." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="" />
+<meta property="og:description" content="--- title: &#34;Transformer 学习之路 - 基于前缀模型的文本摘要技术&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析基于前缀模型的文本摘要技术，结合代码示例，详细分析其技术原理与应用场景。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 基于前缀模型的文本摘要技术 在自然语言处理（NLP）领域，文本摘要是一项重要的任务，它旨在从长篇文章中提取出关键信息，生成简洁的摘要。随着 Transformer 模型的兴起，基于前缀模型（Prefix Model）的文本摘要技术逐渐成为研究热点。本文将深入探讨前缀模型的原理、应用场景及其实现细节，并结合代码示例帮助读者理解如何应用这一技术。 ## 前缀模型的基本概念 前缀模型是一种特殊的文本生成模型，通过在输入序列前添加“前缀”来引导模型生成符合特定需求的输出。其核心思想是通过给输入文本添加适当的“前缀”来调整模型的生成方向。例如，如果想要生成一个故事摘要，我们可以添加“摘要:”作为前缀，这样模型会理解它应该输出的是摘要而不是继续讲述故事。 ### 前缀模型的典型应用场景 前缀模型在多种生成式任务中都有广泛应用，包括但不限于： - **文本摘要**：在输入文本前加上“总结：”或“摘要：”这样的前缀，引导模型输出总结性的句子。 - **机器翻译**：在输入前添加特定语言标签，例如在英文文本前添加“[Translate to French]”，模型将生成法语的翻译。 - **对话生成**：在输入前加入角色标签或话题前缀，模型可以生成具有特定风格的对话。 - **代码生成**：添加“生成代码：”等指示语，使模型知道要生成符合指令的代码。 ## 前缀模型的结构和实现 前缀模型通常基于序列到序列（Seq2Seq）架构，前缀信息可以直接添加到输入序列中。以文本摘要为例，其实现步骤如下： 1. **定义前缀**：在输入文章前添加“摘要：”，即构造输入`“摘要：[原文内容]”`。 2. **编码阶段**： - 编码器会处理整个带前缀的输入序列，把“摘要：”这一部分信息编码为隐藏状态。 - 编码器将这个包含“摘要”提示的隐藏状态传递给解码器。 3. **解码阶段**： - 解码器根据编码器的输出，结合“摘要：”前缀的暗示，从而生成一段总结性内容。 ### 实现示例 假设我们使用 Hugging Face 提供的 `transformers` 库的一个预训练模型来实现前缀模型，以下是一个简单的代码示例： ```python from transformers import AutoTokenizer, AutoModelForSeq2SeqLM # 加载模型和分词器，例如BART或T5 tokenizer = AutoTokenizer." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/summarizatioin_glm/" /><meta property="article:section" content="post" />
+
+
+
+  
+  <meta itemprop="name" content="">
+<meta itemprop="description" content="--- title: &#34;Transformer 学习之路 - 基于前缀模型的文本摘要技术&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析基于前缀模型的文本摘要技术，结合代码示例，详细分析其技术原理与应用场景。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 基于前缀模型的文本摘要技术 在自然语言处理（NLP）领域，文本摘要是一项重要的任务，它旨在从长篇文章中提取出关键信息，生成简洁的摘要。随着 Transformer 模型的兴起，基于前缀模型（Prefix Model）的文本摘要技术逐渐成为研究热点。本文将深入探讨前缀模型的原理、应用场景及其实现细节，并结合代码示例帮助读者理解如何应用这一技术。 ## 前缀模型的基本概念 前缀模型是一种特殊的文本生成模型，通过在输入序列前添加“前缀”来引导模型生成符合特定需求的输出。其核心思想是通过给输入文本添加适当的“前缀”来调整模型的生成方向。例如，如果想要生成一个故事摘要，我们可以添加“摘要:”作为前缀，这样模型会理解它应该输出的是摘要而不是继续讲述故事。 ### 前缀模型的典型应用场景 前缀模型在多种生成式任务中都有广泛应用，包括但不限于： - **文本摘要**：在输入文本前加上“总结：”或“摘要：”这样的前缀，引导模型输出总结性的句子。 - **机器翻译**：在输入前添加特定语言标签，例如在英文文本前添加“[Translate to French]”，模型将生成法语的翻译。 - **对话生成**：在输入前加入角色标签或话题前缀，模型可以生成具有特定风格的对话。 - **代码生成**：添加“生成代码：”等指示语，使模型知道要生成符合指令的代码。 ## 前缀模型的结构和实现 前缀模型通常基于序列到序列（Seq2Seq）架构，前缀信息可以直接添加到输入序列中。以文本摘要为例，其实现步骤如下： 1. **定义前缀**：在输入文章前添加“摘要：”，即构造输入`“摘要：[原文内容]”`。 2. **编码阶段**： - 编码器会处理整个带前缀的输入序列，把“摘要：”这一部分信息编码为隐藏状态。 - 编码器将这个包含“摘要”提示的隐藏状态传递给解码器。 3. **解码阶段**： - 解码器根据编码器的输出，结合“摘要：”前缀的暗示，从而生成一段总结性内容。 ### 实现示例 假设我们使用 Hugging Face 提供的 `transformers` 库的一个预训练模型来实现前缀模型，以下是一个简单的代码示例： ```python from transformers import AutoTokenizer, AutoModelForSeq2SeqLM # 加载模型和分词器，例如BART或T5 tokenizer = AutoTokenizer.">
+
+<meta itemprop="wordCount" content="335">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content=""/>
+<meta name="twitter:description" content="--- title: &#34;Transformer 学习之路 - 基于前缀模型的文本摘要技术&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析基于前缀模型的文本摘要技术，结合代码示例，详细分析其技术原理与应用场景。&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 基于前缀模型的文本摘要技术 在自然语言处理（NLP）领域，文本摘要是一项重要的任务，它旨在从长篇文章中提取出关键信息，生成简洁的摘要。随着 Transformer 模型的兴起，基于前缀模型（Prefix Model）的文本摘要技术逐渐成为研究热点。本文将深入探讨前缀模型的原理、应用场景及其实现细节，并结合代码示例帮助读者理解如何应用这一技术。 ## 前缀模型的基本概念 前缀模型是一种特殊的文本生成模型，通过在输入序列前添加“前缀”来引导模型生成符合特定需求的输出。其核心思想是通过给输入文本添加适当的“前缀”来调整模型的生成方向。例如，如果想要生成一个故事摘要，我们可以添加“摘要:”作为前缀，这样模型会理解它应该输出的是摘要而不是继续讲述故事。 ### 前缀模型的典型应用场景 前缀模型在多种生成式任务中都有广泛应用，包括但不限于： - **文本摘要**：在输入文本前加上“总结：”或“摘要：”这样的前缀，引导模型输出总结性的句子。 - **机器翻译**：在输入前添加特定语言标签，例如在英文文本前添加“[Translate to French]”，模型将生成法语的翻译。 - **对话生成**：在输入前加入角色标签或话题前缀，模型可以生成具有特定风格的对话。 - **代码生成**：添加“生成代码：”等指示语，使模型知道要生成符合指令的代码。 ## 前缀模型的结构和实现 前缀模型通常基于序列到序列（Seq2Seq）架构，前缀信息可以直接添加到输入序列中。以文本摘要为例，其实现步骤如下： 1. **定义前缀**：在输入文章前添加“摘要：”，即构造输入`“摘要：[原文内容]”`。 2. **编码阶段**： - 编码器会处理整个带前缀的输入序列，把“摘要：”这一部分信息编码为隐藏状态。 - 编码器将这个包含“摘要”提示的隐藏状态传递给解码器。 3. **解码阶段**： - 解码器根据编码器的输出，结合“摘要：”前缀的暗示，从而生成一段总结性内容。 ### 实现示例 假设我们使用 Hugging Face 提供的 `transformers` 库的一个预训练模型来实现前缀模型，以下是一个简单的代码示例： ```python from transformers import AutoTokenizer, AutoModelForSeq2SeqLM # 加载模型和分词器，例如BART或T5 tokenizer = AutoTokenizer."/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5"></h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      
+    </div>
+    
+  </header>
+
+  <section><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>title: &#34;Transformer 学习之路 - 基于前缀模型的文本摘要技术&#34;
+</span></span><span style="display:flex;"><span>date: 2024-04-19T17:35:18+08:00
+</span></span><span style="display:flex;"><span>draft: false
+</span></span><span style="display:flex;"><span>description: &#34;深入解析基于前缀模型的文本摘要技术，结合代码示例，详细分析其技术原理与应用场景。&#34;
+</span></span><span style="display:flex;"><span>categories: [&#34;Python&#34;, &#34;Transformer&#34;]
+</span></span><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># Transformer 学习之路 - 基于前缀模型的文本摘要技术
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>在自然语言处理（NLP）领域，文本摘要是一项重要的任务，它旨在从长篇文章中提取出关键信息，生成简洁的摘要。随着 Transformer 模型的兴起，基于前缀模型（Prefix Model）的文本摘要技术逐渐成为研究热点。本文将深入探讨前缀模型的原理、应用场景及其实现细节，并结合代码示例帮助读者理解如何应用这一技术。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 前缀模型的基本概念
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>前缀模型是一种特殊的文本生成模型，通过在输入序列前添加“前缀”来引导模型生成符合特定需求的输出。其核心思想是通过给输入文本添加适当的“前缀”来调整模型的生成方向。例如，如果想要生成一个故事摘要，我们可以添加“摘要:”作为前缀，这样模型会理解它应该输出的是摘要而不是继续讲述故事。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">### 前缀模型的典型应用场景
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>前缀模型在多种生成式任务中都有广泛应用，包括但不限于：
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> **文本摘要**：在输入文本前加上“总结：”或“摘要：”这样的前缀，引导模型输出总结性的句子。
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> **机器翻译**：在输入前添加特定语言标签，例如在英文文本前添加“[Translate to French]”，模型将生成法语的翻译。
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> **对话生成**：在输入前加入角色标签或话题前缀，模型可以生成具有特定风格的对话。
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">-</span> **代码生成**：添加“生成代码：”等指示语，使模型知道要生成符合指令的代码。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">## 前缀模型的结构和实现
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>前缀模型通常基于序列到序列（Seq2Seq）架构，前缀信息可以直接添加到输入序列中。以文本摘要为例，其实现步骤如下：
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">1.</span> <span style="font-style:italic">**</span>定义前缀**：在输入文章前添加“摘要：”，即构造输入`“摘要：[原文内容]”`。
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">2.</span> <span style="font-style:italic">**</span>编码阶段**：
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">-</span> 编码器会处理整个带前缀的输入序列，把“摘要：”这一部分信息编码为隐藏状态。
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">-</span> 编码器将这个包含“摘要”提示的隐藏状态传递给解码器。
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">3.</span> <span style="font-style:italic">**</span>解码阶段**：
+</span></span><span style="display:flex;"><span>   <span style="color:#66d9ef">-</span> 解码器根据编码器的输出，结合“摘要：”前缀的暗示，从而生成一段总结性内容。
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">### 实现示例
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>假设我们使用 Hugging Face 提供的 <span style="color:#e6db74">`transformers`</span> 库的一个预训练模型来实现前缀模型，以下是一个简单的代码示例：
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>```python
+</span></span><span style="display:flex;"><span>from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 加载模型和分词器，例如BART或T5
+</span></span><span style="display:flex;"><span>tokenizer = AutoTokenizer.from_pretrained(&#34;facebook/bart-large-cnn&#34;)
+</span></span><span style="display:flex;"><span>model = AutoModelForSeq2SeqLM.from_pretrained(&#34;facebook/bart-large-cnn&#34;)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 定义输入内容和前缀
+</span></span><span style="display:flex;"><span>text = &#34;The weather forecast indicates heavy rain this weekend in several regions.&#34;
+</span></span><span style="display:flex;"><span>prefix = &#34;Summarize: &#34;  # 用于指引模型生成摘要
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 在输入文本前添加前缀
+</span></span><span style="display:flex;"><span>input_text = prefix + text
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 编码输入
+</span></span><span style="display:flex;"><span>inputs = tokenizer(input_text, return_tensors=&#34;pt&#34;)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span># 生成摘要
+</span></span><span style="display:flex;"><span>summary_ids = model.generate(inputs[&#34;input_ids&#34;], max_length=50, num_beams=5, early_stopping=True)
+</span></span><span style="display:flex;"><span>summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>print(&#34;Generated Summary:&#34;, summary)
+</span></span></code></pre></div><p>在这个例子中：</p>
+<ul>
+<li><code>prefix = &quot;Summarize: &quot;</code>指引模型生成总结性内容。</li>
+<li>通过<code>generate()</code>方法，模型会根据输入生成一个简短的摘要内容。</li>
+</ul>
+<h2 id="基于glm的文本摘要实现">基于GLM的文本摘要实现</h2>
+<p>接下来，我们将基于GLM（Generative Language Model）实现一个完整的文本摘要任务。以下是具体步骤：</p>
+<h3 id="step1-导入相关包">Step1 导入相关包</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> datasets <span style="color:#f92672">import</span> Dataset
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoTokenizer, AutoModelForSeq2SeqLM, DataCollatorForSeq2Seq, Seq2SeqTrainer, Seq2SeqTrainingArguments
+</span></span></code></pre></div><h3 id="step2-加载数据集">Step2 加载数据集</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>ds <span style="color:#f92672">=</span> Dataset<span style="color:#f92672">.</span>load_from_disk(<span style="color:#e6db74">&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/08-text_summarization/nlpcc_2017/&#34;</span>)
+</span></span><span style="display:flex;"><span>ds <span style="color:#f92672">=</span> ds<span style="color:#f92672">.</span>train_test_split(<span style="color:#ae81ff">100</span>, seed<span style="color:#f92672">=</span><span style="color:#ae81ff">42</span>)
+</span></span></code></pre></div><h3 id="step3-数据预处理">Step3 数据预处理</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;THUDM/glm-large-chinese&#34;</span>, trust_remote_code<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">process_func</span>(examples):
+</span></span><span style="display:flex;"><span>    contents <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34;摘要生成: </span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> e <span style="color:#f92672">+</span> tokenizer<span style="color:#f92672">.</span>mask_token <span style="color:#66d9ef">for</span> e <span style="color:#f92672">in</span> examples[<span style="color:#e6db74">&#34;content&#34;</span>]]
+</span></span><span style="display:flex;"><span>    inputs <span style="color:#f92672">=</span> tokenizer(contents, max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">384</span>, truncation<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, padding<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;max_length&#34;</span>, return_tensors<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pt&#34;</span>)
+</span></span><span style="display:flex;"><span>    inputs <span style="color:#f92672">=</span> tokenizer<span style="color:#f92672">.</span>build_inputs_for_generation(inputs, targets<span style="color:#f92672">=</span>examples[<span style="color:#e6db74">&#39;title&#39;</span>], padding<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, max_gen_length<span style="color:#f92672">=</span><span style="color:#ae81ff">64</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> inputs
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tokenized_ds <span style="color:#f92672">=</span> ds<span style="color:#f92672">.</span>map(process_func, batched<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, remove_columns<span style="color:#f92672">=</span>ds[<span style="color:#e6db74">&#34;train&#34;</span>]<span style="color:#f92672">.</span>column_names)
+</span></span></code></pre></div><h3 id="step4-创建模型">Step4 创建模型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModelForSeq2SeqLM<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;THUDM/glm-large-chinese&#34;</span>, trust_remote_code<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span></code></pre></div><h3 id="step5-创建模型评估函数">Step5 创建模型评估函数</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> rouge_chinese <span style="color:#f92672">import</span> Rouge
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>rouge <span style="color:#f92672">=</span> Rouge()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">compute_metric</span>(evalPred):
+</span></span><span style="display:flex;"><span>    predictions, labels <span style="color:#f92672">=</span> evalPred
+</span></span><span style="display:flex;"><span>    decode_preds <span style="color:#f92672">=</span> tokenizer<span style="color:#f92672">.</span>batch_decode(predictions, skip_special_tokens<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    labels <span style="color:#f92672">=</span> np<span style="color:#f92672">.</span>where(labels <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">100</span>, labels, tokenizer<span style="color:#f92672">.</span>pad_token_id)
+</span></span><span style="display:flex;"><span>    decode_labels <span style="color:#f92672">=</span> tokenizer<span style="color:#f92672">.</span>batch_decode(labels, skip_special_tokens<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    decode_preds <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34; &#34;</span><span style="color:#f92672">.</span>join(p) <span style="color:#66d9ef">for</span> p <span style="color:#f92672">in</span> decode_preds]
+</span></span><span style="display:flex;"><span>    decode_labels <span style="color:#f92672">=</span> [<span style="color:#e6db74">&#34; &#34;</span><span style="color:#f92672">.</span>join(l) <span style="color:#66d9ef">for</span> l <span style="color:#f92672">in</span> decode_labels]
+</span></span><span style="display:flex;"><span>    scores <span style="color:#f92672">=</span> rouge<span style="color:#f92672">.</span>get_scores(decode_preds, decode_labels, avg<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;rouge-1&#34;</span>: scores[<span style="color:#e6db74">&#34;rouge-1&#34;</span>][<span style="color:#e6db74">&#34;f&#34;</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;rouge-2&#34;</span>: scores[<span style="color:#e6db74">&#34;rouge-2&#34;</span>][<span style="color:#e6db74">&#34;f&#34;</span>],
+</span></span><span style="display:flex;"><span>        <span style="color:#e6db74">&#34;rouge-l&#34;</span>: scores[<span style="color:#e6db74">&#34;rouge-l&#34;</span>][<span style="color:#e6db74">&#34;f&#34;</span>],
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><h3 id="step6-配置训练参数">Step6 配置训练参数</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>os<span style="color:#f92672">.</span>environ[<span style="color:#e6db74">&#34;WANDB_DISABLED&#34;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;true&#34;</span>
+</span></span><span style="display:flex;"><span>args <span style="color:#f92672">=</span> Seq2SeqTrainingArguments(
+</span></span><span style="display:flex;"><span>    output_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./summary_glm&#34;</span>,
+</span></span><span style="display:flex;"><span>    per_device_train_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">4</span>,
+</span></span><span style="display:flex;"><span>    per_device_eval_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>,
+</span></span><span style="display:flex;"><span>    gradient_accumulation_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>,
+</span></span><span style="display:flex;"><span>    logging_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">8</span>,
+</span></span><span style="display:flex;"><span>    num_train_epochs<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h3 id="step7-创建trainer">Step7 创建Trainer</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>trainer <span style="color:#f92672">=</span> Seq2SeqTrainer(
+</span></span><span style="display:flex;"><span>    args<span style="color:#f92672">=</span>args,
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">=</span>model,
+</span></span><span style="display:flex;"><span>    train_dataset<span style="color:#f92672">=</span>tokenized_ds[<span style="color:#e6db74">&#34;train&#34;</span>],
+</span></span><span style="display:flex;"><span>    tokenizer<span style="color:#f92672">=</span>tokenizer,
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h3 id="step8-训练模型">Step8 训练模型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>trainer<span style="color:#f92672">.</span>train()
+</span></span></code></pre></div><h3 id="step9-评估模型">Step9 评估模型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>input_text <span style="color:#f92672">=</span> ds[<span style="color:#e6db74">&#34;test&#34;</span>][<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>][<span style="color:#e6db74">&#34;content&#34;</span>]
+</span></span><span style="display:flex;"><span>inputs <span style="color:#f92672">=</span> tokenizer(<span style="color:#e6db74">&#34;摘要生成: </span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span> <span style="color:#f92672">+</span> input_text <span style="color:#f92672">+</span> tokenizer<span style="color:#f92672">.</span>mask_token, return_tensors<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;pt&#34;</span>)
+</span></span><span style="display:flex;"><span>inputs <span style="color:#f92672">=</span> tokenizer<span style="color:#f92672">.</span>build_inputs_for_generation(inputs, max_gen_length<span style="color:#f92672">=</span><span style="color:#ae81ff">64</span>)
+</span></span><span style="display:flex;"><span>inputs <span style="color:#f92672">=</span> inputs<span style="color:#f92672">.</span>to(<span style="color:#e6db74">&#34;cuda&#34;</span>)
+</span></span><span style="display:flex;"><span>output <span style="color:#f92672">=</span> model<span style="color:#f92672">.</span>generate(<span style="color:#f92672">**</span>inputs, max_new_tokens<span style="color:#f92672">=</span><span style="color:#ae81ff">64</span>, eos_token_id<span style="color:#f92672">=</span>tokenizer<span style="color:#f92672">.</span>eop_token_id, do_sample<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>tokenizer<span style="color:#f92672">.</span>decode(output[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">.</span>tolist())
+</span></span></code></pre></div><h3 id="step10-保存模型">Step10 保存模型</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model<span style="color:#f92672">.</span>save_pretrained(<span style="color:#e6db74">&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/08-text_summarization/summary_glm&#34;</span>)
+</span></span></code></pre></div><h2 id="总结">总结</h2>
+<p>前缀模型通过简单的“前缀”机制，能够在同一模型结构下完成多种生成任务，具有极高的灵活性和实用性。本文详细介绍了前缀模型的原理、应用场景及其在文本摘要任务中的实现，希望能够帮助读者更好地理解和应用这一技术。</p>
+<pre tabindex="0"><code></code></pre></section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/ner/"
+      ><span class="mr-1.5">←</span><span></span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/tokenizer/"
+      ><span></span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>

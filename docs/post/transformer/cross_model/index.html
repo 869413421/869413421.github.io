@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<html
+  class="not-ready text-sm lg:text-base"
+  style="--bg: #fff"
+  lang="en-zh"
+>
+  <head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, shrink-to-fit=no"
+  />
+
+  
+  <title>Transformer 学习之路 - 文本相似度实例 - 清水泥沙</title>
+
+  
+  <meta name="theme-color" />
+  
+  <meta name="description" content="Transformer 学习之路 - 文本相似度实例 Transformer 模型自 2017 年提出以来，已经成为了自然语言处理（NLP）领域的核心技术之一。它不仅改变了机器翻译、文本生成等任务的处理方式，还在文本相似度计算、情感分析等任务中展现了强大的能力。本文将基于 Transformer 技术，详细讲解如何实现文本相似度计算，并结合代码示例进行深入解析。
+1. 背景与问题 文本相似度计算是 NLP 中的一个重要任务，它旨在衡量两段文本在语义上的相似程度。传统的文本相似度计算方法通常基于词袋模型或 TF-IDF，但这些方法无法捕捉到文本的深层语义信息。Transformer 模型通过自注意力机制（Self-Attention）和多层编码器，能够更好地理解文本的上下文关系，从而在文本相似度计算中取得了显著的效果提升。
+2. 环境准备 在开始之前，我们需要安装一些必要的 Python 库，包括 transformers、datasets 和 evaluate。这些库将帮助我们加载预训练模型、处理数据集以及评估模型性能。
+!pip install evaluate datasets 3. 加载数据集 我们使用 datasets 库加载一个 JSON 格式的文本相似度数据集。该数据集包含两段文本及其相似度标签。
+from datasets import load_dataset dataset = load_dataset(&#34;json&#34;, data_files=&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/05-sentence_similarity/train_pair_1w.json&#34;, split=&#34;train&#34;) 为了训练和评估模型，我们将数据集划分为训练集和测试集。
+datasets = dataset.train_test_split(test_size=0.2) 4. 数据预处理 在将数据输入模型之前，我们需要对文本进行预处理。这里我们使用 AutoTokenizer 加载一个中文预训练模型的分词器，并对文本进行分词和截断。
+from transformers import AutoTokenizer tokenizer = AutoTokenizer.from_pretrained(&#34;hfl/chinese-macbert-base&#34;) def preprocess_function(examples): tokenized_examples = tokenizer(examples[&#34;sentence1&#34;], examples[&#34;sentence2&#34;], truncation=True, max_length=128) tokenized_examples[&#34;labels&#34;] = [float(example) for example in examples[&#34;label&#34;]] return tokenized_examples tokenized_datasets = datasets." />
+  <meta
+    name="author"
+    content=""
+  />
+  
+
+  
+  
+  
+  
+  
+  
+  <link rel="preload stylesheet" as="style" href="https://869413421.github.io/main.min.css" />
+
+  
+
+  
+     
+  <link rel="preload" as="image" href="https://869413421.github.io/theme.png" />
+
+  
+  
+  
+  <link rel="preload" as="image" href="https://www.gravatar.com/avatar/6fd8df4abe41f17fd8e2dd7d97b5cc8c?s=160&amp;d=identicon" />
+  
+  
+
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/github.svg" />
+  
+  <link rel="preload" as="image" href="https://869413421.github.io/rss.svg" />
+  
+
+  
+  <link rel="icon" href="https://869413421.github.io/favicon.ico" />
+  <link rel="apple-touch-icon" href="https://869413421.github.io/apple-touch-icon.png" />
+
+  
+  <meta name="generator" content="Hugo 0.110.0">
+
+  
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta property="og:title" content="Transformer 学习之路 - 文本相似度实例" />
+<meta property="og:description" content="通过 Transformer 技术实现文本相似度计算的详细教程" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://869413421.github.io/post/transformer/cross_model/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2024-04-19T17:35:18+08:00" />
+<meta property="article:modified_time" content="2024-04-19T17:35:18+08:00" />
+
+  
+  <meta itemprop="name" content="Transformer 学习之路 - 文本相似度实例">
+<meta itemprop="description" content="通过 Transformer 技术实现文本相似度计算的详细教程"><meta itemprop="datePublished" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="dateModified" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="wordCount" content="255">
+<meta itemprop="keywords" content="" />
+  
+  <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Transformer 学习之路 - 文本相似度实例"/>
+<meta name="twitter:description" content="通过 Transformer 技术实现文本相似度计算的详细教程"/>
+
+  
+  
+</head>
+
+  <body class="text-black duration-200 ease-out dark:text-white">
+    <header class="mx-auto flex h-[5rem] max-w-3xl px-8 lg:justify-center">
+  <div class="relative z-50 mr-auto flex items-center">
+    <a
+      class="-translate-x-[1px] -translate-y-0.5 text-3xl font-bold"
+      href="https://869413421.github.io/"
+      >清水泥沙</a
+    >
+    <a
+      class="btn-dark ml-6 h-6 w-6 shrink-0 cursor-pointer [background:url(./theme.svg)_left_center/cover_no-repeat] dark:invert dark:[background-position:right]"
+    ></a>
+  </div>
+
+  <a
+    class="btn-menu relative z-50 -mr-8 flex h-[5rem] w-[5rem] shrink-0 cursor-pointer flex-col items-center justify-center gap-2.5 lg:hidden"
+  ></a>
+
+  
+  <script>
+    
+    const htmlClass = document.documentElement.classList;
+    setTimeout(() => {
+      htmlClass.remove('not-ready');
+    }, 10);
+
+    
+    const btnMenu = document.querySelector('.btn-menu');
+    btnMenu.addEventListener('click', () => {
+      htmlClass.toggle('open');
+    });
+
+    
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    const lightBg = `"#fff"`.replace(/"/g, '');
+    const setDark = (isDark) => {
+      metaTheme.setAttribute('content', isDark ? '#000' : lightBg);
+      htmlClass[isDark ? 'add' : 'remove']('dark');
+      localStorage.setItem('dark', isDark);
+    };
+
+    
+    const darkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+    if (htmlClass.contains('dark')) {
+      setDark(true);
+    } else {
+      const darkVal = localStorage.getItem('dark');
+      setDark(darkVal ? darkVal === 'true' : darkScheme.matches);
+    }
+
+    
+    darkScheme.addEventListener('change', (event) => {
+      setDark(event.matches);
+    });
+
+    
+    const btnDark = document.querySelector('.btn-dark');
+    btnDark.addEventListener('click', () => {
+      setDark(localStorage.getItem('dark') !== 'true');
+    });
+  </script>
+
+  <div
+    class="nav-wrapper fixed inset-x-0 top-full z-40 flex h-full select-none flex-col justify-center pb-16 duration-200 dark:bg-black lg:static lg:h-auto lg:flex-row lg:!bg-transparent lg:pb-0 lg:transition-none"
+  >
+    
+    
+    <nav class="lg:ml-12 lg:flex lg:flex-row lg:items-center lg:space-x-6">
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/tags"
+        >标签</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/categories"
+        >分类</a
+      >
+      
+      <a
+        class="block text-center text-2xl leading-[5rem] lg:text-base lg:font-normal"
+        href="/about/"
+        >个人简历</a
+      >
+      
+    </nav>
+    
+
+    
+    <nav
+      class="mt-12 flex justify-center space-x-10 dark:invert lg:mt-0 lg:ml-12 lg:items-center lg:space-x-6"
+    >
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./github.svg)"
+        href=" https://github.com/869413421 "
+        target="_blank"
+      ></a>
+      
+      <a
+        class="h-8 w-8 [background:var(--url)_center_center/cover_no-repeat] lg:h-6 lg:w-6"
+        style="--url: url(./rss.svg)"
+        href=" https://869413421.github.io/index.xml "
+        target="_blank"
+      ></a>
+      
+    </nav>
+    
+  </div>
+</header>
+
+
+    <main
+      class="prose prose-neutral relative mx-auto min-h-[calc(100%-10rem)] max-w-3xl px-8 pt-20 pb-32 dark:prose-invert"
+    >
+      
+
+<article>
+  <header class="mb-20">
+    <h1 class="!my-0 pb-2.5">Transformer 学习之路 - 文本相似度实例</h1>
+
+    
+    <div class="text-sm opacity-60">
+      
+      <time>Apr 19, 2024</time>
+      
+      
+    </div>
+    
+  </header>
+
+  <section><h1 id="transformer-学习之路---文本相似度实例">Transformer 学习之路 - 文本相似度实例</h1>
+<p>Transformer 模型自 2017 年提出以来，已经成为了自然语言处理（NLP）领域的核心技术之一。它不仅改变了机器翻译、文本生成等任务的处理方式，还在文本相似度计算、情感分析等任务中展现了强大的能力。本文将基于 Transformer 技术，详细讲解如何实现文本相似度计算，并结合代码示例进行深入解析。</p>
+<h2 id="1-背景与问题">1. 背景与问题</h2>
+<p>文本相似度计算是 NLP 中的一个重要任务，它旨在衡量两段文本在语义上的相似程度。传统的文本相似度计算方法通常基于词袋模型或 TF-IDF，但这些方法无法捕捉到文本的深层语义信息。Transformer 模型通过自注意力机制（Self-Attention）和多层编码器，能够更好地理解文本的上下文关系，从而在文本相似度计算中取得了显著的效果提升。</p>
+<h2 id="2-环境准备">2. 环境准备</h2>
+<p>在开始之前，我们需要安装一些必要的 Python 库，包括 <code>transformers</code>、<code>datasets</code> 和 <code>evaluate</code>。这些库将帮助我们加载预训练模型、处理数据集以及评估模型性能。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#960050;background-color:#1e0010">!</span>pip install evaluate datasets
+</span></span></code></pre></div><h2 id="3-加载数据集">3. 加载数据集</h2>
+<p>我们使用 <code>datasets</code> 库加载一个 JSON 格式的文本相似度数据集。该数据集包含两段文本及其相似度标签。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> datasets <span style="color:#f92672">import</span> load_dataset
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>dataset <span style="color:#f92672">=</span> load_dataset(<span style="color:#e6db74">&#34;json&#34;</span>, data_files<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/05-sentence_similarity/train_pair_1w.json&#34;</span>, split<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;train&#34;</span>)
+</span></span></code></pre></div><p>为了训练和评估模型，我们将数据集划分为训练集和测试集。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>datasets <span style="color:#f92672">=</span> dataset<span style="color:#f92672">.</span>train_test_split(test_size<span style="color:#f92672">=</span><span style="color:#ae81ff">0.2</span>)
+</span></span></code></pre></div><h2 id="4-数据预处理">4. 数据预处理</h2>
+<p>在将数据输入模型之前，我们需要对文本进行预处理。这里我们使用 <code>AutoTokenizer</code> 加载一个中文预训练模型的分词器，并对文本进行分词和截断。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoTokenizer
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tokenizer <span style="color:#f92672">=</span> AutoTokenizer<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/chinese-macbert-base&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">preprocess_function</span>(examples):
+</span></span><span style="display:flex;"><span>    tokenized_examples <span style="color:#f92672">=</span> tokenizer(examples[<span style="color:#e6db74">&#34;sentence1&#34;</span>], examples[<span style="color:#e6db74">&#34;sentence2&#34;</span>], truncation<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, max_length<span style="color:#f92672">=</span><span style="color:#ae81ff">128</span>)
+</span></span><span style="display:flex;"><span>    tokenized_examples[<span style="color:#e6db74">&#34;labels&#34;</span>] <span style="color:#f92672">=</span> [float(example) <span style="color:#66d9ef">for</span> example <span style="color:#f92672">in</span> examples[<span style="color:#e6db74">&#34;label&#34;</span>]]
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> tokenized_examples
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>tokenized_datasets <span style="color:#f92672">=</span> datasets<span style="color:#f92672">.</span>map(preprocess_function, batched<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>, remove_columns<span style="color:#f92672">=</span>datasets[<span style="color:#e6db74">&#34;train&#34;</span>]<span style="color:#f92672">.</span>column_names)
+</span></span></code></pre></div><h2 id="5-创建模型">5. 创建模型</h2>
+<p>我们使用 <code>AutoModelForSequenceClassification</code> 加载一个预训练的中文模型，并将其用于文本相似度分类任务。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoModelForSequenceClassification
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model <span style="color:#f92672">=</span> AutoModelForSequenceClassification<span style="color:#f92672">.</span>from_pretrained(<span style="color:#e6db74">&#34;hfl/chinese-macbert-base&#34;</span>, num_labels<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span></code></pre></div><h2 id="6-模型评估函数">6. 模型评估函数</h2>
+<p>为了评估模型的性能，我们定义了 <code>eval_metric</code> 函数，该函数计算模型的准确率（Accuracy）和 F1 分数。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> evaluate
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>acc_metric <span style="color:#f92672">=</span> evaluate<span style="color:#f92672">.</span>load(<span style="color:#e6db74">&#34;accuracy&#34;</span>)
+</span></span><span style="display:flex;"><span>f1_metric <span style="color:#f92672">=</span> evaluate<span style="color:#f92672">.</span>load(<span style="color:#e6db74">&#34;f1&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">eval_metric</span>(eval_predict):
+</span></span><span style="display:flex;"><span>    predictions, labels <span style="color:#f92672">=</span> eval_predict
+</span></span><span style="display:flex;"><span>    predictions <span style="color:#f92672">=</span> [int(p <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0.5</span>) <span style="color:#66d9ef">for</span> p <span style="color:#f92672">in</span> predictions]
+</span></span><span style="display:flex;"><span>    labels <span style="color:#f92672">=</span> [int(l) <span style="color:#66d9ef">for</span> l <span style="color:#f92672">in</span> labels]
+</span></span><span style="display:flex;"><span>    acc <span style="color:#f92672">=</span> acc_metric<span style="color:#f92672">.</span>compute(predictions<span style="color:#f92672">=</span>predictions, references<span style="color:#f92672">=</span>labels)
+</span></span><span style="display:flex;"><span>    f1 <span style="color:#f92672">=</span> f1_metric<span style="color:#f92672">.</span>compute(predictions<span style="color:#f92672">=</span>predictions, references<span style="color:#f92672">=</span>labels)
+</span></span><span style="display:flex;"><span>    acc<span style="color:#f92672">.</span>update(f1)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> acc
+</span></span></code></pre></div><h2 id="7-配置训练参数">7. 配置训练参数</h2>
+<p>我们使用 <code>TrainingArguments</code> 配置模型的训练参数，包括学习率、批量大小、评估策略等。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> TrainingArguments
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>train_args <span style="color:#f92672">=</span> TrainingArguments(
+</span></span><span style="display:flex;"><span>    output_dir<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;./cross_model&#34;</span>,
+</span></span><span style="display:flex;"><span>    per_device_train_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">32</span>,
+</span></span><span style="display:flex;"><span>    per_device_eval_batch_size<span style="color:#f92672">=</span><span style="color:#ae81ff">32</span>,
+</span></span><span style="display:flex;"><span>    logging_steps<span style="color:#f92672">=</span><span style="color:#ae81ff">10</span>,
+</span></span><span style="display:flex;"><span>    eval_strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;epoch&#34;</span>,
+</span></span><span style="display:flex;"><span>    save_strategy<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;epoch&#34;</span>,
+</span></span><span style="display:flex;"><span>    save_total_limit<span style="color:#f92672">=</span><span style="color:#ae81ff">3</span>,
+</span></span><span style="display:flex;"><span>    learning_rate<span style="color:#f92672">=</span><span style="color:#ae81ff">2e-5</span>,
+</span></span><span style="display:flex;"><span>    weight_decay<span style="color:#f92672">=</span><span style="color:#ae81ff">0.01</span>,
+</span></span><span style="display:flex;"><span>    metric_for_best_model<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;f1&#34;</span>,
+</span></span><span style="display:flex;"><span>    load_best_model_at_end<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h2 id="8-创建-trainer">8. 创建 Trainer</h2>
+<p><code>Trainer</code> 是 Hugging Face 提供的一个高级 API，它封装了模型的训练、评估和预测过程。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> Trainer, DataCollatorWithPadding
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>trainer <span style="color:#f92672">=</span> Trainer(
+</span></span><span style="display:flex;"><span>    model<span style="color:#f92672">=</span>model,
+</span></span><span style="display:flex;"><span>    args<span style="color:#f92672">=</span>train_args,
+</span></span><span style="display:flex;"><span>    tokenizer<span style="color:#f92672">=</span>tokenizer,
+</span></span><span style="display:flex;"><span>    train_dataset<span style="color:#f92672">=</span>tokenized_datasets[<span style="color:#e6db74">&#34;train&#34;</span>],
+</span></span><span style="display:flex;"><span>    eval_dataset<span style="color:#f92672">=</span>tokenized_datasets[<span style="color:#e6db74">&#34;test&#34;</span>],
+</span></span><span style="display:flex;"><span>    data_collator<span style="color:#f92672">=</span>DataCollatorWithPadding(tokenizer<span style="color:#f92672">=</span>tokenizer),
+</span></span><span style="display:flex;"><span>    compute_metrics<span style="color:#f92672">=</span>eval_metric
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><h2 id="9-训练模型">9. 训练模型</h2>
+<p>我们调用 <code>trainer.train()</code> 开始训练模型。在训练过程中，模型会根据训练数据不断调整参数，以最小化损失函数。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>trainer<span style="color:#f92672">.</span>train()
+</span></span></code></pre></div><h2 id="10-评估模型">10. 评估模型</h2>
+<p>训练完成后，我们使用 <code>pipeline</code> API 对模型进行评估。通过输入两段文本，模型将输出它们的相似度标签。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> pipeline
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>config<span style="color:#f92672">.</span>id2label <span style="color:#f92672">=</span> {<span style="color:#ae81ff">0</span>: <span style="color:#e6db74">&#34;不相似&#34;</span>, <span style="color:#ae81ff">1</span>: <span style="color:#e6db74">&#34;相似&#34;</span>}
+</span></span><span style="display:flex;"><span>pipe <span style="color:#f92672">=</span> pipeline(<span style="color:#e6db74">&#34;text-classification&#34;</span>, model<span style="color:#f92672">=</span>model, tokenizer<span style="color:#f92672">=</span>tokenizer, device<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>result <span style="color:#f92672">=</span> pipe({<span style="color:#e6db74">&#34;text&#34;</span>: <span style="color:#e6db74">&#34;今天天气真好&#34;</span>, <span style="color:#e6db74">&#34;text_pair&#34;</span>: <span style="color:#e6db74">&#34;真不错，现在的天气真不错&#34;</span>}, function_to_apply<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;none&#34;</span>)
+</span></span><span style="display:flex;"><span>result[<span style="color:#e6db74">&#34;label&#34;</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;相似&#34;</span> <span style="color:#66d9ef">if</span> result[<span style="color:#e6db74">&#34;score&#34;</span>] <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0.5</span> <span style="color:#66d9ef">else</span> <span style="color:#e6db74">&#34;不相似&#34;</span>
+</span></span><span style="display:flex;"><span>result
+</span></span></code></pre></div><h2 id="11-保存模型">11. 保存模型</h2>
+<p>最后，我们将训练好的模型保存到指定路径，以便后续使用。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>model_save_path <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/05-sentence_similarity/model/cross&#34;</span>
+</span></span><span style="display:flex;"><span>model<span style="color:#f92672">.</span>save_pretrained(model_save_path)
+</span></span></code></pre></div><h2 id="总结">总结</h2>
+<p>通过本文的详细讲解，我们了解了如何使用 Transformer 技术实现文本相似度计算。从数据加载、预处理到模型训练和评估，每一步都结合了代码示例，帮助读者更好地理解和应用 Transformer 模型。希望这篇文章能够为你在 NLP 领域的学习和实践提供有价值的参考。</p>
+</section>
+
+  
+  
+
+  
+  
+  
+  <nav class="mt-24 flex rounded-lg bg-black/[3%] text-lg dark:bg-white/[8%]">
+    
+    <a
+      class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/classification_demo/"
+      ><span class="mr-1.5">←</span><span>Transformer 学习之路 - 文本分类实战</span></a
+    >
+    
+    
+    <a
+      class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
+      href="https://869413421.github.io/post/transformer/dual_model/"
+      ><span>Transformer 学习之路 - 文本相似度实战</span><span class="ml-1.5">→</span></a
+    >
+    
+  </nav>
+  
+
+  
+  
+
+  
+  
+</article>
+
+
+    </main>
+
+    <footer
+  class="opaco mx-auto flex h-[5rem] max-w-3xl items-center px-8 text-[0.9em] opacity-60"
+>
+  <div class="mr-auto">
+    &copy; 2025
+    <a class="link" href="https://869413421.github.io/">清水泥沙</a>
+  </div>
+</footer>
+
+  </body>
+</html>
