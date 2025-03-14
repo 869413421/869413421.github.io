@@ -51,12 +51,19 @@
   />
 
   
-  <title> - 清水泥沙</title>
+  <title>Transformer 学习之路 - 因果语言模型训练实例 - 清水泥沙</title>
 
   
   <meta name="theme-color" />
   
-  <meta name="description" content="--- title: &#34;Transformer 学习之路 - 因果语言模型训练实例&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 因果语言模型训练实例 在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。 --- ## 什么是因果语言模型？ 因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。 --- ## 自回归模型的工作原理 自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。 例如，生成句子 `&#34;今天天气不错，我想去公园。&#34;` 的过程如下： 1. 初始输入：`&#34;今天天气&#34;` 2. 模型生成下一个单词：`&#34;不错&#34;` 3. 当前输入变为：`&#34;今天天气不错&#34;` 4. 模型再次生成下一个单词：`&#34;我想去公园。&#34;` 在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。 --- ## 结合因果与自回归 因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。 --- ## 代码实现：训练一个因果语言模型 接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。 ### Step 1: 导入相关包 ```python from datasets import Dataset from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments Step 2: 加载数据集 ds = Dataset." />
+  <meta name="description" content="Transformer 学习之路 - 因果语言模型训练实例 在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。
+什么是因果语言模型？ 因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。
+自回归模型的工作原理 自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。
+例如，生成句子 &quot;今天天气不错，我想去公园。&quot; 的过程如下：
+初始输入：&quot;今天天气&quot; 模型生成下一个单词：&quot;不错&quot; 当前输入变为：&quot;今天天气不错&quot; 模型再次生成下一个单词：&quot;我想去公园。&quot; 在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。
+结合因果与自回归 因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。
+代码实现：训练一个因果语言模型 接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。
+Step 1: 导入相关包 from datasets import Dataset from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments Step 2: 加载数据集 ds = Dataset.load_from_disk(&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/07-language_model/wiki_cn_filtered/&#34;) Step 3: 数据预处理 tokenizer = AutoTokenizer.from_pretrained(&#34;Langboat/bloom-389m-zh&#34;) def process_func(examples): contents = [e &#43; tokenizer.eos_token for e in examples[&#34;completion&#34;]] return tokenizer(contents, max_length=384, truncation=True) tokenized_ds = ds." />
   <meta
     name="author"
     content=""
@@ -109,23 +116,23 @@
   
   
   
-  <meta property="og:title" content="" />
-<meta property="og:description" content="--- title: &#34;Transformer 学习之路 - 因果语言模型训练实例&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 因果语言模型训练实例 在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。 --- ## 什么是因果语言模型？ 因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。 --- ## 自回归模型的工作原理 自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。 例如，生成句子 `&#34;今天天气不错，我想去公园。&#34;` 的过程如下： 1. 初始输入：`&#34;今天天气&#34;` 2. 模型生成下一个单词：`&#34;不错&#34;` 3. 当前输入变为：`&#34;今天天气不错&#34;` 4. 模型再次生成下一个单词：`&#34;我想去公园。&#34;` 在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。 --- ## 结合因果与自回归 因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。 --- ## 代码实现：训练一个因果语言模型 接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。 ### Step 1: 导入相关包 ```python from datasets import Dataset from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments Step 2: 加载数据集 ds = Dataset." />
+  <meta property="og:title" content="Transformer 学习之路 - 因果语言模型训练实例" />
+<meta property="og:description" content="深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://869413421.github.io/post/transformer/causal_lm/" /><meta property="article:section" content="post" />
-
-
+<meta property="article:published_time" content="2024-04-19T17:35:18+08:00" />
+<meta property="article:modified_time" content="2024-04-19T17:35:18+08:00" />
 
   
-  <meta itemprop="name" content="">
-<meta itemprop="description" content="--- title: &#34;Transformer 学习之路 - 因果语言模型训练实例&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 因果语言模型训练实例 在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。 --- ## 什么是因果语言模型？ 因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。 --- ## 自回归模型的工作原理 自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。 例如，生成句子 `&#34;今天天气不错，我想去公园。&#34;` 的过程如下： 1. 初始输入：`&#34;今天天气&#34;` 2. 模型生成下一个单词：`&#34;不错&#34;` 3. 当前输入变为：`&#34;今天天气不错&#34;` 4. 模型再次生成下一个单词：`&#34;我想去公园。&#34;` 在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。 --- ## 结合因果与自回归 因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。 --- ## 代码实现：训练一个因果语言模型 接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。 ### Step 1: 导入相关包 ```python from datasets import Dataset from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments Step 2: 加载数据集 ds = Dataset.">
-
-<meta itemprop="wordCount" content="209">
+  <meta itemprop="name" content="Transformer 学习之路 - 因果语言模型训练实例">
+<meta itemprop="description" content="深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现"><meta itemprop="datePublished" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="dateModified" content="2024-04-19T17:35:18+08:00" />
+<meta itemprop="wordCount" content="176">
 <meta itemprop="keywords" content="" />
   
   <meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content=""/>
-<meta name="twitter:description" content="--- title: &#34;Transformer 学习之路 - 因果语言模型训练实例&#34; date: 2024-04-19T17:35:18&#43;08:00 draft: false description: &#34;深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现&#34; categories: [&#34;Python&#34;, &#34;Transformer&#34;] --- # Transformer 学习之路 - 因果语言模型训练实例 在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。 --- ## 什么是因果语言模型？ 因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。 --- ## 自回归模型的工作原理 自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。 例如，生成句子 `&#34;今天天气不错，我想去公园。&#34;` 的过程如下： 1. 初始输入：`&#34;今天天气&#34;` 2. 模型生成下一个单词：`&#34;不错&#34;` 3. 当前输入变为：`&#34;今天天气不错&#34;` 4. 模型再次生成下一个单词：`&#34;我想去公园。&#34;` 在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。 --- ## 结合因果与自回归 因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。 --- ## 代码实现：训练一个因果语言模型 接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。 ### Step 1: 导入相关包 ```python from datasets import Dataset from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments Step 2: 加载数据集 ds = Dataset."/>
+<meta name="twitter:title" content="Transformer 学习之路 - 因果语言模型训练实例"/>
+<meta name="twitter:description" content="深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现"/>
 
   
   
@@ -252,66 +259,43 @@
 
 <article>
   <header class="mb-20">
-    <h1 class="!my-0 pb-2.5"></h1>
+    <h1 class="!my-0 pb-2.5">Transformer 学习之路 - 因果语言模型训练实例</h1>
 
     
     <div class="text-sm opacity-60">
+      
+      <time>Apr 19, 2024</time>
       
       
     </div>
     
   </header>
 
-  <section><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-markdown" data-lang="markdown"><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>title: &#34;Transformer 学习之路 - 因果语言模型训练实例&#34;
-</span></span><span style="display:flex;"><span>date: 2024-04-19T17:35:18+08:00
-</span></span><span style="display:flex;"><span>draft: false
-</span></span><span style="display:flex;"><span>description: &#34;深入解析因果语言模型在 Transformer 中的应用，结合代码示例讲解其技术原理与实现&#34;
-</span></span><span style="display:flex;"><span>categories: [&#34;Python&#34;, &#34;Transformer&#34;]
-</span></span><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span># Transformer 学习之路 - 因果语言模型训练实例
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">## 什么是因果语言模型？
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span>因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">## 自回归模型的工作原理
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span>自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>例如，生成句子 <span style="color:#e6db74">`&#34;今天天气不错，我想去公园。&#34;`</span> 的过程如下：
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">1.</span> 初始输入：`&#34;今天天气&#34;`
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">2.</span> 模型生成下一个单词：`&#34;不错&#34;`
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">3.</span> 当前输入变为：`&#34;今天天气不错&#34;`
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">4.</span> 模型再次生成下一个单词：`&#34;我想去公园。&#34;`
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">## 结合因果与自回归
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span>因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>---
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">## 代码实现：训练一个因果语言模型
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span>接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#75715e">### Step 1: 导入相关包
-</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
-</span></span><span style="display:flex;"><span>```python
-</span></span><span style="display:flex;"><span>from datasets import Dataset
-</span></span><span style="display:flex;"><span>from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments
+  <section><h1 id="transformer-学习之路---因果语言模型训练实例">Transformer 学习之路 - 因果语言模型训练实例</h1>
+<p>在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。</p>
+<hr>
+<h2 id="什么是因果语言模型">什么是因果语言模型？</h2>
+<p>因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。</p>
+<hr>
+<h2 id="自回归模型的工作原理">自回归模型的工作原理</h2>
+<p>自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。</p>
+<p>例如，生成句子 <code>&quot;今天天气不错，我想去公园。&quot;</code> 的过程如下：</p>
+<ol>
+<li>初始输入：<code>&quot;今天天气&quot;</code></li>
+<li>模型生成下一个单词：<code>&quot;不错&quot;</code></li>
+<li>当前输入变为：<code>&quot;今天天气不错&quot;</code></li>
+<li>模型再次生成下一个单词：<code>&quot;我想去公园。&quot;</code></li>
+</ol>
+<p>在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。</p>
+<hr>
+<h2 id="结合因果与自回归">结合因果与自回归</h2>
+<p>因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。</p>
+<hr>
+<h2 id="代码实现训练一个因果语言模型">代码实现：训练一个因果语言模型</h2>
+<p>接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。</p>
+<h3 id="step-1-导入相关包">Step 1: 导入相关包</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> datasets <span style="color:#f92672">import</span> Dataset
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> transformers <span style="color:#f92672">import</span> AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments
 </span></span></code></pre></div><h3 id="step-2-加载数据集">Step 2: 加载数据集</h3>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>ds <span style="color:#f92672">=</span> Dataset<span style="color:#f92672">.</span>load_from_disk(<span style="color:#e6db74">&#34;/content/drive/MyDrive/ai-learning/2.NLP Task/07-language_model/wiki_cn_filtered/&#34;</span>)
 </span></span></code></pre></div><h3 id="step-3-数据预处理">Step 3: 数据预处理</h3>
@@ -366,7 +350,7 @@
 </span></span></code></pre></div><hr>
 <h2 id="总结">总结</h2>
 <p>因果自回归模型通过利用已生成的内容来预测下一个单词，实现连贯的文本输出。本文详细解析了其技术原理，并结合代码示例，展示了如何训练一个因果语言模型。希望这篇文章能帮助你更好地理解 Transformer 技术，并将其应用到实际项目中。</p>
-<pre tabindex="0"><code></code></pre></section>
+</section>
 
   
   
@@ -378,15 +362,15 @@
     
     <a
       class="flex w-1/2 items-center rounded-l-md p-6 pr-3 no-underline hover:bg-black/[2%]"
-      href="https://869413421.github.io/post/docker-%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%90%84%E7%A7%8D%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4/"
-      ><span class="mr-1.5">←</span><span></span></a
+      href="https://869413421.github.io/post/transformer/retrieval_chatbot2/"
+      ><span class="mr-1.5">←</span><span>Transformer 学习之路 - 向量召回与排序实战</span></a
     >
     
     
     <a
       class="ml-auto flex w-1/2 items-center justify-end rounded-r-md p-6 pl-3 no-underline hover:bg-black/[2%]"
-      href="https://869413421.github.io/post/transformer/chatbot_ptuning/"
-      ><span></span><span class="ml-1.5">→</span></a
+      href="https://869413421.github.io/post/transformer/summarizatioin/"
+      ><span>Transformer 学习之路 - 基于 T5 的文本摘要</span><span class="ml-1.5">→</span></a
     >
     
   </nav>

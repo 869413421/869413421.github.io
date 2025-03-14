@@ -50,6 +50,20 @@ Prompt Tuning 的基本原理 传统的微调方法通常需要调整整个模�
     </item>
     
     <item>
+      <title>Transformer 学习之路 - Tokenizer 处理流程详解</title>
+      <link>https://869413421.github.io/post/transformer/tokenizer/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/tokenizer/</guid>
+      <description>Tokenizer 处理流程详解 在 Transformer 模型中，Tokenizer（分词器）是将原始文本数据转换为模型可接受的输入格式的关键组件。本文将详细解析 Tokenizer 的处理流程，并结合代码示例帮助读者深入理解其工作原理。
+1. 分词与词典构建 Step1 分词 Tokenizer 的第一步是将文本数据进行分词。分词的方式可以是按字、按词或按子词（subword）进行。分词的目的是将连续的文本分割成离散的单元，以便后续处理。
+from transformers import AutoTokenizer sen = &amp;#34;往者不可谏,来者犹可追&amp;#34; tokenizer = AutoTokenizer.from_pretrained(&amp;#34;uer/roberta-base-finetuned-dianping-chinese&amp;#34;) tokens = tokenizer.tokenize(sen) print(tokens) Step2 构建词典 分词后，Tokenizer 会根据分词结果构建一个词典，将每个词或子词映射到一个唯一的 ID。词典的构建方式取决于是否使用预训练的词向量。如果使用预训练词向量，词典会根据词向量文件进行处理。
+# 查看词典详情 print(tokenizer.vocab) print(tokenizer.vocab_size) 2. 数据转换与填充截断 Step3 数据转换 Tokenizer 将分词后的文本序列转换为数字序列，因为神经网络只接受数字序列作为输入。
+# 将分词结果转换为 ID 序列 ids = tokenizer.convert_tokens_to_ids(tokens) print(ids) # 将 ID 序列转换回分词结果 tokens = tokenizer.convert_ids_to_tokens(ids) print(tokens) # 将分词序列转换为原始字符串 str_sen = tokenizer.convert_tokens_to_string(tokens) print(str_sen) Step4 数据填充与截断 在以 batch 方式输入模型时，需要对过短的数据进行填充，对过长的数据进行截断，以确保所有数据的长度一致。
+# 填充，不足 15 个字会自动填充 0 ids = tokenizer.</description>
+    </item>
+    
+    <item>
       <title>Transformer 学习之路 - 从零开始理解文本分类</title>
       <link>https://869413421.github.io/post/transformer/pipe/</link>
       <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
@@ -95,6 +109,22 @@ accuracy = evaluate.load(&amp;#34;accuracy&amp;#34;) for ref, pred in zip([0,1,0
 3. 代码实现 3.1 读取数据集 首先，我们加载一个法律问答数据集（law_faq.csv），其中包含问题（title）和答案（reply）。
 import pandas as pd data = pd.read_csv(&amp;#39;law_faq.csv&amp;#39;, encoding=&amp;#39;utf-8&amp;#39;) documents = data[&amp;#39;title&amp;#39;].tolist() print(documents[0:5]) # 打印前5个问题 3.2 加载向量模型 使用 sentence-transformers 库加载预训练的向量模型，并将文本转化为向量。
 from sentence_transformers import SentenceTransformer model = SentenceTransformer(&amp;#34;TencentBAC/Conan-embedding-v1&amp;#34;, cache_folder=&amp;#34;cache&amp;#34;) document_vectors = model.encode(documents[0:5], convert_to_numpy=True) print(document_vectors.shape) # 打印向量维度 3.</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 因果语言模型训练实例</title>
+      <link>https://869413421.github.io/post/transformer/causal_lm/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/causal_lm/</guid>
+      <description>Transformer 学习之路 - 因果语言模型训练实例 在自然语言处理（NLP）领域，因果语言模型（Causal Language Model）和自回归模型（Autoregressive Model）是生成任务中的核心概念。它们通过利用已生成的内容来预测下一个单词，从而实现连贯的文本输出。本文将深入解析因果语言模型的技术原理，并结合代码示例，带你一步步实现一个完整的训练流程。
+什么是因果语言模型？ 因果模型关注的是因果关系，旨在理解一个变量对另一个变量的影响。在 NLP 中，因果语言模型通常指的是模型如何根据先前的输入生成后续的输出。换句话说，模型在生成每个单词时，只依赖于之前生成的单词，而不考虑后续单词。
+自回归模型的工作原理 自回归模型是一种生成模型，其中每个输出单词（或 token）的生成依赖于前面生成的单词。这种模型的核心特点是顺序生成，即生成当前单词时只考虑过去的单词。这种结构确保了生成过程的因果性。
+例如，生成句子 &amp;quot;今天天气不错，我想去公园。&amp;quot; 的过程如下：
+初始输入：&amp;quot;今天天气&amp;quot; 模型生成下一个单词：&amp;quot;不错&amp;quot; 当前输入变为：&amp;quot;今天天气不错&amp;quot; 模型再次生成下一个单词：&amp;quot;我想去公园。&amp;quot; 在这个过程中，模型在生成每个单词时只依赖于之前生成的单词，这体现了因果性和自回归性。
+结合因果与自回归 因果自回归模型是一种强大的文本生成工具，广泛应用于对话生成、故事创作等任务。最著名的因果自回归模型是 GPT（Generative Pre-trained Transformer）系列。GPT 模型使用自回归机制生成文本，在输入序列中，模型根据之前的单词生成下一个单词，直到达到指定的长度或遇到结束标记。
+代码实现：训练一个因果语言模型 接下来，我们将通过代码示例，详细讲解如何训练一个因果语言模型。
+Step 1: 导入相关包 from datasets import Dataset from transformers import AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling, Trainer, TrainingArguments Step 2: 加载数据集 ds = Dataset.load_from_disk(&amp;#34;/content/drive/MyDrive/ai-learning/2.NLP Task/07-language_model/wiki_cn_filtered/&amp;#34;) Step 3: 数据预处理 tokenizer = AutoTokenizer.from_pretrained(&amp;#34;Langboat/bloom-389m-zh&amp;#34;) def process_func(examples): contents = [e + tokenizer.eos_token for e in examples[&amp;#34;completion&amp;#34;]] return tokenizer(contents, max_length=384, truncation=True) tokenized_ds = ds.</description>
     </item>
     
     <item>
@@ -250,6 +280,18 @@ import pandas as pd data = pd.read_csv(&amp;#34;/content/drive/MyDrive/ai-learni
 from dual_model import DualModel from transformers import AutoTokenizer dual_model = DualModel.from_pretrained(dual_model_path) dual_model.cuda() dual_model.eval() tokenizer = AutoTokenizer.from_pretrained(&amp;#34;hfl/chinese-macbert-base&amp;#34;) 为什么需要这一步？ 预训练模型已经在大规模数据上进行了训练，能够捕捉到丰富的语言特征。加载这些模型后，我们可以直接使用它们来对文本进行编码，而不需要从头开始训练。
 3. 将问题编码转换为向量 为了进行检索，我们需要将 FAQ 中的问题转换为向量表示。这里我们使用了 DualModel 的 BERT 模型来生成向量。
 import torch from tqdm import tqdm questions = data[&amp;#34;title&amp;#34;].</description>
+    </item>
+    
+    <item>
+      <title>Transformer 学习之路 - 法律标题文本分类实战</title>
+      <link>https://869413421.github.io/post/transformer/classification/</link>
+      <pubDate>Fri, 19 Apr 2024 17:35:18 +0800</pubDate>
+      
+      <guid>https://869413421.github.io/post/transformer/classification/</guid>
+      <description>Transformer 学习之路 - 法律标题文本分类实战 Transformer 模型自 2017 年问世以来，迅速成为自然语言处理（NLP）领域的基石。它通过自注意力机制（Self-Attention）实现了对长距离依赖的高效建模，广泛应用于文本分类、机器翻译、问答系统等任务。本文将以法律标题文本分类为例，详细讲解如何使用 Transformer 技术解决实际问题。
+1. 项目背景与目标 在法律领域，文本分类是一项基础但重要的任务。例如，将法律标题分类为“合同纠纷”、“知识产权”、“劳动法”等类别，有助于快速归档和检索。我们的目标是利用 Transformer 模型，实现法律标题的自动分类。
+2. 环境准备与数据加载 首先，我们需要安装必要的 Python 库，并加载数据集。以下是代码示例：
+! pip install transformers datasets evaluate peft accelerate gradio optimum sentencepiece ! pip install jupyterlab scikit-learn pandas matplotlib tensorboard nltk rouge import evaluate from datasets import load_dataset from transformers import AutoModelForSequenceClassification, AutoTokenizer, TrainingArguments, Trainer, DataCollatorWithPadding # 加载数据集 dataset = load_dataset(&amp;#34;csv&amp;#34;, data_files=&amp;#34;./data.csv&amp;#34;, split=&amp;#34;train&amp;#34;, encoding=&amp;#34;utf-8&amp;#34;) dataset = dataset.filter(lambda x: x[&amp;#34;title&amp;#34;] is not None) 3.</description>
     </item>
     
     <item>

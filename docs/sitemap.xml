@@ -29,6 +29,9 @@
     <loc>https://869413421.github.io/post/transformer/chatbot_prompt_tuning/</loc>
     <lastmod>2024-04-19T17:35:18+08:00</lastmod>
   </url><url>
+    <loc>https://869413421.github.io/post/transformer/tokenizer/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
     <loc>https://869413421.github.io/post/transformer/pipe/</loc>
     <lastmod>2024-04-19T17:35:18+08:00</lastmod>
   </url><url>
@@ -36,6 +39,9 @@
     <lastmod>2024-04-19T17:35:18+08:00</lastmod>
   </url><url>
     <loc>https://869413421.github.io/post/transformer/retrieval_chatbot2/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/causal_lm/</loc>
     <lastmod>2024-04-19T17:35:18+08:00</lastmod>
   </url><url>
     <loc>https://869413421.github.io/post/transformer/summarizatioin/</loc>
@@ -66,6 +72,9 @@
     <lastmod>2024-04-19T17:35:18+08:00</lastmod>
   </url><url>
     <loc>https://869413421.github.io/post/transformer/retrieval_chatbot/</loc>
+    <lastmod>2024-04-19T17:35:18+08:00</lastmod>
+  </url><url>
+    <loc>https://869413421.github.io/post/transformer/classification/</loc>
     <lastmod>2024-04-19T17:35:18+08:00</lastmod>
   </url><url>
     <loc>https://869413421.github.io/post/transformer/1/</loc>
@@ -475,11 +484,7 @@
   </url><url>
     <loc>https://869413421.github.io/post/docker-%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%90%84%E7%A7%8D%E5%AE%89%E8%A3%85%E5%91%BD%E4%BB%A4/</loc>
   </url><url>
-    <loc>https://869413421.github.io/post/transformer/causal_lm/</loc>
-  </url><url>
     <loc>https://869413421.github.io/post/transformer/chatbot_ptuning/</loc>
-  </url><url>
-    <loc>https://869413421.github.io/post/transformer/classification/</loc>
   </url><url>
     <loc>https://869413421.github.io/post/transformer/mrc_simple_version/</loc>
   </url><url>
@@ -488,8 +493,6 @@
     <loc>https://869413421.github.io/post/transformer/ner/</loc>
   </url><url>
     <loc>https://869413421.github.io/post/transformer/summarizatioin_glm/</loc>
-  </url><url>
-    <loc>https://869413421.github.io/post/transformer/tokenizer/</loc>
   </url><url>
     <loc>https://869413421.github.io/series/</loc>
   </url>
